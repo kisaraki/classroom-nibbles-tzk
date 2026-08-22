@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.3",
+    "@types/node": "^22.0.0"
+  },
+  "scripts": {
+    "import:vocabulary": "tsx tools/import-vocabulary.ts",
+    "validate:vocabulary": "tsx tools/validate-vocabulary.ts"
+  }
+}

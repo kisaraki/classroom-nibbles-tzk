@@ -1,0 +1,244 @@
+:root {
+  color: #e9fff9;
+  background: #050b16;
+  font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --accent: #50e3c2;
+  --accent-soft: rgb(80 227 194 / 16%);
+  --panel: rgb(5 13 27 / 84%);
+  --line: rgb(128 235 222 / 25%);
+  --muted: #8aa7ae;
+  --error: #ff8e8e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% 50%, rgb(22 54 69 / 35%), transparent 42%),
+    #050b16;
+}
+
+#app {
+  position: relative;
+  isolation: isolate;
+}
+
+.smoke-scene {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.boot-screen {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: clamp(1rem, 4vw, 4rem);
+  place-items: center end;
+  background:
+    linear-gradient(90deg, transparent 15%, rgb(5 11 22 / 20%) 45%, rgb(5 11 22 / 85%) 100%),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgb(79 227 194 / 2%) 3px 4px);
+}
+
+.boot-screen__panel {
+  width: min(47rem, 100%);
+  max-height: 100%;
+  padding: clamp(1.25rem, 3vw, 2.75rem);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  background: var(--panel);
+  box-shadow: 0 2rem 7rem rgb(0 0 0 / 48%);
+  backdrop-filter: blur(18px);
+}
+
+.boot-screen__eyebrow,
+.boot-screen__phase,
+.boot-screen__status,
+.boot-screen__level-heading,
+.level-card__name {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.boot-screen__eyebrow {
+  margin: 0 0 0.7rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.boot-screen__title {
+  margin: 0;
+  font-size: clamp(3.5rem, 11vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.08em;
+  line-height: 0.86;
+  text-shadow: 0 0 2rem rgb(80 227 194 / 24%);
+}
+
+.boot-screen__phase {
+  margin: 1rem 0 2rem;
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+.boot-screen__status {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.boot-screen__status::before {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: currentcolor;
+  box-shadow: 0 0 0.8rem currentcolor;
+  content: "";
+}
+
+.boot-screen[data-state="ready"] .boot-screen__status {
+  color: var(--accent);
+}
+
+.boot-screen[data-state="loading"] .boot-screen__status::before {
+  animation: boot-pulse 1s ease-in-out infinite alternate;
+}
+
+.boot-screen__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.boot-screen__metric {
+  min-width: 0;
+  padding: 1rem;
+  background: rgb(6 18 33 / 92%);
+}
+
+.boot-screen__metric-label {
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.boot-screen__metric-value {
+  margin: 0;
+  overflow: hidden;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.boot-screen__level-heading {
+  margin: 2rem 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.boot-screen__levels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.level-card {
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--accent-soft);
+}
+
+.level-card__name {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 500;
+}
+
+.level-card__count {
+  margin: 0;
+  color: var(--accent);
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.92rem;
+}
+
+.boot-error {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid rgb(255 142 142 / 45%);
+  background: rgb(88 18 30 / 45%);
+  color: var(--error);
+}
+
+.boot-error[hidden] {
+  display: none;
+}
+
+.boot-error__title {
+  margin: 0 0 0.4rem;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+}
+
+.boot-error__message {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+@keyframes boot-pulse {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .boot-screen {
+    place-items: center;
+  }
+
+  .boot-screen__summary,
+  .boot-screen__levels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-screen__status::before {
+    animation: none !important;
+  }
+}

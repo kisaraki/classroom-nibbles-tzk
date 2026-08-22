@@ -1,0 +1,1403 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "1.0.0-phase0",
+  "generatedOn": "2026-08-22",
+  "source": {
+    "filename": "docs/reference/ceec-vocabulary-level1-6.pdf",
+    "sha256": "b5bf019ec34e6e7e4b121ae865abc9771f205df1fcc08fd8aa1c0c89128c3953",
+    "pages": 75,
+    "declaredWordsPerLevel": 1080,
+    "declaredTotalWords": 6480
+  },
+  "summary": {
+    "parsedSourceRows": 6418,
+    "normalizedPlayableEntries": 6569,
+    "eligibleEntries": 6569,
+    "needsReviewEntries": 113,
+    "uniqueTargetsAcrossAllLevels": 6534,
+    "duplicateTargetGroupsWithinLevel": 35
+  },
+  "byLevel": {
+    "1": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1023,
+      "normalizedPlayableEntries": 1091,
+      "eligibleEntries": 1091,
+      "needsReviewEntries": 30,
+      "uniqueTargets": 1085,
+      "duplicateTargetGroups": 6
+    },
+    "2": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1048,
+      "normalizedPlayableEntries": 1092,
+      "eligibleEntries": 1092,
+      "needsReviewEntries": 21,
+      "uniqueTargets": 1089,
+      "duplicateTargetGroups": 3
+    },
+    "3": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1093,
+      "normalizedPlayableEntries": 1100,
+      "eligibleEntries": 1100,
+      "needsReviewEntries": 3,
+      "uniqueTargets": 1092,
+      "duplicateTargetGroups": 8
+    },
+    "4": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1093,
+      "normalizedPlayableEntries": 1102,
+      "eligibleEntries": 1102,
+      "needsReviewEntries": 34,
+      "uniqueTargets": 1090,
+      "duplicateTargetGroups": 12
+    },
+    "5": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1085,
+      "normalizedPlayableEntries": 1101,
+      "eligibleEntries": 1101,
+      "needsReviewEntries": 11,
+      "uniqueTargets": 1097,
+      "duplicateTargetGroups": 4
+    },
+    "6": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1076,
+      "normalizedPlayableEntries": 1083,
+      "eligibleEntries": 1083,
+      "needsReviewEntries": 14,
+      "uniqueTargets": 1081,
+      "duplicateTargetGroups": 2
+    }
+  },
+  "notes": [
+    "The supplied PDF labels each CEEC level as 1,080 words. Parsed source-row counts are not expected to equal 1,080 because the PDF mixes slash variants, abbreviations, parenthetical forms, multiple senses, and inline synonym annotations.",
+    "Gameplay never parses the PDF at runtime. Runtime data comes from public/data/vocabulary.json.",
+    "Slash is treated as a source-variant separator and is not a gameplay token.",
+    "Supported gameplay tokens are A-Z, SPACE, PERIOD, APOSTROPHE, and HYPHEN.",
+    "Entries marked needsReview are preserved; review status does not automatically make an otherwise token-valid target ineligible.",
+    "No web lookup or silent dictionary correction was used. Source text and Chinese glosses are retained from the supplied PDF extraction."
+  ],
+  "duplicateTargets": [
+    {
+      "sourceLevel": 1,
+      "target": "FALL",
+      "ids": [
+        "ceec-l1-0059-v2-fall",
+        "ceec-l1-0290-v1-fall"
+      ]
+    },
+    {
+      "sourceLevel": 1,
+      "target": "MAY",
+      "ids": [
+        "ceec-l1-0528-v1-may",
+        "ceec-l1-0529-v1-may"
+      ]
+    },
+    {
+      "sourceLevel": 1,
+      "target": "MISS",
+      "ids": [
+        "ceec-l1-0540-v1-miss",
+        "ceec-l1-0541-v1-miss"
+      ]
+    },
+    {
+      "sourceLevel": 1,
+      "target": "SHOP",
+      "ids": [
+        "ceec-l1-0772-v1-shop",
+        "ceec-l1-0773-v1-shop"
+      ]
+    },
+    {
+      "sourceLevel": 1,
+      "target": "STATE",
+      "ids": [
+        "ceec-l1-0842-v1-state",
+        "ceec-l1-0843-v1-state"
+      ]
+    },
+    {
+      "sourceLevel": 1,
+      "target": "SWEET",
+      "ids": [
+        "ceec-l1-0149-v2-sweet",
+        "ceec-l1-0867-v1-sweet"
+      ]
+    },
+    {
+      "sourceLevel": 2,
+      "target": "BACKWARD",
+      "ids": [
+        "ceec-l2-0053-v1-backward",
+        "ceec-l2-0054-v1-backward"
+      ]
+    },
+    {
+      "sourceLevel": 2,
+      "target": "FLASH",
+      "ids": [
+        "ceec-l2-0364-v1-flash",
+        "ceec-l2-0365-v2-flash"
+      ]
+    },
+    {
+      "sourceLevel": 2,
+      "target": "FORWARD",
+      "ids": [
+        "ceec-l2-0384-v1-forward",
+        "ceec-l2-0385-v1-forward"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "ACCOUNT",
+      "ids": [
+        "ceec-l3-0004-v1-account",
+        "ceec-l3-0005-v1-account"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "CAST",
+      "ids": [
+        "ceec-l3-0144-v1-cast",
+        "ceec-l3-0145-v1-cast"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "POP",
+      "ids": [
+        "ceec-l3-0711-v1-pop",
+        "ceec-l3-0712-v1-pop"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "SEAL",
+      "ids": [
+        "ceec-l3-0844-v1-seal",
+        "ceec-l3-0845-v1-seal"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "STRIP",
+      "ids": [
+        "ceec-l3-0936-v1-strip",
+        "ceec-l3-0937-v1-strip"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "STUFF",
+      "ids": [
+        "ceec-l3-0941-v1-stuff",
+        "ceec-l3-0942-v1-stuff"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "TAP",
+      "ids": [
+        "ceec-l3-0975-v1-tap",
+        "ceec-l3-0976-v1-tap"
+      ]
+    },
+    {
+      "sourceLevel": 3,
+      "target": "TEND",
+      "ids": [
+        "ceec-l3-0985-v1-tend",
+        "ceec-l3-0986-v1-tend"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "COMIC",
+      "ids": [
+        "ceec-l4-0178-v1-comic",
+        "ceec-l4-0179-v1-comic"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "CONTENT",
+      "ids": [
+        "ceec-l4-0226-v1-content",
+        "ceec-l4-0227-v1-content"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "COUNTER",
+      "ids": [
+        "ceec-l4-0254-v1-counter",
+        "ceec-l4-0255-v1-counter"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "DIGEST",
+      "ids": [
+        "ceec-l4-0316-v1-digest",
+        "ceec-l4-0317-v1-digest"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "GRAVE",
+      "ids": [
+        "ceec-l4-0510-v1-grave",
+        "ceec-l4-0511-v1-grave"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "LEAN",
+      "ids": [
+        "ceec-l4-0646-v1-lean",
+        "ceec-l4-0647-v1-lean"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "MAKEUP",
+      "ids": [
+        "ceec-l4-0676-v1-makeup",
+        "ceec-l4-0677-v1-makeup"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "OBJECTIVE",
+      "ids": [
+        "ceec-l4-0744-v1-objective",
+        "ceec-l4-0745-v1-objective"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "PROMPT",
+      "ids": [
+        "ceec-l4-0845-v1-prompt",
+        "ceec-l4-0846-v1-prompt"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "RELATIVE",
+      "ids": [
+        "ceec-l4-0893-v1-relative",
+        "ceec-l4-0894-v1-relative"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "STROKE",
+      "ids": [
+        "ceec-l4-0996-v1-stroke",
+        "ceec-l4-0997-v1-stroke"
+      ]
+    },
+    {
+      "sourceLevel": 4,
+      "target": "TAP",
+      "ids": [
+        "ceec-l4-1014-v1-tap",
+        "ceec-l4-1015-v1-tap"
+      ]
+    },
+    {
+      "sourceLevel": 5,
+      "target": "INSURE",
+      "ids": [
+        "ceec-l5-0316-v2-insure",
+        "ceec-l5-0479-v1-insure"
+      ]
+    },
+    {
+      "sourceLevel": 5,
+      "target": "INWARD",
+      "ids": [
+        "ceec-l5-0486-v1-inward",
+        "ceec-l5-0487-v1-inward"
+      ]
+    },
+    {
+      "sourceLevel": 5,
+      "target": "OUTWARD",
+      "ids": [
+        "ceec-l5-0646-v1-outward",
+        "ceec-l5-0647-v1-outward"
+      ]
+    },
+    {
+      "sourceLevel": 5,
+      "target": "UPWARD",
+      "ids": [
+        "ceec-l5-1014-v1-upward",
+        "ceec-l5-1015-v1-upward"
+      ]
+    },
+    {
+      "sourceLevel": 6,
+      "target": "ATTAINMENT",
+      "ids": [
+        "ceec-l6-0082-v1-attainment",
+        "ceec-l6-0083-v1-attainment"
+      ]
+    },
+    {
+      "sourceLevel": 6,
+      "target": "SPOKESPERSON",
+      "ids": [
+        "ceec-l6-0610-v1-spokesperson",
+        "ceec-l6-0895-v1-spokesperson"
+      ]
+    }
+  ],
+  "reviewQueue": [
+    {
+      "id": "ceec-l1-0051-v1-arm",
+      "sourceEntryId": "ceec-src-l1-0051",
+      "sourceLevel": 1,
+      "target": "ARM",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l1-0210-v1-daddy",
+      "sourceEntryId": "ceec-src-l1-0210",
+      "sourceLevel": 1,
+      "target": "DADDY",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0210-v2-dad",
+      "sourceEntryId": "ceec-src-l1-0210",
+      "sourceLevel": 1,
+      "target": "DAD",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0210-v3-papa",
+      "sourceEntryId": "ceec-src-l1-0210",
+      "sourceLevel": 1,
+      "target": "PAPA",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0210-v4-pa",
+      "sourceEntryId": "ceec-src-l1-0210",
+      "sourceLevel": 1,
+      "target": "PA",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0210-v5-pop",
+      "sourceEntryId": "ceec-src-l1-0210",
+      "sourceLevel": 1,
+      "target": "POP",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0282-v1-examination",
+      "sourceEntryId": "ceec-src-l1-0282",
+      "sourceLevel": 1,
+      "target": "EXAMINATION",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0282-v2-exam",
+      "sourceEntryId": "ceec-src-l1-0282",
+      "sourceLevel": 1,
+      "target": "EXAM",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0368-v1-grandfather",
+      "sourceEntryId": "ceec-src-l1-0368",
+      "sourceLevel": 1,
+      "target": "GRANDFATHER",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0368-v2-grandpa",
+      "sourceEntryId": "ceec-src-l1-0368",
+      "sourceLevel": 1,
+      "target": "GRANDPA",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0369-v1-grandmother",
+      "sourceEntryId": "ceec-src-l1-0369",
+      "sourceLevel": 1,
+      "target": "GRANDMOTHER",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0369-v2-grandma",
+      "sourceEntryId": "ceec-src-l1-0369",
+      "sourceLevel": 1,
+      "target": "GRANDMA",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0506-v1-live",
+      "sourceEntryId": "ceec-src-l1-0506",
+      "sourceLevel": 1,
+      "target": "LIVE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l1-0514-v1-lunch",
+      "sourceEntryId": "ceec-src-l1-0514",
+      "sourceLevel": 1,
+      "target": "LUNCH",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0514-v2-luncheon",
+      "sourceEntryId": "ceec-src-l1-0514",
+      "sourceLevel": 1,
+      "target": "LUNCHEON",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0544-v1-mommy",
+      "sourceEntryId": "ceec-src-l1-0544",
+      "sourceLevel": 1,
+      "target": "MOMMY",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0544-v2-momma",
+      "sourceEntryId": "ceec-src-l1-0544",
+      "sourceLevel": 1,
+      "target": "MOMMA",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0544-v3-mom",
+      "sourceEntryId": "ceec-src-l1-0544",
+      "sourceLevel": 1,
+      "target": "MOM",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0626-v1-pants",
+      "sourceEntryId": "ceec-src-l1-0626",
+      "sourceLevel": 1,
+      "target": "PANTS",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0626-v2-trousers",
+      "sourceEntryId": "ceec-src-l1-0626",
+      "sourceLevel": 1,
+      "target": "TROUSERS",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0634-v1-pay",
+      "sourceEntryId": "ceec-src-l1-0634",
+      "sourceLevel": 1,
+      "target": "PAY",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l1-0634-v2-payment",
+      "sourceEntryId": "ceec-src-l1-0634",
+      "sourceLevel": 1,
+      "target": "PAYMENT",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l1-0657-v1-policeman",
+      "sourceEntryId": "ceec-src-l1-0657",
+      "sourceLevel": 1,
+      "target": "POLICEMAN",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0657-v2-cop",
+      "sourceEntryId": "ceec-src-l1-0657",
+      "sourceLevel": 1,
+      "target": "COP",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0876-v1-taxicab",
+      "sourceEntryId": "ceec-src-l1-0876",
+      "sourceLevel": 1,
+      "target": "TAXICAB",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0876-v2-taxi",
+      "sourceEntryId": "ceec-src-l1-0876",
+      "sourceLevel": 1,
+      "target": "TAXI",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0876-v3-cab",
+      "sourceEntryId": "ceec-src-l1-0876",
+      "sourceLevel": 1,
+      "target": "CAB",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0904-v1-thursday",
+      "sourceEntryId": "ceec-src-l1-0904",
+      "sourceLevel": 1,
+      "target": "THURSDAY",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0904-v2-thurs",
+      "sourceEntryId": "ceec-src-l1-0904",
+      "sourceLevel": 1,
+      "target": "THURS.",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l1-0904-v3-thur",
+      "sourceEntryId": "ceec-src-l1-0904",
+      "sourceLevel": 1,
+      "target": "THUR.",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l2-0030-v1-anywhere",
+      "sourceEntryId": "ceec-src-l2-0030",
+      "sourceLevel": 2,
+      "target": "ANYWHERE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l2-0030-v2-anyplace",
+      "sourceEntryId": "ceec-src-l2-0030",
+      "sourceLevel": 2,
+      "target": "ANYPLACE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l2-0043-v1-article",
+      "sourceEntryId": "ceec-src-l2-0043",
+      "sourceLevel": 2,
+      "target": "ARTICLE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0043-v2-essay",
+      "sourceEntryId": "ceec-src-l2-0043",
+      "sourceLevel": 2,
+      "target": "ESSAY",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0068-v1-bear",
+      "sourceEntryId": "ceec-src-l2-0068",
+      "sourceLevel": 2,
+      "target": "BEAR",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0101-v1-bow",
+      "sourceEntryId": "ceec-src-l2-0101",
+      "sourceLevel": 2,
+      "target": "BOW",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0250-v1-desert",
+      "sourceEntryId": "ceec-src-l2-0250",
+      "sourceLevel": 2,
+      "target": "DESERT",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0402-v1-general",
+      "sourceEntryId": "ceec-src-l2-0402",
+      "sourceLevel": 2,
+      "target": "GENERAL",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction",
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0568-v1-measure",
+      "sourceEntryId": "ceec-src-l2-0568",
+      "sourceLevel": 2,
+      "target": "MEASURE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0568-v2-measurement",
+      "sourceEntryId": "ceec-src-l2-0568",
+      "sourceLevel": 2,
+      "target": "MEASUREMENT",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0594-v1-mrt",
+      "sourceEntryId": "ceec-src-l2-0594",
+      "sourceLevel": 2,
+      "target": "MRT",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l2-0594-v2-mass-rapid-transit",
+      "sourceEntryId": "ceec-src-l2-0594",
+      "sourceLevel": 2,
+      "target": "MASS RAPID TRANSIT",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l2-0628-v1-object",
+      "sourceEntryId": "ceec-src-l2-0628",
+      "sourceLevel": 2,
+      "target": "OBJECT",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0688-v1-ping-pong",
+      "sourceEntryId": "ceec-src-l2-0688",
+      "sourceLevel": 2,
+      "target": "PING-PONG",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l2-0688-v2-table-tennis",
+      "sourceEntryId": "ceec-src-l2-0688",
+      "sourceLevel": 2,
+      "target": "TABLE TENNIS",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l2-0739-v1-project",
+      "sourceEntryId": "ceec-src-l2-0739",
+      "sourceLevel": 2,
+      "target": "PROJECT",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0771-v1-refrigerator",
+      "sourceEntryId": "ceec-src-l2-0771",
+      "sourceLevel": 2,
+      "target": "REFRIGERATOR",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l2-0771-v2-fridge",
+      "sourceEntryId": "ceec-src-l2-0771",
+      "sourceLevel": 2,
+      "target": "FRIDGE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l2-0771-v3-icebox",
+      "sourceEntryId": "ceec-src-l2-0771",
+      "sourceLevel": 2,
+      "target": "ICEBOX",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l2-0926-v1-tear",
+      "sourceEntryId": "ceec-src-l2-0926",
+      "sourceLevel": 2,
+      "target": "TEAR",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l2-0994-v1-used-to",
+      "sourceEntryId": "ceec-src-l2-0994",
+      "sourceLevel": 2,
+      "target": "USED TO",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction",
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l3-0034-v1-angel",
+      "sourceEntryId": "ceec-src-l3-0034",
+      "sourceLevel": 3,
+      "target": "ANGEL",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l3-0584-v1-memorize",
+      "sourceEntryId": "ceec-src-l3-0584",
+      "sourceLevel": 3,
+      "target": "MEMORIZE",
+      "reasons": [
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l3-0585-v1-mend",
+      "sourceEntryId": "ceec-src-l3-0585",
+      "sourceLevel": 3,
+      "target": "MEND",
+      "reasons": [
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l4-0040-v1-a-m",
+      "sourceEntryId": "ceec-src-l4-0040",
+      "sourceLevel": 4,
+      "target": "A.M.",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l4-0040-v2-am",
+      "sourceEntryId": "ceec-src-l4-0040",
+      "sourceLevel": 4,
+      "target": "AM",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l4-0068-v1-article",
+      "sourceEntryId": "ceec-src-l4-0068",
+      "sourceLevel": 4,
+      "target": "ARTICLE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0085-v1-atm",
+      "sourceEntryId": "ceec-src-l4-0085",
+      "sourceLevel": 4,
+      "target": "ATM",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l4-0106-v1-beam",
+      "sourceEntryId": "ceec-src-l4-0106",
+      "sourceLevel": 4,
+      "target": "BEAM",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0145-v1-cd",
+      "sourceEntryId": "ceec-src-l4-0145",
+      "sourceLevel": 4,
+      "target": "CD",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l4-0178-v1-comic",
+      "sourceEntryId": "ceec-src-l4-0178",
+      "sourceLevel": 4,
+      "target": "COMIC",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0179-v1-comic",
+      "sourceEntryId": "ceec-src-l4-0179",
+      "sourceLevel": 4,
+      "target": "COMIC",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0179-v2-comics",
+      "sourceEntryId": "ceec-src-l4-0179",
+      "sourceLevel": 4,
+      "target": "COMICS",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0254-v1-counter",
+      "sourceEntryId": "ceec-src-l4-0254",
+      "sourceLevel": 4,
+      "target": "COUNTER",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0255-v1-counter",
+      "sourceEntryId": "ceec-src-l4-0255",
+      "sourceLevel": 4,
+      "target": "COUNTER",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0316-v1-digest",
+      "sourceEntryId": "ceec-src-l4-0316",
+      "sourceLevel": 4,
+      "target": "DIGEST",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0317-v1-digest",
+      "sourceEntryId": "ceec-src-l4-0317",
+      "sourceLevel": 4,
+      "target": "DIGEST",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0355-v1-dvd",
+      "sourceEntryId": "ceec-src-l4-0355",
+      "sourceLevel": 4,
+      "target": "DVD",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l4-0510-v1-grave",
+      "sourceEntryId": "ceec-src-l4-0510",
+      "sourceLevel": 4,
+      "target": "GRAVE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0511-v1-grave",
+      "sourceEntryId": "ceec-src-l4-0511",
+      "sourceLevel": 4,
+      "target": "GRAVE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0645-v1-lead",
+      "sourceEntryId": "ceec-src-l4-0645",
+      "sourceLevel": 4,
+      "target": "LEAD",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0646-v1-lean",
+      "sourceEntryId": "ceec-src-l4-0646",
+      "sourceLevel": 4,
+      "target": "LEAN",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0647-v1-lean",
+      "sourceEntryId": "ceec-src-l4-0647",
+      "sourceLevel": 4,
+      "target": "LEAN",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0676-v1-makeup",
+      "sourceEntryId": "ceec-src-l4-0676",
+      "sourceLevel": 4,
+      "target": "MAKEUP",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0677-v1-makeup",
+      "sourceEntryId": "ceec-src-l4-0677",
+      "sourceLevel": 4,
+      "target": "MAKEUP",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0685-v1-measure",
+      "sourceEntryId": "ceec-src-l4-0685",
+      "sourceLevel": 4,
+      "target": "MEASURE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0718-v1-mtv",
+      "sourceEntryId": "ceec-src-l4-0718",
+      "sourceLevel": 4,
+      "target": "MTV",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l4-0744-v1-objective",
+      "sourceEntryId": "ceec-src-l4-0744",
+      "sourceLevel": 4,
+      "target": "OBJECTIVE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0745-v1-objective",
+      "sourceEntryId": "ceec-src-l4-0745",
+      "sourceLevel": 4,
+      "target": "OBJECTIVE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0845-v1-prompt",
+      "sourceEntryId": "ceec-src-l4-0845",
+      "sourceLevel": 4,
+      "target": "PROMPT",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0846-v1-prompt",
+      "sourceEntryId": "ceec-src-l4-0846",
+      "sourceLevel": 4,
+      "target": "PROMPT",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0893-v1-relative",
+      "sourceEntryId": "ceec-src-l4-0893",
+      "sourceLevel": 4,
+      "target": "RELATIVE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0894-v1-relative",
+      "sourceEntryId": "ceec-src-l4-0894",
+      "sourceLevel": 4,
+      "target": "RELATIVE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0996-v1-stroke",
+      "sourceEntryId": "ceec-src-l4-0996",
+      "sourceLevel": 4,
+      "target": "STROKE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-0997-v1-stroke",
+      "sourceEntryId": "ceec-src-l4-0997",
+      "sourceLevel": 4,
+      "target": "STROKE",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-1014-v1-tap",
+      "sourceEntryId": "ceec-src-l4-1014",
+      "sourceLevel": 4,
+      "target": "TAP",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-1015-v1-tap",
+      "sourceEntryId": "ceec-src-l4-1015",
+      "sourceLevel": 4,
+      "target": "TAP",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l4-1065-v1-very",
+      "sourceEntryId": "ceec-src-l4-1065",
+      "sourceLevel": 4,
+      "target": "VERY",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l5-0023-v1-ai",
+      "sourceEntryId": "ceec-src-l5-0023",
+      "sourceLevel": 5,
+      "target": "AI",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0023-v2-artificial-intelligence",
+      "sourceEntryId": "ceec-src-l5-0023",
+      "sourceLevel": 5,
+      "target": "ARTIFICIAL INTELLIGENCE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0150-v1-cell-phone",
+      "sourceEntryId": "ceec-src-l5-0150",
+      "sourceLevel": 5,
+      "target": "CELL-PHONE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0150-v2-cellphone",
+      "sourceEntryId": "ceec-src-l5-0150",
+      "sourceLevel": 5,
+      "target": "CELLPHONE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0150-v3-cellular-phone",
+      "sourceEntryId": "ceec-src-l5-0150",
+      "sourceLevel": 5,
+      "target": "CELLULAR PHONE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0150-v4-mobile-phone",
+      "sourceEntryId": "ceec-src-l5-0150",
+      "sourceLevel": 5,
+      "target": "MOBILE PHONE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0152-v1-celsius",
+      "sourceEntryId": "ceec-src-l5-0152",
+      "sourceLevel": 5,
+      "target": "CELSIUS",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0152-v2-centigrade",
+      "sourceEntryId": "ceec-src-l5-0152",
+      "sourceLevel": 5,
+      "target": "CENTIGRADE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l5-0580-v1-mold",
+      "sourceEntryId": "ceec-src-l5-0580",
+      "sourceLevel": 5,
+      "target": "MOLD",
+      "reasons": [
+        "source_headword_contains_digit_or_sense_marker"
+      ]
+    },
+    {
+      "id": "ceec-l5-0949-v1-swamp",
+      "sourceEntryId": "ceec-src-l5-0949",
+      "sourceLevel": 5,
+      "target": "SWAMP",
+      "reasons": [
+        "auto_repaired_extraction_spacing"
+      ]
+    },
+    {
+      "id": "ceec-l5-1083-v1-zone-improvement-plan",
+      "sourceEntryId": "ceec-src-l5-1083",
+      "sourceLevel": 5,
+      "target": "ZONE IMPROVEMENT PLAN",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l6-0031-v1-administer",
+      "sourceEntryId": "ceec-src-l6-0031",
+      "sourceLevel": 6,
+      "target": "ADMINISTER",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0031-v2-administrate",
+      "sourceEntryId": "ceec-src-l6-0031",
+      "sourceLevel": 6,
+      "target": "ADMINISTRATE",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0380-v1-eq",
+      "sourceEntryId": "ceec-src-l6-0380",
+      "sourceLevel": 6,
+      "target": "EQ",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l6-0380-v2-emotional-quotient",
+      "sourceEntryId": "ceec-src-l6-0380",
+      "sourceLevel": 6,
+      "target": "EMOTIONAL QUOTIENT",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l6-0456-v1-gmo",
+      "sourceEntryId": "ceec-src-l6-0456",
+      "sourceLevel": 6,
+      "target": "GMO",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0456-v2-genetically-modified-organism",
+      "sourceEntryId": "ceec-src-l6-0456",
+      "sourceLevel": 6,
+      "target": "GENETICALLY MODIFIED ORGANISM",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0541-v1-iq",
+      "sourceEntryId": "ceec-src-l6-0541",
+      "sourceLevel": 6,
+      "target": "IQ",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0541-v2-intelligence-quotient",
+      "sourceEntryId": "ceec-src-l6-0541",
+      "sourceLevel": 6,
+      "target": "INTELLIGENCE QUOTIENT",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0674-v1-personal-digital-assistant",
+      "sourceEntryId": "ceec-src-l6-0674",
+      "sourceLevel": 6,
+      "target": "PERSONAL DIGITAL ASSISTANT",
+      "reasons": [
+        "source_parse_nopron",
+        "missing_pronunciation_in_extraction"
+      ]
+    },
+    {
+      "id": "ceec-l6-0895-v1-spokesperson",
+      "sourceEntryId": "ceec-src-l6-0895",
+      "sourceLevel": 6,
+      "target": "SPOKESPERSON",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0895-v2-spokesman",
+      "sourceEntryId": "ceec-src-l6-0895",
+      "sourceLevel": 6,
+      "target": "SPOKESMAN",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-0895-v3-spokeswoman",
+      "sourceEntryId": "ceec-src-l6-0895",
+      "sourceLevel": 6,
+      "target": "SPOKESWOMAN",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-1066-v1-waterproof",
+      "sourceEntryId": "ceec-src-l6-1066",
+      "sourceLevel": 6,
+      "target": "WATERPROOF",
+      "reasons": [
+        "source_parse_split"
+      ]
+    },
+    {
+      "id": "ceec-l6-1066-v2-watertight",
+      "sourceEntryId": "ceec-src-l6-1066",
+      "sourceLevel": 6,
+      "target": "WATERTIGHT",
+      "reasons": [
+        "source_parse_split"
+      ]
+    }
+  ]
+}

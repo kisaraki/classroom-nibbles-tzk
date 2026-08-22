@@ -1,0 +1,141 @@
+{
+  "bundle": "NIBBLES Phase 0",
+  "generatedOn": "2026-08-22",
+  "sourcePdfSha256": "b5bf019ec34e6e7e4b121ae865abc9771f205df1fcc08fd8aa1c0c89128c3953",
+  "phase0Summary": {
+    "parsedSourceRows": 6418,
+    "normalizedPlayableEntries": 6569,
+    "eligibleEntries": 6569,
+    "needsReviewEntries": 113,
+    "uniqueTargetsAcrossAllLevels": 6534,
+    "duplicateTargetGroupsWithinLevel": 35
+  },
+  "byLevel": {
+    "1": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1023,
+      "normalizedPlayableEntries": 1091,
+      "eligibleEntries": 1091,
+      "needsReviewEntries": 30,
+      "uniqueTargets": 1085,
+      "duplicateTargetGroups": 6
+    },
+    "2": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1048,
+      "normalizedPlayableEntries": 1092,
+      "eligibleEntries": 1092,
+      "needsReviewEntries": 21,
+      "uniqueTargets": 1089,
+      "duplicateTargetGroups": 3
+    },
+    "3": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1093,
+      "normalizedPlayableEntries": 1100,
+      "eligibleEntries": 1100,
+      "needsReviewEntries": 3,
+      "uniqueTargets": 1092,
+      "duplicateTargetGroups": 8
+    },
+    "4": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1093,
+      "normalizedPlayableEntries": 1102,
+      "eligibleEntries": 1102,
+      "needsReviewEntries": 34,
+      "uniqueTargets": 1090,
+      "duplicateTargetGroups": 12
+    },
+    "5": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1085,
+      "normalizedPlayableEntries": 1101,
+      "eligibleEntries": 1101,
+      "needsReviewEntries": 11,
+      "uniqueTargets": 1097,
+      "duplicateTargetGroups": 4
+    },
+    "6": {
+      "sourceHeadingWordCount": 1080,
+      "parsedSourceRows": 1076,
+      "normalizedPlayableEntries": 1083,
+      "eligibleEntries": 1083,
+      "needsReviewEntries": 14,
+      "uniqueTargets": 1081,
+      "duplicateTargetGroups": 2
+    }
+  },
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 3242,
+      "sha256": "9a73fbc595665dff0fb0616430ccac4c9be30767a7aa62b7b27e48c1c104bae8"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 812,
+      "sha256": "f5000aef5f7172fd4358a2fd7d4fc9d9cc0d9c15bfda03c85affa3c6f3b6c2e9"
+    },
+    {
+      "path": "PHASE-00-README.md",
+      "bytes": 1602,
+      "sha256": "0e92f11777ffec984596eef5aaee1692c53d541719414daea257d887b670dcc8"
+    },
+    {
+      "path": "PHASE-01-CODEX.md",
+      "bytes": 6643,
+      "sha256": "6591fa51a5589e81f84e25712766f0613465952bb3eee36dd7f18188def6963f"
+    },
+    {
+      "path": "SPEC.md",
+      "bytes": 8924,
+      "sha256": "e266cf880baa8b32137d4f96b5072b98952ad53f25bb7a0ab9d13f5f35bba936"
+    },
+    {
+      "path": "data/source/ceec-vocabulary-source.json",
+      "bytes": 2470342,
+      "sha256": "790f07dfb9261239e0530d5b037cab44d5769a44b1ca84a86b6107597f08c768"
+    },
+    {
+      "path": "docs/reference/ceec-vocabulary-level1-6.pdf",
+      "bytes": 1690437,
+      "sha256": "b5bf019ec34e6e7e4b121ae865abc9771f205df1fcc08fd8aa1c0c89128c3953"
+    },
+    {
+      "path": "package.phase0-snippet.json",
+      "bytes": 250,
+      "sha256": "87272621669d721fdbdadafffe7d45fff6b67c87bb5e69344eefc3c94b4f40c4"
+    },
+    {
+      "path": "public/data/vocabulary-import-report.json",
+      "bytes": 33291,
+      "sha256": "1391985b84449c864208bddb78c1e8dfed43f699da4d731a9b832ee017a521db"
+    },
+    {
+      "path": "public/data/vocabulary.json",
+      "bytes": 4163624,
+      "sha256": "d25cfe37c012bfc831fab75ccd9bdd3c01ca1865343b1a7bb0284e7a31502200"
+    },
+    {
+      "path": "tools/import-vocabulary.ts",
+      "bytes": 3672,
+      "sha256": "ab35786a5af9f9f3e3428a17348cfe2cad0bd29f92edc40ee71700c47f9a9c4e"
+    },
+    {
+      "path": "tools/validate-vocabulary.ts",
+      "bytes": 2438,
+      "sha256": "3df25a1b8f60c0c14b689c742716c1e597a825cce53d85cbd47576b563c28312"
+    },
+    {
+      "path": "tools/vocabulary-normalizer.ts",
+      "bytes": 4906,
+      "sha256": "a1e7e47e4660fa8ef42280e500487f5b0b1fc47402e280b78b98fa2e7a143989"
+    },
+    {
+      "path": "tools/vocabulary-types.ts",
+      "bytes": 1466,
+      "sha256": "90f3a4b48da98acab9e588d1ea8998c7301b442f3abef80e81b92e502ec6ae92"
+    }
+  ]
+}
