@@ -27,6 +27,9 @@ function clampLength(length: number, config: SnakeConfig): number {
 export class Snake {
   readonly #config: SnakeConfig;
   readonly #trail: Trail;
+  readonly #initialPosition: XZPoint;
+  readonly #initialDirection: DirectionValue;
+  readonly #initialLength: number;
   #headPosition: XZPoint;
   #direction: DirectionValue;
   #length: number;
@@ -41,9 +44,12 @@ export class Snake {
       throw new Error("Invalid snake configuration.");
     }
     this.#config = config;
-    this.#headPosition = initial.position ? { ...initial.position } : { x: 0, z: 0 };
-    this.#direction = initial.direction ?? Direction.NORTH;
-    this.#length = clampLength(initial.length ?? config.initialLength, config);
+    this.#initialPosition = initial.position ? { ...initial.position } : { x: 0, z: 0 };
+    this.#initialDirection = initial.direction ?? Direction.NORTH;
+    this.#initialLength = clampLength(initial.length ?? config.initialLength, config);
+    this.#headPosition = { ...this.#initialPosition };
+    this.#direction = this.#initialDirection;
+    this.#length = this.#initialLength;
     const maximumTrailDistance = config.maximumLength * config.segmentSpacing;
     this.#trail = new Trail(this.#headPosition, this.#direction, maximumTrailDistance);
   }
@@ -99,6 +105,13 @@ export class Snake {
 
   shrink(amount = 1): void {
     this.setLength(this.#length - amount);
+  }
+
+  reset(): void {
+    this.#headPosition = { ...this.#initialPosition };
+    this.#direction = this.#initialDirection;
+    this.#length = this.#initialLength;
+    this.#trail.reset(this.#headPosition, this.#direction);
   }
 
   getSegmentPositions(): readonly XZPoint[] {

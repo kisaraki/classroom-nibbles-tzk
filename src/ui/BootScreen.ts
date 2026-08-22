@@ -30,29 +30,29 @@ export class BootScreen {
     this.#element = createElement("section", "boot-screen");
     this.#element.dataset.testid = "boot-screen";
 
-    const eyebrow = createElement("p", "boot-screen__eyebrow", "SYSTEM BOOTSTRAP / 03");
+    const eyebrow = createElement("p", "boot-screen__eyebrow", "系統啟動 / 03");
     const heading = createElement("h1", "boot-screen__title", APP_CONFIG.title);
-    const phase = createElement("p", "boot-screen__phase", `${APP_CONFIG.phaseLabel} — DATA LINK`);
+    const phase = createElement("p", "boot-screen__phase", `${APP_CONFIG.phaseLabel} — 資料連線`);
 
-    this.#status = createElement("p", "boot-screen__status", "LOADING DATASET…");
+    this.#status = createElement("p", "boot-screen__status", "正在載入字彙資料…");
     this.#status.dataset.testid = "boot-status";
     this.#status.setAttribute("role", "status");
 
     const summary = createElement("dl", "boot-screen__summary");
-    this.#dataVersion = this.#appendMetric(summary, "Data version", "—", "data-version");
-    this.#totalEntries = this.#appendMetric(summary, "Total entries", "—", "total-entries");
+    this.#dataVersion = this.#appendMetric(summary, "資料版本", "—", "data-version");
+    this.#totalEntries = this.#appendMetric(summary, "字彙總數", "—", "total-entries");
     this.#eligibleEntries = this.#appendMetric(
       summary,
-      "Eligible entries",
+      "可遊玩字彙",
       "—",
       "eligible-entries",
     );
 
-    const levelHeading = createElement("h2", "boot-screen__level-heading", "CEEC LEVEL INDEX");
+    const levelHeading = createElement("h2", "boot-screen__level-heading", "CEEC 級別索引");
     const levelGrid = createElement("div", "boot-screen__levels");
     for (const level of CEEC_LEVELS) {
       const card = createElement("article", "level-card");
-      card.append(createElement("h3", "level-card__name", `CEEC Level ${level}`));
+      card.append(createElement("h3", "level-card__name", `CEEC 第 ${level} 級`));
       const count = createElement("p", "level-card__count", "—");
       count.dataset.testid = `level-${level}-count`;
       card.append(count);
@@ -66,7 +66,7 @@ export class BootScreen {
     this.#errorPanel.setAttribute("role", "alert");
     this.#errorPanel.hidden = true;
     this.#errorPanel.append(
-      createElement("h2", "boot-error__title", "VOCABULARY LINK FAILED"),
+      createElement("h2", "boot-error__title", "字彙資料連線失敗"),
       this.#errorMessage,
     );
 
@@ -87,13 +87,13 @@ export class BootScreen {
 
   setLoading(): void {
     this.#element.dataset.state = "loading";
-    this.#status.textContent = "LOADING DATASET…";
+    this.#status.textContent = "正在載入字彙資料…";
     this.#errorPanel.hidden = true;
   }
 
   showMetadata(metadata: VocabularyMetadata): void {
     this.#element.dataset.state = "ready";
-    this.#status.textContent = "DATASET ONLINE";
+    this.#status.textContent = "字彙資料已就緒";
     setValue(this.#dataVersion, metadata.dataVersion);
     setValue(this.#totalEntries, metadata.totalEntries.toLocaleString("en-US"));
     setValue(this.#eligibleEntries, metadata.eligibleEntries.toLocaleString("en-US"));
@@ -101,18 +101,18 @@ export class BootScreen {
       const count = metadata.levels[level];
       setValue(
         this.#levelCounts.get(level)!,
-        `${count.eligible.toLocaleString("en-US")} eligible`,
+        `${count.eligible.toLocaleString("zh-TW")} 筆可用`,
       );
     }
     this.#errorPanel.hidden = true;
   }
 
   showError(error: unknown): void {
+    console.error("字彙資料載入失敗", error);
     this.#element.hidden = false;
     this.#element.dataset.state = "error";
-    this.#status.textContent = "BOOT DEGRADED";
-    this.#errorMessage.textContent =
-      error instanceof Error ? error.message : "An unknown boot error occurred.";
+    this.#status.textContent = "系統啟動異常";
+    this.#errorMessage.textContent = "無法載入字彙資料，請重新整理頁面後再試。";
     this.#errorPanel.hidden = false;
   }
 

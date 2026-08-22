@@ -28,7 +28,7 @@ export class PhaseThreeScene {
     this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.#renderer.domElement.className = "phase-three-scene";
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
-    this.#renderer.domElement.setAttribute("aria-label", "Three.js Phase 3 vocabulary arena");
+    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第三階段字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
     this.#scene.background = new THREE.Color(APP_CONFIG.scene.backgroundColor);

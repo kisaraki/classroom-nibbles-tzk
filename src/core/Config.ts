@@ -1,6 +1,6 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "PHASE 3",
+  phaseLabel: "第三階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     backgroundColor: 0x050b16,
@@ -35,6 +35,10 @@ export const GAMEPLAY_CONFIG = Object.freeze({
     stunDurationSeconds: 1,
     recoveryDurationSeconds: 0.5,
   }),
+  noProgress: Object.freeze({
+    restartAfterSeconds: 20,
+    warningAtSeconds: 10,
+  }),
   token: Object.freeze({
     radius: 0.34,
     collisionRadius: 0.36,
@@ -55,35 +59,35 @@ export const GAMEPLAY_CONFIG = Object.freeze({
 export const GAME_LEVEL_CONFIGS = Object.freeze([
   Object.freeze({
     gameLevel: 1 as const,
-    sceneName: "Cargo Bay",
+    sceneName: "貨艙",
     maximumTokenLength: 5 as number | null,
     wordsPerScene: 5,
     durationSeconds: 120,
   }),
   Object.freeze({
     gameLevel: 2 as const,
-    sceneName: "Ship Pipeline",
+    sceneName: "艦艇管線",
     maximumTokenLength: 8 as number | null,
     wordsPerScene: 5,
     durationSeconds: 90,
   }),
   Object.freeze({
     gameLevel: 3 as const,
-    sceneName: "Asteroid Belt",
+    sceneName: "小行星帶",
     maximumTokenLength: 10 as number | null,
     wordsPerScene: 5,
     durationSeconds: 90,
   }),
   Object.freeze({
     gameLevel: 4 as const,
-    sceneName: "Dense Atmosphere",
+    sceneName: "稠密大氣層",
     maximumTokenLength: null,
     wordsPerScene: 5,
     durationSeconds: 90,
   }),
   Object.freeze({
     gameLevel: 5 as const,
-    sceneName: "Alien Forest",
+    sceneName: "異星森林",
     maximumTokenLength: null,
     wordsPerScene: 5,
     durationSeconds: 60,

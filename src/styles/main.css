@@ -10,6 +10,7 @@
   --line: rgb(128 235 222 / 25%);
   --muted: #8aa7ae;
   --error: #ff8e8e;
+  --warning: #ffd166;
 }
 
 * {
@@ -105,7 +106,7 @@ body {
 }
 
 .phase-three-panel__mission {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 1rem;
 }
 
@@ -217,6 +218,25 @@ body {
 }
 
 .phase-three-panel__message[hidden] {
+  display: none;
+}
+
+.phase-three-panel__countdown {
+  margin: 0 0 0.75rem;
+  padding: 0.8rem;
+  border: 2px solid var(--warning);
+  background: rgb(112 65 0 / 48%);
+  box-shadow: 0 0 1.5rem rgb(255 209 102 / 22%);
+  color: #fff4c9;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  animation: countdown-alert 0.65s ease-in-out infinite alternate;
+}
+
+.phase-three-panel__countdown[hidden] {
   display: none;
 }
 
@@ -350,6 +370,17 @@ body {
   }
   to {
     outline-offset: 5px;
+  }
+}
+
+@keyframes countdown-alert {
+  from {
+    border-color: var(--warning);
+    transform: scale(1);
+  }
+  to {
+    border-color: #fff;
+    transform: scale(1.012);
   }
 }
 
@@ -562,6 +593,10 @@ body {
   }
 
   .phase-three-panel__target-token[data-status="next"] {
+    animation: none;
+  }
+
+  .phase-three-panel__countdown {
     animation: none;
   }
 }

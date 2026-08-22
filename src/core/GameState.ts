@@ -67,7 +67,10 @@ const GAME_TRANSITIONS: TransitionMap<GameState> = Object.freeze({
     GameState.MAP_EXPANDED,
   ]),
   [GameState.LEVEL_CLEAR]: Object.freeze([GameState.TRANSITION_IN, GameState.GAME_CLEAR]),
-  [GameState.LEVEL_FAILED]: Object.freeze([GameState.MAIN_MENU]),
+  [GameState.LEVEL_FAILED]: Object.freeze([
+    GameState.MAIN_MENU,
+    GameState.TRANSITION_IN,
+  ]),
   [GameState.GAME_CLEAR]: Object.freeze([GameState.CREDITS]),
   [GameState.CREDITS]: Object.freeze([GameState.MAIN_MENU]),
 });

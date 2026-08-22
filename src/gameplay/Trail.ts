@@ -41,15 +41,20 @@ export class Trail {
 
   constructor(origin: XZPoint, initialDirection: Direction, maximumDistance: number) {
     if (maximumDistance <= 0) throw new Error("Trail maximumDistance must be positive.");
-    const forward = directionVector(initialDirection);
     this.#maximumDistance = maximumDistance;
-    this.#points = [
+    this.#points = [];
+    this.reset(origin, initialDirection);
+  }
+
+  reset(origin: XZPoint, initialDirection: Direction): void {
+    const forward = directionVector(initialDirection);
+    this.#points.splice(0, this.#points.length,
       copyPoint(origin),
       {
-        x: origin.x - forward.x * maximumDistance,
-        z: origin.z - forward.z * maximumDistance,
+        x: origin.x - forward.x * this.#maximumDistance,
+        z: origin.z - forward.z * this.#maximumDistance,
       },
-    ];
+    );
   }
 
   record(position: XZPoint): void {

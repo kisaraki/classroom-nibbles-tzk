@@ -39,7 +39,7 @@ export function fixedLevelForMode(mode: VocabularyMode): VocabularyLevel | null 
 
 export function vocabularyModeLabel(mode: VocabularyMode): string {
   const fixedLevel = fixedLevelForMode(mode);
-  if (fixedLevel) return `CEEC Level ${fixedLevel}`;
-  if (mode === VocabularyMode.PROGRESSIVE) return "Progressive";
-  return "Mixed 1–6";
+  if (fixedLevel) return `CEEC 第 ${fixedLevel} 級`;
+  if (mode === VocabularyMode.PROGRESSIVE) return "逐關進階";
+  return "CEEC 1–6 級混合";
 }

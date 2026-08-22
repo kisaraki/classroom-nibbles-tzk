@@ -52,4 +52,22 @@ describe("Snake", () => {
     snake.grow(100);
     expect(snake.length).toBe(40);
   });
+
+  it("restores its initial position, direction, length, and trail", () => {
+    const snake = new Snake(GAMEPLAY_CONFIG.snake, {
+      position: { x: 2, z: 3 },
+      direction: Direction.EAST,
+      length: 9,
+    });
+    snake.advance(1);
+    snake.trySetDirection(Direction.NORTH);
+    snake.shrink(4);
+
+    snake.reset();
+
+    expect(snake.headPosition).toEqual({ x: 2, z: 3 });
+    expect(snake.direction).toBe(Direction.EAST);
+    expect(snake.length).toBe(9);
+    expect(snake.getSegmentPositions()[1]).toEqual({ x: 1.25, z: 3 });
+  });
 });

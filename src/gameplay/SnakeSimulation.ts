@@ -119,6 +119,13 @@ export class SnakeSimulation {
     return () => this.#collisionListeners.delete(listener);
   }
 
+  reset(): void {
+    this.#snake.reset();
+    this.#delayRemainingSeconds = 0;
+    this.#latestCollision = null;
+    this.#recoveryRequired = false;
+  }
+
   #enterStun(
     kind: CollisionKind,
     attemptedPosition: XZPoint,

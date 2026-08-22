@@ -1,3 +1,4 @@
+import { GAMEPLAY_CONFIG } from "../core/Config";
 import { GameState, type GameState as GameStateValue } from "../core/GameState";
 import type { StateMachine } from "../core/StateMachine";
 import type { CharacterToken, VocabularyEntry } from "../vocabulary/types";
@@ -40,6 +41,15 @@ export interface VocabularyGameplayStatus {
   readonly progressIndex: number;
   readonly nextToken: CharacterToken | null;
   readonly latestCollection: TokenCollectionKind | null;
+  readonly noProgressTimeRemainingSeconds: number;
+  readonly noProgressWarningActive: boolean;
+  readonly levelRestartCount: number;
+  readonly restartNoticeActive: boolean;
+}
+
+export interface NoProgressConfig {
+  readonly restartAfterSeconds: number;
+  readonly warningAtSeconds: number;
 }
 
 export type WordStartedListener = (entry: VocabularyEntry) => void;
@@ -50,6 +60,7 @@ export class VocabularyGameplaySession {
   readonly #snakeSimulation: SnakeSimulation;
   readonly #tokenPool: TokenPool;
   readonly #tokenCollisions: TokenCollisionSystem;
+  readonly #noProgressConfig: NoProgressConfig;
   readonly #wordStartedListeners = new Set<WordStartedListener>();
   #sceneIndex = 0;
   #wordIndex = 0;
@@ -57,6 +68,9 @@ export class VocabularyGameplaySession {
   #timeRemainingSeconds: number;
   #pendingWrongToken: CharacterToken | null = null;
   #latestCollection: TokenCollectionKind | null = null;
+  #noProgressTimeRemainingSeconds: number;
+  #levelRestartCount = 0;
+  #restartNoticeActive = false;
 
   constructor(
     plan: VocabularyRunPlan,
@@ -64,16 +78,26 @@ export class VocabularyGameplaySession {
     snakeSimulation: SnakeSimulation,
     tokenPool: TokenPool,
     tokenCollisions: TokenCollisionSystem,
+    noProgressConfig: NoProgressConfig = GAMEPLAY_CONFIG.noProgress,
   ) {
     if (plan.scenes.length !== 5 || plan.scenes.some((scene) => scene.words.length !== 5)) {
       throw new Error("A vocabulary run must contain five scenes with five words each.");
+    }
+    if (
+      noProgressConfig.restartAfterSeconds <= 0 ||
+      noProgressConfig.warningAtSeconds <= 0 ||
+      noProgressConfig.warningAtSeconds > noProgressConfig.restartAfterSeconds
+    ) {
+      throw new Error("No-progress timing values must be positive and warning must not exceed restart time.");
     }
     this.#plan = plan;
     this.#stateMachine = stateMachine;
     this.#snakeSimulation = snakeSimulation;
     this.#tokenPool = tokenPool;
     this.#tokenCollisions = tokenCollisions;
+    this.#noProgressConfig = Object.freeze({ ...noProgressConfig });
     this.#timeRemainingSeconds = this.#currentScene.durationSeconds;
+    this.#noProgressTimeRemainingSeconds = this.#noProgressConfig.restartAfterSeconds;
     this.#tokenPool.normalize(this.#snakeSimulation.snake);
   }
 
@@ -95,6 +119,12 @@ export class VocabularyGameplaySession {
       progressIndex: this.#progressIndex,
       nextToken: entry.tokens[this.#progressIndex] ?? null,
       latestCollection: this.#latestCollection,
+      noProgressTimeRemainingSeconds: Math.max(this.#noProgressTimeRemainingSeconds, 0),
+      noProgressWarningActive:
+        TIMER_STATES.has(this.#stateMachine.state) &&
+        this.#noProgressTimeRemainingSeconds <= this.#noProgressConfig.warningAtSeconds,
+      levelRestartCount: this.#levelRestartCount,
+      restartNoticeActive: this.#restartNoticeActive,
     });
   }
 
@@ -105,9 +135,14 @@ export class VocabularyGameplaySession {
 
     if (TIMER_STATES.has(this.#stateMachine.state)) {
       this.#timeRemainingSeconds -= deltaSeconds;
+      this.#noProgressTimeRemainingSeconds -= deltaSeconds;
       if (this.#timeRemainingSeconds <= 0) {
         this.#timeRemainingSeconds = 0;
         this.#stateMachine.transition(GameState.LEVEL_FAILED);
+        return;
+      }
+      if (this.#noProgressTimeRemainingSeconds <= 0) {
+        this.#restartCurrentLevel();
         return;
       }
     }
@@ -139,6 +174,8 @@ export class VocabularyGameplaySession {
       this.#snakeSimulation.snake.shrink();
       this.#progressIndex += 1;
       this.#latestCollection = TokenCollectionKind.CORRECT;
+      this.#noProgressTimeRemainingSeconds = this.#noProgressConfig.restartAfterSeconds;
+      this.#restartNoticeActive = false;
       const nextToken = this.#currentEntry.tokens[this.#progressIndex];
       if (!nextToken) {
         this.#stateMachine.transition(GameState.TYPING_TEST);
@@ -190,7 +227,27 @@ export class VocabularyGameplaySession {
   #resetForCurrentWord(): void {
     this.#progressIndex = 0;
     this.#latestCollection = null;
+    this.#noProgressTimeRemainingSeconds = this.#noProgressConfig.restartAfterSeconds;
+    this.#restartNoticeActive = false;
     this.#tokenPool.normalize(this.#snakeSimulation.snake);
+    for (const listener of this.#wordStartedListeners) listener(this.#currentEntry);
+  }
+
+  #restartCurrentLevel(): void {
+    this.#stateMachine.transition(GameState.LEVEL_FAILED);
+    this.#wordIndex = 0;
+    this.#progressIndex = 0;
+    this.#timeRemainingSeconds = this.#currentScene.durationSeconds;
+    this.#noProgressTimeRemainingSeconds = this.#noProgressConfig.restartAfterSeconds;
+    this.#pendingWrongToken = null;
+    this.#latestCollection = null;
+    this.#levelRestartCount += 1;
+    this.#restartNoticeActive = true;
+    this.#snakeSimulation.reset();
+    this.#tokenPool.clear();
+    this.#tokenPool.normalize(this.#snakeSimulation.snake);
+    this.#stateMachine.transition(GameState.TRANSITION_IN);
+    this.#stateMachine.transition(GameState.HUNTING);
     for (const listener of this.#wordStartedListeners) listener(this.#currentEntry);
   }
 

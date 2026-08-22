@@ -3,6 +3,9 @@
 ## Phase 3 — 2026-08-22
 
 ### Added
+- Traditional Chinese browser metadata, boot flow, vocabulary selection, HUD labels, state feedback, controls and accessibility text.
+- A 20-second no-progress deadline that resets after every correct token, displays an urgent final-10-second countdown, and restarts the current Game Level on expiry without rerolling its vocabulary.
+- Full level-restart restoration for scene time, first-word progress, snake position/direction/length and the 30-token pool.
 - Independent vocabulary selection for CEEC Level 1–6, PROGRESSIVE and MIXED 1–6 modes.
 - Seeded deterministic random source shared by word selection and spawning; gameplay call sites do not use `Math.random()`.
 - Five-scene × five-word run planning with unique ids/targets, scene token-length limits and the specified Progressive mapping.
@@ -13,7 +16,7 @@
 - Scene main timer and Phase 3 handoff to `TYPING_TEST` after a word is fully collected.
 - A Phase 4-facing success hook that advances words and scenes, resets each new scene timer, and reaches `GAME_CLEAR` after word 25.
 - Three.js token sprites, pulsing target token, vocabulary selection screen and progress/meaning/level telemetry.
-- Unit and E2E coverage for selection, spawning, pool normalization, token outcomes and the Phase 3 browser flow.
+- Unit and E2E coverage for selection, spawning, pool normalization, token outcomes, no-progress restart behavior and the Traditional Chinese Phase 3 browser flow.
 
 ### Changed
 - Advanced the boot flow through `VOCABULARY_SELECT` before entering `HUNTING`.

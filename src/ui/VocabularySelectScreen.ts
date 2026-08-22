@@ -43,19 +43,19 @@ export class VocabularySelectScreen {
     this.#element.dataset.testid = "vocabulary-select";
     const panel = createElement("div", "vocabulary-select__panel");
     panel.append(
-      createElement("p", "vocabulary-select__eyebrow", "MISSION CONFIGURATION / 03"),
+      createElement("p", "vocabulary-select__eyebrow", "任務設定 / 03"),
       createElement("h1", "vocabulary-select__title", APP_CONFIG.title),
-      createElement("p", "vocabulary-select__phase", `${APP_CONFIG.phaseLabel} — TOKEN HUNT`),
+      createElement("p", "vocabulary-select__phase", `${APP_CONFIG.phaseLabel} — 字元獵取`),
       createElement(
         "p",
         "vocabulary-select__intro",
-        "Vocabulary Level and Game Level are independent. Choose the vocabulary source for a deterministic five-scene run.",
+        "字彙級別與遊戲關卡彼此獨立。請選擇字彙來源；使用相同種子即可重現相同的五關任務。",
       ),
     );
 
     this.#form = createElement("form", "vocabulary-select__form");
     const modeLabel = createElement("label", "vocabulary-select__field");
-    modeLabel.append(createElement("span", "vocabulary-select__label", "Vocabulary mode"));
+    modeLabel.append(createElement("span", "vocabulary-select__label", "字彙模式"));
     this.#mode = createElement("select", "vocabulary-select__input");
     this.#mode.dataset.testid = "vocabulary-mode";
     this.#mode.name = "vocabulary-mode";
@@ -68,7 +68,7 @@ export class VocabularySelectScreen {
     modeLabel.append(this.#mode);
 
     const seedLabel = createElement("label", "vocabulary-select__field");
-    seedLabel.append(createElement("span", "vocabulary-select__label", "Deterministic seed"));
+    seedLabel.append(createElement("span", "vocabulary-select__label", "關卡種子"));
     this.#seed = createElement("input", "vocabulary-select__input");
     this.#seed.dataset.testid = "run-seed";
     this.#seed.name = "run-seed";
@@ -77,7 +77,7 @@ export class VocabularySelectScreen {
     this.#seed.required = true;
     seedLabel.append(this.#seed);
 
-    const submit = createElement("button", "vocabulary-select__submit", "START TOKEN HUNT");
+    const submit = createElement("button", "vocabulary-select__submit", "開始字元獵取");
     submit.type = "submit";
     submit.dataset.testid = "start-run";
     this.#error = createElement("p", "vocabulary-select__error");
@@ -89,7 +89,7 @@ export class VocabularySelectScreen {
     const dataset = createElement(
       "p",
       "vocabulary-select__dataset",
-      `${metadata.dataVersion} · ${metadata.eligibleEntries.toLocaleString("en-US")} eligible entries`,
+      `資料版本 ${metadata.dataVersion} · ${metadata.eligibleEntries.toLocaleString("zh-TW")} 筆可遊玩字彙`,
     );
     dataset.dataset.testid = "phase-three-data-version";
     panel.append(this.#form, dataset);
@@ -103,7 +103,11 @@ export class VocabularySelectScreen {
   }
 
   showError(error: unknown): void {
-    this.#error.textContent = error instanceof Error ? error.message : "Unable to start run.";
+    console.error("無法開始關卡", error);
+    const message = error instanceof Error ? error.message : "";
+    this.#error.textContent = /[\u3400-\u9fff]/u.test(message)
+      ? message
+      : "無法建立關卡，請更換字彙模式或種子後再試。";
     this.#error.hidden = false;
   }
 
@@ -116,12 +120,12 @@ export class VocabularySelectScreen {
     this.#error.hidden = true;
     const mode = VOCABULARY_MODE_OPTIONS.find((option) => option === this.#mode.value);
     if (!mode) {
-      this.showError(new Error("Choose a valid vocabulary mode."));
+      this.showError(new Error("請選擇有效的字彙模式。"));
       return;
     }
     const seed = this.#seed.value.trim();
     if (!seed) {
-      this.showError(new Error("Enter a deterministic seed."));
+      this.showError(new Error("請輸入關卡種子。"));
       return;
     }
     this.#listener(Object.freeze({ mode, seed }));

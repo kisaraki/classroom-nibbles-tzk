@@ -171,6 +171,42 @@ describe("VocabularyGameplaySession", () => {
     expect(session.status.timeRemainingSeconds).toBe(remaining);
   });
 
+  it("shows the final ten-second warning and resets it after a correct token", () => {
+    const { session } = createSession("AB");
+
+    session.update(10);
+
+    expect(session.status.noProgressWarningActive).toBe(true);
+    expect(session.status.noProgressTimeRemainingSeconds).toBeCloseTo(10);
+
+    const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
+    session.resolveTokenCollision(correct.id);
+
+    expect(session.status.noProgressWarningActive).toBe(false);
+    expect(session.status.noProgressTimeRemainingSeconds).toBe(20);
+  });
+
+  it("restarts the current level after twenty seconds without a correct token", () => {
+    const { session, snake } = createSession("A");
+    const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
+    session.resolveTokenCollision(correct.id);
+    session.advanceAfterTypingSuccess();
+    expect(session.status.wordNumber).toBe(2);
+    expect(snake.length).toBe(7);
+
+    session.update(20);
+
+    expect(session.status.state).toBe(GameState.HUNTING);
+    expect(session.status.wordNumber).toBe(1);
+    expect(session.status.timeRemainingSeconds).toBe(120);
+    expect(session.status.noProgressTimeRemainingSeconds).toBe(20);
+    expect(session.status.levelRestartCount).toBe(1);
+    expect(session.status.restartNoticeActive).toBe(true);
+    expect(session.tokenEntities).toHaveLength(30);
+    expect(snake.headPosition).toEqual({ x: 0, z: 0 });
+    expect(snake.length).toBe(8);
+  });
+
   it("advances across all five scenes only through the future typing-success hook", () => {
     const { session } = createSession("A");
 

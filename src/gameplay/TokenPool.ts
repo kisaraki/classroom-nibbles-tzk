@@ -66,6 +66,10 @@ export class TokenPool {
     if (entity) this.#entities.delete(id);
     return entity;
   }
+
+  clear(): void {
+    this.#entities.clear();
+  }
 }
 
 export function tokenDisplayLabel(token: CharacterToken): string {
