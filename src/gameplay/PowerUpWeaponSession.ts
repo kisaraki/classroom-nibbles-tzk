@@ -24,6 +24,11 @@ const ACTIVE_WORLD_STATES = new Set<GameStateValue>([
   GameState.MAP_EXPANDED,
 ]);
 
+const INTERACTION_STATES = new Set<GameStateValue>([
+  GameState.HUNTING,
+  GameState.MAP_EXPANDED,
+]);
+
 export interface PowerUpCollectionResult {
   readonly kind: PowerUpKindValue;
   readonly timeDeltaSeconds: number;
@@ -94,7 +99,7 @@ export class PowerUpWeaponSession {
   }
 
   fire(): boolean {
-    if (this.#stateMachine.state !== GameState.HUNTING) return false;
+    if (!INTERACTION_STATES.has(this.#stateMachine.state)) return false;
     return this.#weapon.fire(this.#snake.headPosition, this.#snake.direction) !== null;
   }
 
@@ -120,13 +125,13 @@ export class PowerUpWeaponSession {
       }
     }
 
-    if (this.#stateMachine.state !== GameState.HUNTING) return;
+    if (!INTERACTION_STATES.has(this.#stateMachine.state)) return;
     const collision = this.#detectPowerUpCollision();
     if (collision) this.resolvePowerUpCollision(collision.id);
   }
 
   resolvePowerUpCollision(entityId: string): PowerUpCollectionResult | null {
-    if (this.#stateMachine.state !== GameState.HUNTING) return null;
+    if (!INTERACTION_STATES.has(this.#stateMachine.state)) return null;
     const entity = this.#powerUpPool.getById(entityId);
     if (!entity) return null;
 

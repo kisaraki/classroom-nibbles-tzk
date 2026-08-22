@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("以中文介面選擇獨立字彙並開始第五階段", async ({ page }) => {
+test("以中文座艙介面選擇獨立字彙並開始第六階段", async ({ page }) => {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("./");
 
-  await expect(page).toHaveTitle("NIBBLES — 第五階段");
+  await expect(page).toHaveTitle("NIBBLES — 第六階段");
   await expect(page.getByTestId("vocabulary-select")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
@@ -14,7 +14,7 @@ test("以中文介面選擇獨立字彙並開始第五階段", async ({ page }) 
   await expect(page.getByTestId("phase-three-canvas")).toBeVisible();
 
   await page.getByTestId("vocabulary-mode").selectOption("CEEC_3");
-  await page.getByTestId("run-seed").fill("phase-five-e2e");
+  await page.getByTestId("run-seed").fill("phase-six-e2e");
   await page.getByTestId("start-run").click();
 
   await expect(page.getByTestId("vocabulary-select")).toBeHidden();
@@ -26,6 +26,14 @@ test("以中文介面選擇獨立字彙並開始第五階段", async ({ page }) 
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-token-count", "30");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-power-up-count", "5");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
+  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-camera-mode", "snake-eye");
+  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-camera-count", "1");
+  await expect(page.getByTestId("cockpit-overlay")).toBeVisible();
+  await expect(page.getByTestId("mini-map")).toBeVisible();
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-snake-points", "8");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-token-count", "30");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-power-up-count", "5");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-obstacle-count", "0");
   await expect(page.getByTestId("ammo-count")).toHaveText("0");
   await expect(page.getByTestId("target-tokens").locator('[aria-current="step"]')).toHaveCount(1);
   await expect(page.getByTestId("phase-message")).toBeHidden();
@@ -41,5 +49,23 @@ test("以中文介面選擇獨立字彙並開始第五階段", async ({ page }) 
   await page.keyboard.press("Space");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
   await expect(page.getByTestId("ammo-count")).toHaveText("0");
+
+  await page.getByTestId("tactical-map-toggle").click();
+  await expect(page.getByTestId("simulation-state")).toHaveText("戰術地圖");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "true");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-time-scale", "0.25");
+  await expect(page.getByTestId("tactical-map-status")).toContainText("0.25×");
+  const expandedHeadX = await page.getByTestId("mini-map").getAttribute("data-head-x");
+  await expect.poll(
+    () => page.getByTestId("mini-map").getAttribute("data-head-x"),
+  ).not.toBe(expandedHeadX);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("simulation-state")).toHaveText("進行中");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "false");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-time-scale", "1");
+  await page.keyboard.press("m");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "true");
+  await page.keyboard.press("m");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "false");
   expect(pageErrors).toEqual([]);
 });

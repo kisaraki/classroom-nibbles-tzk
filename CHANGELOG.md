@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Phase 6 — 2026-08-22
+
+### Added
+- A single snake-eye PerspectiveCamera rig with short heading-change smoothing and no stereo-rendering dependency.
+- A fixed cockpit mask, horizon accents and central targeting reticle around the Three.js scene.
+- A lower-left mini-map that distinguishes SOLID and WRAP boundaries and shows all tokens, power-ups, active bullets, future obstacle markers, the snake head and the complete snake trail.
+- Click and `M` controls for an enlarged tactical map, plus `Esc` and `M` close controls and a visible 0.25× status indicator.
+- Unit and Chromium coverage for camera behavior, tactical-map state/input, complete-trail radar data and continued quarter-speed gameplay.
+
+### Changed
+- Advanced browser metadata, default seed and visible phase markers to Phase 6.
+- Made `MAP_EXPANDED` an active gameplay state whose fixed-step simulation and main timer run at 0.25 speed; steering, collection and firing remain available.
+- Replaced the temporary isometric camera and diagnostic layout with the cockpit view and right-side Chinese mission HUD.
+- Hid the rendered snake head from the first-person scene while retaining the full snake on the mini-map and tactical map.
+
+### Known Issues
+- Phase 7's five functional environments are not implemented; every Game Level still uses the existing cargo arena.
+
 ## Phase 5 — 2026-08-22
 
 ### Added

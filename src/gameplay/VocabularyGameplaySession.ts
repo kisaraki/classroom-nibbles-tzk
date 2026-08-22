@@ -15,6 +15,11 @@ const TIMER_STATES = new Set<GameStateValue>([
   GameState.MAP_EXPANDED,
 ]);
 
+const COLLECTION_STATES = new Set<GameStateValue>([
+  GameState.HUNTING,
+  GameState.MAP_EXPANDED,
+]);
+
 export const TokenCollectionKind = Object.freeze({
   CORRECT: "CORRECT",
   WRONG: "WRONG",
@@ -120,12 +125,12 @@ export class VocabularyGameplaySession {
     }
 
     this.#snakeSimulation.update(deltaSeconds);
-    if (this.#pendingWrongToken && this.#stateMachine.state === GameState.HUNTING) {
+    if (this.#pendingWrongToken && COLLECTION_STATES.has(this.#stateMachine.state)) {
       this.#tokenPool.ensureToken(this.#pendingWrongToken, this.#snakeSimulation.snake);
       this.#pendingWrongToken = null;
     }
 
-    if (this.#stateMachine.state !== GameState.HUNTING) return;
+    if (!COLLECTION_STATES.has(this.#stateMachine.state)) return;
     const collision = this.#tokenCollisions.detect(
       this.#snakeSimulation.snake.headPosition,
       this.#tokenPool.entities,
@@ -135,7 +140,7 @@ export class VocabularyGameplaySession {
   }
 
   resolveTokenCollision(entityId: string): TokenCollectionResult | null {
-    if (this.#stateMachine.state !== GameState.HUNTING) return null;
+    if (!COLLECTION_STATES.has(this.#stateMachine.state)) return null;
     const entity = this.#tokenPool.getById(entityId);
     if (!entity) return null;
     const expected = this.#currentEntry.tokens[this.#progressIndex];

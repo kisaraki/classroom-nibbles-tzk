@@ -76,7 +76,10 @@ export class SnakeSimulation {
   }
 
   requestDirection(direction: Direction): boolean {
-    if (this.#stateMachine.state === GameState.HUNTING) {
+    if (
+      this.#stateMachine.state === GameState.HUNTING ||
+      this.#stateMachine.state === GameState.MAP_EXPANDED
+    ) {
       return this.#snake.trySetDirection(direction);
     }
     if (this.#stateMachine.state !== GameState.RECOVERY) return false;
@@ -100,7 +103,10 @@ export class SnakeSimulation {
       this.#advanceRecovery(deltaSeconds);
       return;
     }
-    if (this.#stateMachine.state !== GameState.HUNTING) return;
+    if (
+      this.#stateMachine.state !== GameState.HUNTING &&
+      this.#stateMachine.state !== GameState.MAP_EXPANDED
+    ) return;
 
     const candidate = this.#snake.previewPosition(deltaSeconds);
     const collision = this.#collisionSystem.detect(candidate, this.#snake, this.#arena);
@@ -112,7 +118,10 @@ export class SnakeSimulation {
   }
 
   applyWrongTokenCollision(position: XZPoint): boolean {
-    if (this.#stateMachine.state !== GameState.HUNTING) return false;
+    if (
+      this.#stateMachine.state !== GameState.HUNTING &&
+      this.#stateMachine.state !== GameState.MAP_EXPANDED
+    ) return false;
     this.#enterStun(CollisionKind.WRONG_TOKEN, position, false);
     return true;
   }

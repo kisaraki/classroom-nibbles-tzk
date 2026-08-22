@@ -11,11 +11,13 @@ function createActiveSimulation(
   arena: Arena,
   initial: SnakeInitialState = {},
   length: number = GAMEPLAY_CONFIG.snake.initialLength,
+  expandedMap = false,
 ): SnakeSimulation {
   const stateMachine = createGameStateMachine();
   stateMachine.transition(GameState.MAIN_MENU);
   stateMachine.transition(GameState.TRANSITION_IN);
   stateMachine.transition(GameState.HUNTING);
+  if (expandedMap) stateMachine.transition(GameState.MAP_EXPANDED);
   const snake = new Snake(GAMEPLAY_CONFIG.snake, { ...initial, length });
   const collisions = new CollisionSystem({
     headRadius: GAMEPLAY_CONFIG.snake.headCollisionRadius,
@@ -32,6 +34,22 @@ function createActiveSimulation(
 }
 
 describe("SnakeSimulation", () => {
+  it("continues movement and steering while the tactical map is expanded", () => {
+    const arena = new Arena({
+      halfWidth: 20,
+      halfDepth: 20,
+      xBoundaryMode: BoundaryMode.SOLID,
+      zBoundaryMode: BoundaryMode.SOLID,
+    });
+    const simulation = createActiveSimulation(arena, {}, 8, true);
+
+    expect(simulation.requestDirection(Direction.EAST)).toBe(true);
+    simulation.update(0.25);
+
+    expect(simulation.status.state).toBe(GameState.MAP_EXPANDED);
+    expect(simulation.snake.headPosition.x).toBeCloseTo(1.125);
+  });
+
   it("wraps crossing segments individually instead of teleporting the whole snake", () => {
     const arena = new Arena({
       halfWidth: 5,

@@ -171,6 +171,19 @@ describe("VocabularyGameplaySession", () => {
     expect(session.status.timeRemainingSeconds).toBe(remaining);
   });
 
+  it("collects ordered tokens while the tactical map remains expanded", () => {
+    const { session, stateMachine } = createSession("AB");
+    stateMachine.transition(GameState.MAP_EXPANDED);
+    const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
+
+    expect(session.resolveTokenCollision(correct.id)).toMatchObject({
+      kind: TokenCollectionKind.CORRECT,
+      progressIndex: 1,
+    });
+    expect(session.status.state).toBe(GameState.MAP_EXPANDED);
+    expect(session.status.nextToken).toBe("B");
+  });
+
   it("rolls back only the last token and adds five main-timer seconds on typing timeout", () => {
     const { session, snake } = createSession("AB");
     const first = session.tokenEntities.find((entity) => entity.token === "A")!;

@@ -77,7 +77,7 @@ If a vocabulary filter yields fewer than 5 candidates, relax recent-history filt
 
 Use one PerspectiveCamera plus a cockpit/snake-eye mask rather than stereo rendering in Version 1. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
 
-Mini-map in lower left shows arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Enlarged tactical map runs gameplay at 0.25 speed; Esc closes it.
+Mini-map in lower left shows arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. It runs gameplay at 0.25 speed; `Esc` or `M` closes it.
 
 The Version 1.x user interface uses Traditional Chinese for navigation, labels, state feedback, countdown warnings and accessibility text. English vocabulary targets, CEEC names and conventional control abbreviations may remain where they are learning content or proper names.
 

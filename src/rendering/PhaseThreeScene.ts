@@ -8,6 +8,7 @@ import type { BulletEntity } from "../gameplay/WeaponSystem";
 import type { CharacterToken } from "../vocabulary/types";
 import { ArenaView } from "./ArenaView";
 import { BulletView } from "./BulletView";
+import { CockpitCameraRig } from "./CockpitCameraRig";
 import { PowerUpView } from "./PowerUpView";
 import { SnakeView } from "./SnakeView";
 import { TokenView } from "./TokenView";
@@ -19,6 +20,7 @@ export class PhaseThreeScene {
   readonly #renderer: THREE.WebGLRenderer;
   readonly #scene = new THREE.Scene();
   readonly #camera: THREE.PerspectiveCamera;
+  readonly #cameraRig: CockpitCameraRig;
   readonly #arenaView: ArenaView;
   readonly #snakeView: SnakeView;
   readonly #tokenView: TokenView;
@@ -34,7 +36,9 @@ export class PhaseThreeScene {
     this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.#renderer.domElement.className = "phase-three-scene";
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
-    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第五階段字彙遊戲場");
+    this.#renderer.domElement.dataset.cameraMode = "snake-eye";
+    this.#renderer.domElement.dataset.cameraCount = "1";
+    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第六階段第一人稱字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
     this.#scene.background = new THREE.Color(APP_CONFIG.scene.backgroundColor);
@@ -45,9 +49,13 @@ export class PhaseThreeScene {
       APP_CONFIG.scene.cameraNear,
       APP_CONFIG.scene.cameraFar,
     );
-    const cameraPosition = APP_CONFIG.scene.cameraPosition;
-    this.#camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-    this.#camera.lookAt(0, 0, 0);
+    this.#cameraRig = new CockpitCameraRig(this.#camera, {
+      eyeHeight: APP_CONFIG.scene.cameraEyeHeight,
+      followDistance: APP_CONFIG.scene.cameraFollowDistance,
+      lookAhead: APP_CONFIG.scene.cameraLookAhead,
+      lookHeight: APP_CONFIG.scene.cameraLookHeight,
+      turnSmoothingSeconds: APP_CONFIG.scene.cameraTurnSmoothingSeconds,
+    });
 
     this.#scene.add(new THREE.HemisphereLight(0xbcecff, 0x08101e, 2.5));
     const keyLight = new THREE.DirectionalLight(0x73ffe1, 3.5);
@@ -75,11 +83,13 @@ export class PhaseThreeScene {
     bullets: readonly BulletEntity[],
     nextToken: CharacterToken | null,
     elapsedSeconds: number,
+    frameDeltaSeconds: number,
   ): void {
     this.#renderer.domElement.dataset.tokenCount = String(tokens.length);
     this.#renderer.domElement.dataset.powerUpCount = String(powerUps.length);
     this.#renderer.domElement.dataset.bulletCount = String(bullets.length);
-    this.#snakeView.update(snake, arena);
+    this.#cameraRig.update(snake.headPosition, snake.direction, arena, frameDeltaSeconds);
+    this.#snakeView.update(snake, arena, false);
     this.#tokenView.update(tokens, arena, nextToken, elapsedSeconds);
     this.#powerUpView.update(powerUps, arena, elapsedSeconds);
     this.#bulletView.update(bullets, arena);

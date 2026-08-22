@@ -16,10 +16,13 @@ import {
 } from "../gameplay/TypingTestSession";
 import { VocabularyGameplaySession } from "../gameplay/VocabularyGameplaySession";
 import { DirectionInput } from "../input/DirectionInput";
+import { TacticalMapInput } from "../input/TacticalMapInput";
 import { WeaponInput } from "../input/WeaponInput";
 import { PhaseThreeScene } from "../rendering/PhaseThreeScene";
 import { BootScreen } from "../ui/BootScreen";
+import { CockpitOverlay } from "../ui/CockpitOverlay";
 import { PhaseThreePanel } from "../ui/PhaseThreePanel";
+import { RadarMap } from "../ui/RadarMap";
 import { TypingTestModal } from "../ui/TypingTestModal";
 import {
   VocabularySelectScreen,
@@ -32,6 +35,7 @@ import { GAMEPLAY_CONFIG, getVocabularyUrl } from "./Config";
 import { FixedStepRunner } from "./FixedStepRunner";
 import { createGameStateMachine, GameState } from "./GameState";
 import { SeededRandom } from "./SeededRandom";
+import { TacticalMapController } from "./TacticalMapController";
 
 export class Game {
   readonly #container: HTMLElement;
@@ -62,11 +66,18 @@ export class Game {
   readonly #weaponInput = new WeaponInput(() => {
     this.#powerUpWeapon?.fire();
   });
+  readonly #tacticalMapController = new TacticalMapController(this.#stateMachine);
+  readonly #tacticalMapInput = new TacticalMapInput({
+    toggle: () => this.#tacticalMapController.toggle(),
+    close: () => this.#tacticalMapController.close(),
+  });
   readonly #recentHistory = new RecentTargetHistory();
   readonly #unsubscribeStateChange: () => void;
   #scene: PhaseThreeScene | null = null;
   #selectionScreen: VocabularySelectScreen | null = null;
   #panel: PhaseThreePanel | null = null;
+  #cockpitOverlay: CockpitOverlay | null = null;
+  #radarMap: RadarMap | null = null;
   #repository: VocabularyRepository | null = null;
   #gameplay: VocabularyGameplaySession | null = null;
   #powerUpWeapon: PowerUpWeaponSession | null = null;
@@ -107,10 +118,13 @@ export class Game {
   dispose(): void {
     this.#input.detach();
     this.#weaponInput.detach();
+    this.#tacticalMapInput.detach();
     this.#stopTypingTest();
     this.#unsubscribeStateChange();
     document.removeEventListener("visibilitychange", this.#onVisibilityChange);
     this.#selectionScreen?.dispose();
+    this.#cockpitOverlay?.dispose();
+    this.#radarMap?.dispose();
     this.#scene?.dispose();
     this.#timer?.dispose();
   }
@@ -178,6 +192,15 @@ export class Game {
       this.#gameplay = gameplay;
       this.#powerUpWeapon = powerUpWeapon;
       this.#panel = new PhaseThreePanel(this.#container);
+      this.#cockpitOverlay = new CockpitOverlay(this.#container);
+      this.#radarMap = new RadarMap(
+        this.#container,
+        this.#arena,
+        () => {
+          this.#tacticalMapController.toggle();
+        },
+      );
+      this.#tacticalMapInput.attach();
       this.#selectionScreen.hide();
       this.#stateMachine.transition(GameState.HUNTING);
       this.#recentHistory.remember(gameplay.status.entry.target);
@@ -190,10 +213,14 @@ export class Game {
     if (!this.#scene || !this.#timer) return;
     this.#timer.update();
     this.#updateTypingTest(performance.now());
-    this.#fixedStepRunner.advance(this.#timer.getDelta(), (stepSeconds) => {
-      this.#gameplay?.update(stepSeconds);
-      this.#powerUpWeapon?.update(stepSeconds);
-    });
+    const frameDeltaSeconds = this.#timer.getDelta();
+    this.#fixedStepRunner.advance(
+      frameDeltaSeconds * this.#tacticalMapController.timeScale,
+      (stepSeconds) => {
+        this.#gameplay?.update(stepSeconds);
+        this.#powerUpWeapon?.update(stepSeconds);
+      },
+    );
 
     const gameplayStatus = this.#gameplay?.status;
     this.#scene.render(
@@ -204,7 +231,19 @@ export class Game {
       this.#powerUpWeapon?.bulletEntities ?? [],
       gameplayStatus?.nextToken ?? null,
       this.#timer.getElapsed(),
+      frameDeltaSeconds,
     );
+    if (gameplayStatus && this.#powerUpWeapon) {
+      this.#radarMap?.update({
+        snakeSegments: this.#snake.getSegmentPositions(),
+        snakeDirection: this.#snake.direction,
+        tokens: this.#gameplay?.tokenEntities ?? [],
+        powerUps: this.#powerUpWeapon.powerUpEntities,
+        bullets: this.#powerUpWeapon.bulletEntities,
+        obstacles: [],
+        nextToken: gameplayStatus.nextToken,
+      });
+    }
     if (gameplayStatus && this.#powerUpWeapon) {
       this.#panel?.update(
         gameplayStatus,
@@ -218,6 +257,10 @@ export class Game {
     current: ReturnType<typeof createGameStateMachine>["state"],
     previous: ReturnType<typeof createGameStateMachine>["state"],
   ): void => {
+    this.#radarMap?.setExpanded(
+      current === GameState.MAP_EXPANDED,
+      current === GameState.MAP_EXPANDED ? this.#tacticalMapController.timeScale : 1,
+    );
     if (current === GameState.TYPING_TEST) {
       this.#startTypingTest();
       return;

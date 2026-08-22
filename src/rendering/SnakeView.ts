@@ -39,10 +39,11 @@ export class SnakeView {
     scene.add(this.#body, this.#head, this.#nose);
   }
 
-  update(snake: Snake, arena: Arena): void {
+  update(snake: Snake, arena: Arena, showHead = true): void {
     const segments = snake.getSegmentPositions();
     const head = arena.toDisplayPoint(segments[0] ?? snake.headPosition);
     this.#head.position.set(head.x, 0.4, head.z);
+    this.#head.visible = showHead;
 
     const forward = directionVector(snake.direction);
     const nosePosition = arena.toDisplayPoint({
@@ -50,6 +51,7 @@ export class SnakeView {
       z: snake.headPosition.z + forward.z * 0.38,
     });
     this.#nose.position.set(nosePosition.x, 0.42, nosePosition.z);
+    this.#nose.visible = showHead;
 
     this.#body.count = Math.max(segments.length - 1, 0);
     for (let index = 1; index < segments.length; index += 1) {

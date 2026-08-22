@@ -56,8 +56,8 @@ body {
 .phase-three-panel {
   position: absolute;
   top: clamp(0.8rem, 2.5vw, 2rem);
-  left: clamp(0.8rem, 2.5vw, 2rem);
-  z-index: 2;
+  right: clamp(0.8rem, 2.5vw, 2rem);
+  z-index: 3;
   width: min(31rem, calc(100% - 1.6rem));
   max-height: calc(100% - clamp(1.6rem, 5vw, 4rem));
   padding: clamp(1rem, 2.5vw, 1.6rem);
@@ -68,6 +68,190 @@ body {
   box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 38%);
   pointer-events: none;
   backdrop-filter: blur(16px);
+}
+
+.cockpit-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  background:
+    linear-gradient(108deg, rgb(1 6 13 / 92%) 0 5.5%, transparent 6% 94%, rgb(1 6 13 / 92%) 94.5%),
+    linear-gradient(180deg, rgb(1 6 13 / 88%) 0 4.5%, transparent 8% 78%, rgb(1 6 13 / 96%) 92% 100%);
+  box-shadow:
+    inset 0 0 5rem rgb(0 0 0 / 78%),
+    inset 0 -6rem 8rem rgb(0 0 0 / 70%);
+  pointer-events: none;
+}
+
+.cockpit-overlay::before,
+.cockpit-overlay::after {
+  position: absolute;
+  bottom: -3.5rem;
+  width: 38%;
+  height: 10rem;
+  border: 1px solid rgb(80 227 194 / 22%);
+  background: linear-gradient(180deg, #0b1a27, #02060d 72%);
+  box-shadow: 0 -0.8rem 3rem rgb(0 0 0 / 65%);
+  content: "";
+}
+
+.cockpit-overlay::before {
+  left: -4%;
+  transform: skewX(16deg);
+}
+
+.cockpit-overlay::after {
+  right: -4%;
+  transform: skewX(-16deg);
+}
+
+.cockpit-overlay__reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid rgb(134 255 225 / 58%);
+  border-radius: 50%;
+  box-shadow: 0 0 1rem rgb(80 227 194 / 18%);
+  transform: translate(-50%, -50%);
+}
+
+.cockpit-overlay__reticle::before,
+.cockpit-overlay__reticle::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: rgb(233 255 249 / 70%);
+  content: "";
+  transform: translate(-50%, -50%);
+}
+
+.cockpit-overlay__reticle::before {
+  width: 3.8rem;
+  height: 1px;
+}
+
+.cockpit-overlay__reticle::after {
+  width: 1px;
+  height: 3.8rem;
+}
+
+.cockpit-overlay__horizon {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  width: min(28rem, 42vw);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(80 227 194 / 28%), transparent);
+  transform: translateX(-50%);
+}
+
+.cockpit-overlay__strut {
+  position: absolute;
+  top: 0;
+  width: 1.1rem;
+  height: 43%;
+  background: linear-gradient(90deg, #02070e, #142535, #02070e);
+  box-shadow: 0 0 1rem rgb(0 0 0 / 70%);
+  transform-origin: top;
+}
+
+.cockpit-overlay__strut--left {
+  left: 16%;
+  transform: skewX(-18deg);
+}
+
+.cockpit-overlay__strut--right {
+  right: 16%;
+  transform: skewX(18deg);
+}
+
+.radar-map {
+  position: absolute;
+  bottom: clamp(0.8rem, 2.5vw, 2rem);
+  left: clamp(0.8rem, 2.5vw, 2rem);
+  z-index: 4;
+  width: min(17rem, 42vw);
+  border: 1px solid rgb(80 227 194 / 42%);
+  background: rgb(2 11 21 / 92%);
+  box-shadow: 0 1rem 4rem rgb(0 0 0 / 52%);
+  transition: inset 180ms ease, width 180ms ease;
+}
+
+.radar-map__button {
+  display: grid;
+  width: 100%;
+  padding: 0.65rem;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #e9fff9;
+  cursor: pointer;
+  text-align: left;
+}
+
+.radar-map__button:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.radar-map__heading,
+.radar-map__status,
+.radar-map__legend {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  letter-spacing: 0.08em;
+}
+
+.radar-map__heading {
+  color: var(--accent);
+  font-size: 0.68rem;
+}
+
+.radar-map__status,
+.radar-map__legend {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.52rem;
+  line-height: 1.4;
+}
+
+.radar-map__canvas {
+  display: block;
+  width: 100%;
+  height: 10rem;
+  margin-top: 0.45rem;
+  border: 1px solid rgb(80 227 194 / 18%);
+}
+
+.radar-map[data-expanded="true"] {
+  position: fixed;
+  inset: clamp(0.8rem, 3vw, 2.5rem);
+  z-index: 7;
+  width: auto;
+  background: rgb(2 8 17 / 98%);
+  box-shadow: 0 0 0 100vmax rgb(0 4 10 / 78%), 0 2rem 7rem rgb(0 0 0 / 75%);
+}
+
+.radar-map[data-expanded="true"] .radar-map__button {
+  height: 100%;
+  padding: clamp(0.8rem, 2vw, 1.5rem);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.radar-map[data-expanded="true"] .radar-map__heading {
+  font-size: clamp(0.9rem, 2vw, 1.25rem);
+}
+
+.radar-map[data-expanded="true"] .radar-map__status {
+  color: var(--warning);
+  font-size: 0.68rem;
+}
+
+.radar-map[data-expanded="true"] .radar-map__canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 18rem;
 }
 
 .phase-three-panel__eyebrow,
@@ -718,8 +902,14 @@ body {
   }
 
   .phase-three-panel {
+    right: auto;
+    left: 0.8rem;
     max-height: calc(100% - 1.6rem);
     overflow: auto;
+  }
+
+  .radar-map {
+    width: min(14rem, calc(100% - 1.6rem));
   }
 
   .phase-three-panel__mission {

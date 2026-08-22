@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D cockpit vocabulary game based on class
 
 ## Current status
 
-Phase 5 is complete. The Traditional Chinese vocabulary hunt now includes five persistent power-up types, cumulative ATTACK ammo, Space-key firing, projectile collision/reposition rules, and the existing 30-second three-success typing reinforcement.
+Phase 6 is complete. The Traditional Chinese vocabulary hunt now uses a single snake-eye PerspectiveCamera, a cockpit HUD, a lower-left mini-map with the complete snake trail and all live arena entities, and a 0.25-speed enlarged tactical map.
 
 ## Requirements
 
@@ -19,9 +19,9 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the interactive Phase 5 vocabulary run.
+Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the interactive Phase 6 vocabulary run.
 
-## Phase 5 gameplay and controls
+## Phase 6 gameplay and controls
 
 - Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
 - A seed creates a reproducible five-scene × five-word run without repeated ids or targets.
@@ -36,6 +36,9 @@ Vite prints the local development URL. Choose a vocabulary mode and deterministi
 - A bullet repositions a hit token or power-up without collecting or activating it. Solid walls destroy bullets, and otherwise unspent bullets expire after four seconds.
 - Red east/west walls are `SOLID`; blue north/south gates are `WRAP`.
 - Wall and self collisions retain the Phase 2 non-lethal stun/recovery behavior.
+- The single snake-eye camera follows the snake's heading with a short visual smoothing transition; the cockpit mask and reticle stay fixed around the view.
+- The lower-left mini-map shows SOLID/WRAP boundaries, all tokens and power-ups, active bullets, future obstacle markers, the snake head and the complete snake trail.
+- Click the mini-map or press `M` to open the enlarged tactical map. Gameplay, collection, firing and the main timer continue at 0.25 speed; press `Esc` or `M` to close it.
 
 Completing the final token pauses movement and the main timer in `TYPING_TEST` and opens the typing reinforcement modal:
 
@@ -45,7 +48,7 @@ Completing the final token pauses movement and the main timer in `TYPING_TEST` a
 - Timeout returns to hunting with only the final token rolled back and five seconds added to the main timer.
 - Copy, cut and paste are blocked only inside the typing modal; normal browser clipboard behavior remains available elsewhere.
 
-The isometric camera and diagnostic HUD remain development presentation until the cockpit/HUD phase.
+Phase 7's five functional environments have not been implemented; Phase 6 continues to use the existing cargo-arena presentation across all Game Levels.
 
 ## Quality and build commands
 
@@ -86,7 +89,8 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 - Phase 3 tests cover deterministic run selection, Progressive mapping, filter relaxation, spawn constraints/fallback, token-pool normalization, ordered progress, repeated tokens, wrong-token respawn, length rewards/penalties and timer pausing.
 - Phase 4 tests cover answer normalization, exact internal punctuation/spacing, consecutive-success streaks, real-time timeout, final-token rollback and the five-second timer bonus.
 - Phase 5 tests cover persistent mutually spaced power-ups, signed timer effects, cumulative ammo, firing restrictions, projectile motion, WRAP travel, solid-wall removal and non-activating shot repositioning.
-- Playwright checks vocabulary selection, independent Game/Vocabulary labels, the 30-token and five-power-up scene, ammo HUD, non-color target cue, steering/firing rules, typing-modal submission and modal-scoped clipboard blocking.
+- Phase 6 tests cover the snake-eye camera rig, smoothed cardinal turns, tactical-map state/input, 0.25 time scaling and continued gameplay while the enlarged map is open.
+- Playwright checks vocabulary selection, independent Game/Vocabulary labels, the 30-token and five-power-up scene, cockpit and complete-trail mini-map, steering/firing rules, tactical-map keyboard and pointer controls, continued quarter-speed movement, typing-modal submission and modal-scoped clipboard blocking.
 - `.github/workflows/ci.yml` runs quality gates on pushes and pull requests, with E2E isolated in its own job.
 - `.github/workflows/deploy-pages.yml` validates and builds `dist/` before deploying it through official GitHub Pages actions on `main`.
 
@@ -95,9 +99,9 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 ```text
 src/core/          Boot coordination, state machine, fixed-step loop, and configuration
 src/gameplay/      Three.js-independent snake, trail, arena, collision, and simulation logic
-src/input/         Keyboard direction and weapon input adapters
-src/rendering/     Three.js arena, snake, token, power-up, and projectile presentation
-src/ui/            Boot/error UI, vocabulary selection, gameplay telemetry, and typing modal
+src/input/         Keyboard direction, weapon, and tactical-map input adapters
+src/rendering/     Three.js arena/entities plus the snake-eye camera rig
+src/ui/            Chinese screens, cockpit HUD, radar/tactical map, and typing modal
 src/vocabulary/    Runtime repository, modes, deterministic WordSelector, and tests
 e2e/               Playwright smoke test
 public/data/       Runtime vocabulary dataset and Phase 0 audit report
@@ -107,4 +111,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract. Phase 6 has not started.
+See `SPEC.md` for the full product contract. Phase 7 has not started.

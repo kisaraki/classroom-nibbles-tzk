@@ -1,13 +1,17 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "第五階段",
+  phaseLabel: "第六階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     backgroundColor: 0x050b16,
-    cameraFieldOfView: 52,
-    cameraNear: 0.1,
+    cameraFieldOfView: 60,
+    cameraNear: 0.05,
     cameraFar: 100,
-    cameraPosition: Object.freeze({ x: 0, y: 16, z: 13 }),
+    cameraEyeHeight: 0.92,
+    cameraFollowDistance: 0.12,
+    cameraLookAhead: 6,
+    cameraLookHeight: 0.72,
+    cameraTurnSmoothingSeconds: 0.15,
     maxPixelRatio: 2,
     floorColor: 0x091827,
     solidWallColor: 0xff6b6b,
@@ -21,6 +25,9 @@ export const GAMEPLAY_CONFIG = Object.freeze({
   fixedStepSeconds: 1 / 60,
   maximumFrameDeltaSeconds: 0.1,
   maximumUpdatesPerFrame: 6,
+  tacticalMap: Object.freeze({
+    timeScale: 0.25,
+  }),
   snake: Object.freeze({
     initialLength: 8,
     minimumLength: 3,

@@ -125,7 +125,7 @@ describe("PowerUpWeaponSession", () => {
     expect(session.powerUpEntities).toHaveLength(5);
   });
 
-  it("adds five cumulative ammo from ATTACK and disables firing outside HUNTING", () => {
+  it("adds cumulative ammo, fires on the tactical map, and rejects stun firing", () => {
     const { session, stateMachine } = createFixture();
     const attack = session.powerUpEntities.find(
       (entity) => entity.kind === PowerUpKind.ATTACK,
@@ -137,10 +137,12 @@ describe("PowerUpWeaponSession", () => {
     )!;
     expect(session.resolvePowerUpCollision(respawnedAttack.id)?.ammoDelta).toBe(5);
     expect(session.status.ammo).toBe(10);
+    stateMachine.transition(GameState.MAP_EXPANDED);
     expect(session.fire()).toBe(true);
     expect(session.status.ammo).toBe(9);
     expect(session.status.bulletCount).toBe(1);
 
+    stateMachine.transition(GameState.HUNTING);
     stateMachine.transition(GameState.STUNNED);
     expect(session.fire()).toBe(false);
     expect(session.status.ammo).toBe(9);

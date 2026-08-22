@@ -122,7 +122,7 @@ export class PhaseThreePanel {
     this.#element.dataset.testid = "phase-three-panel";
     const heading = createElement("header", "phase-three-panel__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "字元獵取 / 05"),
+      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 06"),
       createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
     );
 
@@ -165,7 +165,7 @@ export class PhaseThreePanel {
     const controls = createElement(
       "p",
       "phase-three-panel__controls",
-      "使用 WASD 或方向鍵轉向 · 空白鍵發射 · 收集有外框的下一個字元",
+      "WASD / 方向鍵轉向 · 空白鍵發射 · M 展開戰術地圖 · Esc 關閉",
     );
     this.#element.append(
       heading,
