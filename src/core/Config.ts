@@ -26,6 +26,7 @@ export const GAMEPLAY_CONFIG = Object.freeze({
     minimumLength: 3,
     maximumLength: 40,
     segmentSpacing: 0.75,
+    minimumUTurnDistance: 0.75,
     speed: 4.5,
     headCollisionRadius: 0.32,
     bodyCollisionRadius: 0.28,

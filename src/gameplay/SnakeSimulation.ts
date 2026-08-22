@@ -37,6 +37,7 @@ export class SnakeSimulation {
   #delayRemainingSeconds = 0;
   #latestCollision: CollisionKind | null = null;
   #recoveryRequired = false;
+  #recoveryTurnUsed = false;
 
   constructor(
     snake: Snake,
@@ -75,13 +76,15 @@ export class SnakeSimulation {
   }
 
   requestDirection(direction: Direction): boolean {
-    if (
-      this.#stateMachine.state !== GameState.HUNTING &&
-      this.#stateMachine.state !== GameState.RECOVERY
-    ) {
-      return false;
+    if (this.#stateMachine.state === GameState.HUNTING) {
+      return this.#snake.trySetDirection(direction);
     }
-    return this.#snake.trySetDirection(direction);
+    if (this.#stateMachine.state !== GameState.RECOVERY) return false;
+    if (direction === this.#snake.direction) return true;
+    if (this.#recoveryTurnUsed) return false;
+    const accepted = this.#snake.trySetDirection(direction, true);
+    if (accepted) this.#recoveryTurnUsed = true;
+    return accepted;
   }
 
   update(deltaSeconds: number): void {
@@ -124,6 +127,7 @@ export class SnakeSimulation {
     this.#delayRemainingSeconds = 0;
     this.#latestCollision = null;
     this.#recoveryRequired = false;
+    this.#recoveryTurnUsed = false;
   }
 
   #enterStun(
@@ -151,6 +155,7 @@ export class SnakeSimulation {
       return;
     }
     this.#delayRemainingSeconds = this.#config.recoveryDurationSeconds;
+    this.#recoveryTurnUsed = false;
     this.#stateMachine.transition(GameState.RECOVERY);
   }
 

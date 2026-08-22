@@ -30,6 +30,8 @@ Vite must use `base: "./"`. Runtime assets/data must work from a repository subp
 
 The world is true 3D, but gameplay movement is constrained to the XZ plane. Directions are NORTH (-Z), SOUTH (+Z), WEST (-X), EAST (+X). Direct 180-degree reversal is illegal. Physics direction changes immediately; camera/cockpit visual rotation may smooth over roughly 120–180 ms. Snake motion is continuous and the body follows a recorded trail, not grid jumps.
 
+Two rapid 90-degree inputs must not bypass the reversal rule and curl the head into its own trail. If a second corner would reverse the heading from before the previous turn, reject it until the head has travelled at least one segment spacing. During `RECOVERY`, allow one legal stationary turn, but never a direct reversal or a second stationary turn.
+
 Default configuration: initial length 8, min 3, max 40, segment spacing 0.75 world unit, speed approximately 4.5 units/sec. Put gameplay constants in a central config module.
 
 ## 4. State machine

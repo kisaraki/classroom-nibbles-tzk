@@ -26,6 +26,7 @@ Vite prints the local development URL. Choose a vocabulary mode and deterministi
 - Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
 - A seed creates a reproducible five-scene × five-word run without repeated ids or targets.
 - Steer with `WASD` or the arrow keys.
+- Rapid double-corner input cannot fold the head back into the snake: a U-shaped second turn is accepted only after moving at least one 0.75-unit segment spacing. Recovery still permits one stationary escape turn.
 - Collect the outlined/pulsing next token shown in the target sequence.
 - A correct token advances progress and shortens the snake by one segment, with a minimum length of 3.
 - A wrong token lengthens the snake by one segment, with a maximum length of 40, stuns for one second, then respawns.

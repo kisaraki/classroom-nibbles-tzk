@@ -11,6 +11,7 @@ export interface SnakeConfig {
   readonly minimumLength: number;
   readonly maximumLength: number;
   readonly segmentSpacing: number;
+  readonly minimumUTurnDistance: number;
   readonly speed: number;
 }
 
@@ -32,6 +33,8 @@ export class Snake {
   readonly #initialLength: number;
   #headPosition: XZPoint;
   #direction: DirectionValue;
+  #directionBeforeLastTurn: DirectionValue;
+  #distanceSinceLastTurn = Number.POSITIVE_INFINITY;
   #length: number;
 
   constructor(config: SnakeConfig, initial: SnakeInitialState = {}) {
@@ -39,6 +42,7 @@ export class Snake {
       config.minimumLength < 1 ||
       config.maximumLength < config.minimumLength ||
       config.segmentSpacing <= 0 ||
+      config.minimumUTurnDistance < config.segmentSpacing ||
       config.speed <= 0
     ) {
       throw new Error("Invalid snake configuration.");
@@ -49,6 +53,7 @@ export class Snake {
     this.#initialLength = clampLength(initial.length ?? config.initialLength, config);
     this.#headPosition = { ...this.#initialPosition };
     this.#direction = this.#initialDirection;
+    this.#directionBeforeLastTurn = this.#initialDirection;
     this.#length = this.#initialLength;
     const maximumTrailDistance = config.maximumLength * config.segmentSpacing;
     this.#trail = new Trail(this.#headPosition, this.#direction, maximumTrailDistance);
@@ -70,11 +75,24 @@ export class Snake {
     return { ...this.#headPosition };
   }
 
-  trySetDirection(requested: DirectionValue): boolean {
+  trySetDirection(requested: DirectionValue, allowStationaryRecoveryTurn = false): boolean {
     if (requested === this.#direction || isOppositeDirection(this.#direction, requested)) {
       return requested === this.#direction;
     }
+    const wouldCurlInward = isOppositeDirection(
+      this.#directionBeforeLastTurn,
+      requested,
+    );
+    if (
+      wouldCurlInward &&
+      !allowStationaryRecoveryTurn &&
+      this.#distanceSinceLastTurn < this.#config.minimumUTurnDistance
+    ) {
+      return false;
+    }
+    this.#directionBeforeLastTurn = this.#direction;
     this.#direction = requested;
+    this.#distanceSinceLastTurn = 0;
     return true;
   }
 
@@ -92,6 +110,7 @@ export class Snake {
 
   advance(deltaSeconds: number): void {
     this.#headPosition = this.previewPosition(deltaSeconds);
+    this.#distanceSinceLastTurn += this.#config.speed * deltaSeconds;
     this.#trail.record(this.#headPosition);
   }
 
@@ -110,6 +129,8 @@ export class Snake {
   reset(): void {
     this.#headPosition = { ...this.#initialPosition };
     this.#direction = this.#initialDirection;
+    this.#directionBeforeLastTurn = this.#initialDirection;
+    this.#distanceSinceLastTurn = Number.POSITIVE_INFINITY;
     this.#length = this.#initialLength;
     this.#trail.reset(this.#headPosition, this.#direction);
   }

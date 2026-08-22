@@ -24,12 +24,28 @@ describe("Snake", () => {
     expect(snake.direction).toBe(Direction.EAST);
   });
 
+  it("rejects a rapid second corner that would curl the head back into its trail", () => {
+    const snake = new Snake(GAMEPLAY_CONFIG.snake);
+
+    expect(snake.trySetDirection(Direction.EAST)).toBe(true);
+    expect(snake.trySetDirection(Direction.SOUTH)).toBe(false);
+    expect(snake.direction).toBe(Direction.EAST);
+
+    snake.advance(
+      GAMEPLAY_CONFIG.snake.minimumUTurnDistance / GAMEPLAY_CONFIG.snake.speed,
+    );
+
+    expect(snake.trySetDirection(Direction.SOUTH)).toBe(true);
+    expect(snake.direction).toBe(Direction.SOUTH);
+  });
+
   it("places body segments along the recorded trail through corners", () => {
     const snake = new Snake({
       initialLength: 4,
       minimumLength: 3,
       maximumLength: 8,
       segmentSpacing: 1,
+      minimumUTurnDistance: 1,
       speed: 1,
     });
     snake.advance(2);

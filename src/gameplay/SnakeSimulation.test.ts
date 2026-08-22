@@ -91,9 +91,32 @@ describe("SnakeSimulation", () => {
     expect(simulation.status.state).toBe(GameState.RECOVERY);
     expect(simulation.requestDirection(Direction.NORTH)).toBe(true);
     expect(simulation.snake.direction).toBe(Direction.NORTH);
+    expect(simulation.requestDirection(Direction.WEST)).toBe(false);
+    expect(simulation.snake.direction).toBe(Direction.NORTH);
     simulation.update(0.5);
     expect(simulation.status.state).toBe(GameState.HUNTING);
     expect(simulation.snake.headPosition).toEqual(startPosition);
+  });
+
+  it("prevents two rapid corners from bypassing the direct-reversal guard", () => {
+    const arena = new Arena({
+      halfWidth: 20,
+      halfDepth: 20,
+      xBoundaryMode: BoundaryMode.SOLID,
+      zBoundaryMode: BoundaryMode.SOLID,
+    });
+    const simulation = createActiveSimulation(arena);
+
+    expect(simulation.requestDirection(Direction.EAST)).toBe(true);
+    expect(simulation.requestDirection(Direction.SOUTH)).toBe(false);
+    expect(simulation.snake.direction).toBe(Direction.EAST);
+
+    simulation.update(
+      GAMEPLAY_CONFIG.snake.minimumUTurnDistance / GAMEPLAY_CONFIG.snake.speed,
+    );
+
+    expect(simulation.requestDirection(Direction.SOUTH)).toBe(true);
+    expect(simulation.snake.direction).toBe(Direction.SOUTH);
   });
 
   it("detects self collision as the same non-lethal delay penalty", () => {

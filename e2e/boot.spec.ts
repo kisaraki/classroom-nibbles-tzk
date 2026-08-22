@@ -28,7 +28,10 @@ test("以中文介面選擇獨立字彙並開始第四階段", async ({ page }) 
   await expect(page.getByTestId("phase-message")).toBeHidden();
   await expect(page.getByTestId("no-progress-countdown")).toBeHidden();
 
-  await page.keyboard.press("ArrowRight");
+  await page.evaluate(() => {
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "ArrowRight" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "ArrowDown" }));
+  });
   await expect(page.getByTestId("snake-heading")).toHaveText("東");
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("snake-heading")).toHaveText("東");

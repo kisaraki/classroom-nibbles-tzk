@@ -18,6 +18,7 @@
 
 ### Fixed
 - Typing time now uses an absolute `performance.now()` deadline instead of the fixed-step gameplay clock, so hiding the page cannot pause the test.
+- Prevented rapid two-corner input from bypassing direct-reversal protection and curling the snake head inward; U-shaped turns now require one segment spacing of forward travel, with one safe stationary turn retained during recovery.
 
 ### Known Issues
 - Power-ups, weapon and ammo remain intentionally unavailable until Phase 5.
