@@ -89,7 +89,7 @@ All spawning goes through one SpawnManager. A spawn must be inside the arena, ou
 
 ## 10. Power-ups and weapon
 
-Always keep one each of +10, +5, -10, -5, ATTACK in the arena. ATTACK adds 5 ammo and ammo may accumulate. Space fires if ammo > 0. A bullet can destroy/reposition characters or power-ups; shooting a power-up does not activate it. Shooting the target character does not count as correct/wrong. Bullet hitting a solid wall disappears.
+Always keep one each of +10, +5, -10, -5, ATTACK in the arena. Numeric power-ups adjust the scene main timer by their signed number of seconds; reaching zero through a negative power-up uses the normal `LEVEL_FAILED` flow. ATTACK adds 5 ammo and ammo may accumulate. Space fires if ammo > 0. A bullet can destroy/reposition characters or power-ups; shooting a power-up does not activate it. Shooting the target character does not count as correct/wrong. Bullet hitting a solid wall disappears. To prevent unbounded projectiles on WRAP axes, an otherwise unspent bullet expires after 4 seconds.
 
 ## 11. Typing test
 

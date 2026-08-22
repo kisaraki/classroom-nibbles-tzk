@@ -1,6 +1,6 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "第四階段",
+  phaseLabel: "第五階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     backgroundColor: 0x050b16,
@@ -40,6 +40,16 @@ export const GAMEPLAY_CONFIG = Object.freeze({
     durationSeconds: 30,
     requiredConsecutiveSuccesses: 3,
     timeoutMainTimeBonusSeconds: 5,
+  }),
+  powerUp: Object.freeze({
+    collisionRadius: 0.42,
+    attackAmmoReward: 5,
+  }),
+  weapon: Object.freeze({
+    bulletRadius: 0.12,
+    bulletSpeed: 13,
+    muzzleOffset: 0.58,
+    bulletLifetimeSeconds: 4,
   }),
   token: Object.freeze({
     radius: 0.34,

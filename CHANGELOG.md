@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Phase 5 — 2026-08-22
+
+### Added
+- Persistent seeded arena pool containing one each of +10, +5, −10, −5 and ATTACK without overlapping the snake, tokens or other power-ups.
+- Signed numeric power-up effects for the scene main timer; negative adjustments reaching zero use the existing non-lethal level-failed flow.
+- Cumulative ATTACK rewards of five rounds and Space-key firing restricted to `HUNTING`.
+- Fixed-step projectile movement across WRAP axes, four-second safety expiry and removal on SOLID-wall impact.
+- Shot-token and shot-power-up repositioning that never advances vocabulary progress or activates the struck power-up.
+- Three.js power-up labels and projectile rendering plus Traditional Chinese ammo, power-up and shot telemetry.
+- Unit and Chromium coverage for Phase 5 spawn, collection, ammo, firing, impact and browser-HUD behavior.
+
+### Changed
+- Advanced browser metadata, default seed and visible phase markers to Phase 5.
+- Extended shared spawn occupancy so future token respawns avoid all live power-ups.
+
+### Known Issues
+- The current isometric scene and telemetry overlay remain temporary until the cockpit HUD and mini-map work in Phase 6.
+
 ## Phase 4 — 2026-08-22
 
 ### Added

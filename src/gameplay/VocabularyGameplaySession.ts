@@ -215,6 +215,20 @@ export class VocabularyGameplaySession {
     return true;
   }
 
+  adjustMainTime(deltaSeconds: number): number {
+    if (!Number.isFinite(deltaSeconds)) {
+      throw new Error("Main-time adjustment must be finite.");
+    }
+    if (!TIMER_STATES.has(this.#stateMachine.state)) {
+      return Math.max(this.#timeRemainingSeconds, 0);
+    }
+    this.#timeRemainingSeconds = Math.max(0, this.#timeRemainingSeconds + deltaSeconds);
+    if (this.#timeRemainingSeconds === 0) {
+      this.#stateMachine.transition(GameState.LEVEL_FAILED);
+    }
+    return this.#timeRemainingSeconds;
+  }
+
   #resetForCurrentWord(): void {
     this.#progressIndex = 0;
     this.#latestCollection = null;

@@ -10,16 +10,24 @@ export interface TokenEntity {
   readonly radius: number;
 }
 
+export type SpawnOccupantsProvider = () => readonly SpawnOccupant[];
+
 export class TokenPool {
   readonly #spawnManager: SpawnManager;
   readonly #tokenRadius: number;
+  readonly #additionalOccupants: SpawnOccupantsProvider;
   readonly #entities = new Map<string, TokenEntity>();
   #nextId = 1;
 
-  constructor(spawnManager: SpawnManager, tokenRadius: number) {
+  constructor(
+    spawnManager: SpawnManager,
+    tokenRadius: number,
+    additionalOccupants: SpawnOccupantsProvider = () => [],
+  ) {
     if (tokenRadius <= 0) throw new Error("Token radius must be positive.");
     this.#spawnManager = spawnManager;
     this.#tokenRadius = tokenRadius;
+    this.#additionalOccupants = additionalOccupants;
   }
 
   get entities(): readonly TokenEntity[] {
@@ -36,10 +44,13 @@ export class TokenPool {
   }
 
   spawn(token: CharacterToken, snake: Snake): TokenEntity {
-    const occupied: SpawnOccupant[] = this.entities.map((entity) => ({
-      position: entity.position,
-      radius: entity.radius,
-    }));
+    const occupied: SpawnOccupant[] = [
+      ...this.entities.map((entity) => ({
+        position: entity.position,
+        radius: entity.radius,
+      })),
+      ...this.#additionalOccupants(),
+    ];
     const position = this.#spawnManager.findPosition({
       radius: this.#tokenRadius,
       snakeHead: snake.headPosition,
@@ -65,6 +76,11 @@ export class TokenPool {
     const entity = this.#entities.get(id) ?? null;
     if (entity) this.#entities.delete(id);
     return entity;
+  }
+
+  reposition(id: string, snake: Snake): TokenEntity | null {
+    const entity = this.remove(id);
+    return entity ? this.spawn(entity.token, snake) : null;
   }
 }
 

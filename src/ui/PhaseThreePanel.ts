@@ -1,5 +1,7 @@
-import { APP_CONFIG } from "../core/Config";
+import { APP_CONFIG, GAMEPLAY_CONFIG } from "../core/Config";
 import { CollisionKind } from "../gameplay/CollisionSystem";
+import { PowerUpKind } from "../gameplay/PowerUpPool";
+import type { PowerUpWeaponStatus } from "../gameplay/PowerUpWeaponSession";
 import type { SnakeSimulationStatus } from "../gameplay/SnakeSimulation";
 import {
   TokenCollectionKind,
@@ -7,6 +9,7 @@ import {
 } from "../gameplay/VocabularyGameplaySession";
 import { Direction } from "../gameplay/Direction";
 import { tokenDisplayLabel } from "../gameplay/TokenPool";
+import { BulletImpactKind } from "../gameplay/WeaponSystem";
 
 function createElement<K extends keyof HTMLElementTagNameMap>(
   tagName: K,
@@ -73,6 +76,24 @@ function tokenName(token: VocabularyGameplayStatus["nextToken"]): string {
   return token ?? "—";
 }
 
+function powerUpLabel(powerUp: PowerUpWeaponStatus["latestPowerUp"]): string {
+  if (powerUp === PowerUpKind.TIME_PLUS_10) return "主計時 +10 秒";
+  if (powerUp === PowerUpKind.TIME_PLUS_5) return "主計時 +5 秒";
+  if (powerUp === PowerUpKind.TIME_MINUS_10) return "主計時 −10 秒";
+  if (powerUp === PowerUpKind.TIME_MINUS_5) return "主計時 −5 秒";
+  if (powerUp === PowerUpKind.ATTACK) {
+    return `彈藥 +${GAMEPLAY_CONFIG.powerUp.attackAmmoReward}`;
+  }
+  return "無";
+}
+
+function bulletImpactLabel(impact: PowerUpWeaponStatus["latestBulletImpact"]): string {
+  if (impact === BulletImpactKind.TOKEN) return "字元已重新配置";
+  if (impact === BulletImpactKind.POWER_UP) return "道具已重新配置";
+  if (impact === BulletImpactKind.SOLID_WALL) return "命中實體牆";
+  return "無";
+}
+
 export class PhaseThreePanel {
   readonly #element: HTMLElement;
   readonly #gameLevel: HTMLElement;
@@ -89,6 +110,9 @@ export class PhaseThreePanel {
   readonly #progress: HTMLElement;
   readonly #collision: HTMLElement;
   readonly #collection: HTMLElement;
+  readonly #ammo: HTMLElement;
+  readonly #powerUp: HTMLElement;
+  readonly #shot: HTMLElement;
   readonly #phaseMessage: HTMLElement;
   #renderedEntryId = "";
   #renderedProgress = -1;
@@ -98,7 +122,7 @@ export class PhaseThreePanel {
     this.#element.dataset.testid = "phase-three-panel";
     const heading = createElement("header", "phase-three-panel__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "字元獵取 / 04"),
+      createElement("p", "phase-three-panel__eyebrow", "字元獵取 / 05"),
       createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
     );
 
@@ -131,6 +155,9 @@ export class PhaseThreePanel {
     this.#length = this.#appendMetric(telemetry, "長度", "—", "snake-length");
     this.#collision = this.#appendMetric(telemetry, "碰撞", "無", "latest-collision");
     this.#collection = this.#appendMetric(telemetry, "字元", "無", "latest-collection");
+    this.#ammo = this.#appendMetric(telemetry, "彈藥", "0", "ammo-count");
+    this.#powerUp = this.#appendMetric(telemetry, "道具", "無", "latest-power-up");
+    this.#shot = this.#appendMetric(telemetry, "射擊", "無", "latest-shot");
 
     this.#phaseMessage = createElement("p", "phase-three-panel__message");
     this.#phaseMessage.dataset.testid = "phase-message";
@@ -138,7 +165,7 @@ export class PhaseThreePanel {
     const controls = createElement(
       "p",
       "phase-three-panel__controls",
-      "使用 WASD 或方向鍵轉向 · 收集有外框的下一個字元",
+      "使用 WASD 或方向鍵轉向 · 空白鍵發射 · 收集有外框的下一個字元",
     );
     this.#element.append(
       heading,
@@ -151,7 +178,11 @@ export class PhaseThreePanel {
     container.append(this.#element);
   }
 
-  update(gameplay: VocabularyGameplayStatus, snake: SnakeSimulationStatus): void {
+  update(
+    gameplay: VocabularyGameplayStatus,
+    snake: SnakeSimulationStatus,
+    powerUpWeapon: PowerUpWeaponStatus,
+  ): void {
     this.#element.dataset.state = gameplay.state;
     this.#gameLevel.textContent = `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`;
     this.#vocabularyLevel.textContent = gameplay.vocabularyMode;
@@ -163,6 +194,9 @@ export class PhaseThreePanel {
     this.#length.textContent = String(snake.length);
     this.#collision.textContent = collisionLabel(snake.latestCollision);
     this.#collection.textContent = collectionLabel(gameplay.latestCollection);
+    this.#ammo.textContent = String(powerUpWeapon.ammo);
+    this.#powerUp.textContent = powerUpLabel(powerUpWeapon.latestPowerUp);
+    this.#shot.textContent = bulletImpactLabel(powerUpWeapon.latestBulletImpact);
     this.#meaning.textContent = gameplay.entry.meaningZh;
     this.#partOfSpeech.textContent = gameplay.entry.partOfSpeech ?? "";
     this.#progress.textContent =

@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D cockpit vocabulary game based on class
 
 ## Current status
 
-Phase 4 is complete. The browser supports the full vocabulary hunt plus a Traditional Chinese 30-second typing reinforcement modal. Every word now advances only after three consecutive correct submissions; an error resets the streak, while timeout returns only the final token and adds five seconds to the scene timer.
+Phase 5 is complete. The Traditional Chinese vocabulary hunt now includes five persistent power-up types, cumulative ATTACK ammo, Space-key firing, projectile collision/reposition rules, and the existing 30-second three-success typing reinforcement.
 
 ## Requirements
 
@@ -19,9 +19,9 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the interactive Phase 4 vocabulary run.
+Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the interactive Phase 5 vocabulary run.
 
-## Phase 4 gameplay and controls
+## Phase 5 gameplay and controls
 
 - Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
 - A seed creates a reproducible five-scene × five-word run without repeated ids or targets.
@@ -31,6 +31,9 @@ Vite prints the local development URL. Choose a vocabulary mode and deterministi
 - A correct token advances progress and shortens the snake by one segment, with a minimum length of 3.
 - A wrong token lengthens the snake by one segment, with a maximum length of 40, stuns for one second, then respawns.
 - All 30 gameplay token types—A–Z, SPACE, PERIOD, APOSTROPHE, and HYPHEN—exist at the start of every word.
+- One each of +10, +5, −10, −5 and ATTACK always exists. Numeric power-ups adjust the scene main timer by the displayed seconds; a negative adjustment reaching zero uses the normal level-failed flow.
+- ATTACK adds five cumulative rounds. Press `Space` while hunting to fire one round in the current heading; firing is disabled during stun, recovery and typing.
+- A bullet repositions a hit token or power-up without collecting or activating it. Solid walls destroy bullets, and otherwise unspent bullets expire after four seconds.
 - Red east/west walls are `SOLID`; blue north/south gates are `WRAP`.
 - Wall and self collisions retain the Phase 2 non-lethal stun/recovery behavior.
 
@@ -82,7 +85,8 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 - Vitest also covers fixed-step timing, cardinal movement, trail sampling, length limits, per-segment wrapping, SOLID walls, self collision, stun, and recovery.
 - Phase 3 tests cover deterministic run selection, Progressive mapping, filter relaxation, spawn constraints/fallback, token-pool normalization, ordered progress, repeated tokens, wrong-token respawn, length rewards/penalties and timer pausing.
 - Phase 4 tests cover answer normalization, exact internal punctuation/spacing, consecutive-success streaks, real-time timeout, final-token rollback and the five-second timer bonus.
-- Playwright checks vocabulary selection, independent Game/Vocabulary labels, the 30-token scene, non-color target cue, steering rules, typing-modal submission and modal-scoped clipboard blocking.
+- Phase 5 tests cover persistent mutually spaced power-ups, signed timer effects, cumulative ammo, firing restrictions, projectile motion, WRAP travel, solid-wall removal and non-activating shot repositioning.
+- Playwright checks vocabulary selection, independent Game/Vocabulary labels, the 30-token and five-power-up scene, ammo HUD, non-color target cue, steering/firing rules, typing-modal submission and modal-scoped clipboard blocking.
 - `.github/workflows/ci.yml` runs quality gates on pushes and pull requests, with E2E isolated in its own job.
 - `.github/workflows/deploy-pages.yml` validates and builds `dist/` before deploying it through official GitHub Pages actions on `main`.
 
@@ -91,8 +95,8 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 ```text
 src/core/          Boot coordination, state machine, fixed-step loop, and configuration
 src/gameplay/      Three.js-independent snake, trail, arena, collision, and simulation logic
-src/input/         Keyboard-to-direction input adapter
-src/rendering/     Three.js arena, instanced snake, and token-sprite presentation
+src/input/         Keyboard direction and weapon input adapters
+src/rendering/     Three.js arena, snake, token, power-up, and projectile presentation
 src/ui/            Boot/error UI, vocabulary selection, gameplay telemetry, and typing modal
 src/vocabulary/    Runtime repository, modes, deterministic WordSelector, and tests
 e2e/               Playwright smoke test
@@ -103,4 +107,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract. Phase 5 has not started.
+See `SPEC.md` for the full product contract. Phase 6 has not started.

@@ -1,11 +1,14 @@
 import * as THREE from "three";
 import { Arena } from "../gameplay/Arena";
 import { CollisionSystem } from "../gameplay/CollisionSystem";
+import { PowerUpPool } from "../gameplay/PowerUpPool";
+import { PowerUpWeaponSession } from "../gameplay/PowerUpWeaponSession";
 import { Snake } from "../gameplay/Snake";
 import { SnakeSimulation } from "../gameplay/SnakeSimulation";
 import { SpawnManager } from "../gameplay/SpawnManager";
 import { TokenCollisionSystem } from "../gameplay/TokenCollisionSystem";
 import { TokenPool } from "../gameplay/TokenPool";
+import { WeaponSystem } from "../gameplay/WeaponSystem";
 import {
   TypingAttemptKind,
   TypingTestSession,
@@ -13,6 +16,7 @@ import {
 } from "../gameplay/TypingTestSession";
 import { VocabularyGameplaySession } from "../gameplay/VocabularyGameplaySession";
 import { DirectionInput } from "../input/DirectionInput";
+import { WeaponInput } from "../input/WeaponInput";
 import { PhaseThreeScene } from "../rendering/PhaseThreeScene";
 import { BootScreen } from "../ui/BootScreen";
 import { PhaseThreePanel } from "../ui/PhaseThreePanel";
@@ -55,6 +59,9 @@ export class Game {
   readonly #input = new DirectionInput((direction) => {
     this.#snakeSimulation.requestDirection(direction);
   });
+  readonly #weaponInput = new WeaponInput(() => {
+    this.#powerUpWeapon?.fire();
+  });
   readonly #recentHistory = new RecentTargetHistory();
   readonly #unsubscribeStateChange: () => void;
   #scene: PhaseThreeScene | null = null;
@@ -62,6 +69,7 @@ export class Game {
   #panel: PhaseThreePanel | null = null;
   #repository: VocabularyRepository | null = null;
   #gameplay: VocabularyGameplaySession | null = null;
+  #powerUpWeapon: PowerUpWeaponSession | null = null;
   #typingTest: TypingTestSession | null = null;
   #typingModal: TypingTestModal | null = null;
   #timer: THREE.Timer | null = null;
@@ -98,6 +106,7 @@ export class Game {
 
   dispose(): void {
     this.#input.detach();
+    this.#weaponInput.detach();
     this.#stopTypingTest();
     this.#unsubscribeStateChange();
     document.removeEventListener("visibilitychange", this.#onVisibilityChange);
@@ -126,7 +135,20 @@ export class Game {
           fallbackGridSpacing: GAMEPLAY_CONFIG.token.fallbackGridSpacing,
         },
       );
-      const tokenPool = new TokenPool(spawnManager, GAMEPLAY_CONFIG.token.collisionRadius);
+      let powerUpPool: PowerUpPool | null = null;
+      const tokenPool = new TokenPool(
+        spawnManager,
+        GAMEPLAY_CONFIG.token.collisionRadius,
+        () => powerUpPool?.spawnOccupants ?? [],
+      );
+      powerUpPool = new PowerUpPool(
+        spawnManager,
+        GAMEPLAY_CONFIG.powerUp.collisionRadius,
+        () => tokenPool.entities.map((entity) => ({
+          position: entity.position,
+          radius: entity.radius,
+        })),
+      );
       const tokenCollisions = new TokenCollisionSystem(
         GAMEPLAY_CONFIG.snake.headCollisionRadius,
       );
@@ -137,10 +159,24 @@ export class Game {
         tokenPool,
         tokenCollisions,
       );
+      const powerUpWeapon = new PowerUpWeaponSession(
+        this.#stateMachine,
+        this.#snake,
+        this.#arena,
+        tokenPool,
+        powerUpPool,
+        new WeaponSystem(this.#arena, GAMEPLAY_CONFIG.weapon),
+        GAMEPLAY_CONFIG.snake.headCollisionRadius,
+        GAMEPLAY_CONFIG.powerUp.attackAmmoReward,
+        (deltaSeconds) => {
+          gameplay.adjustMainTime(deltaSeconds);
+        },
+      );
       gameplay.subscribeToWordStarted((entry) => this.#recentHistory.remember(entry.target));
 
       this.#stateMachine.transition(GameState.TRANSITION_IN);
       this.#gameplay = gameplay;
+      this.#powerUpWeapon = powerUpWeapon;
       this.#panel = new PhaseThreePanel(this.#container);
       this.#selectionScreen.hide();
       this.#stateMachine.transition(GameState.HUNTING);
@@ -156,6 +192,7 @@ export class Game {
     this.#updateTypingTest(performance.now());
     this.#fixedStepRunner.advance(this.#timer.getDelta(), (stepSeconds) => {
       this.#gameplay?.update(stepSeconds);
+      this.#powerUpWeapon?.update(stepSeconds);
     });
 
     const gameplayStatus = this.#gameplay?.status;
@@ -163,10 +200,18 @@ export class Game {
       this.#snake,
       this.#arena,
       this.#gameplay?.tokenEntities ?? [],
+      this.#powerUpWeapon?.powerUpEntities ?? [],
+      this.#powerUpWeapon?.bulletEntities ?? [],
       gameplayStatus?.nextToken ?? null,
       this.#timer.getElapsed(),
     );
-    if (gameplayStatus) this.#panel?.update(gameplayStatus, this.#snakeSimulation.status);
+    if (gameplayStatus && this.#powerUpWeapon) {
+      this.#panel?.update(
+        gameplayStatus,
+        this.#snakeSimulation.status,
+        this.#powerUpWeapon.status,
+      );
+    }
   };
 
   readonly #onStateChange = (
@@ -178,7 +223,10 @@ export class Game {
       return;
     }
     if (previous === GameState.TYPING_TEST) this.#stopTypingTest();
-    if (current === GameState.HUNTING) this.#input.attach();
+    if (current === GameState.HUNTING) {
+      this.#input.attach();
+      this.#weaponInput.attach();
+    }
   };
 
   readonly #onVisibilityChange = (): void => {
@@ -188,6 +236,7 @@ export class Game {
   #startTypingTest(): void {
     if (!this.#gameplay) return;
     this.#input.detach();
+    this.#weaponInput.detach();
     this.#stopTypingTest();
     const config = GAMEPLAY_CONFIG.typingTest;
     const typingTest = new TypingTestSession(

@@ -206,6 +206,16 @@ describe("VocabularyGameplaySession", () => {
     expect(session.status.timeRemainingSeconds).toBe(100);
   });
 
+  it("applies signed main-time power-up adjustments and fails normally at zero", () => {
+    const { session } = createSession("AB");
+
+    expect(session.adjustMainTime(10)).toBe(130);
+    expect(session.status.state).toBe(GameState.HUNTING);
+    expect(session.adjustMainTime(-125)).toBe(5);
+    expect(session.adjustMainTime(-5)).toBe(0);
+    expect(session.status.state).toBe(GameState.LEVEL_FAILED);
+  });
+
   it("advances across all five scenes only through the future typing-success hook", () => {
     const { session } = createSession("A");
 
