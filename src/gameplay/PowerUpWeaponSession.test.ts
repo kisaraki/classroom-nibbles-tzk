@@ -83,6 +83,25 @@ function createFixture(): {
 }
 
 describe("PowerUpWeaponSession", () => {
+  it("publishes power-up collection and non-expiry bullet-impact events", () => {
+    const { session, tokenPool, weapon } = createFixture();
+    const powerUps: string[] = [];
+    const impacts: string[] = [];
+    session.subscribeToPowerUpCollections((result) => powerUps.push(result.kind));
+    session.subscribeToBulletImpacts((kind) => impacts.push(kind));
+
+    const attack = session.powerUpEntities.find(
+      (entity) => entity.kind === PowerUpKind.ATTACK,
+    )!;
+    session.resolvePowerUpCollision(attack.id);
+    const token = tokenPool.entities[0]!;
+    weapon.fire({ x: token.position.x, z: token.position.z + 1.88 }, Direction.NORTH);
+    session.update(0.1);
+
+    expect(powerUps).toEqual([PowerUpKind.ATTACK]);
+    expect(impacts).toEqual(["TOKEN"]);
+  });
+
   it("always keeps one of each power-up without overlapping tokens", () => {
     const { session, arena, tokenPool, powerUpPool } = createFixture();
 

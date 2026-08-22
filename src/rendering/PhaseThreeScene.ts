@@ -47,7 +47,7 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
     this.#renderer.domElement.dataset.cameraMode = "snake-eye";
     this.#renderer.domElement.dataset.cameraCount = "1";
-    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第七階段第一人稱字彙遊戲場");
+    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第八階段第一人稱字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
     this.#scene.background = new THREE.Color(environment.palette.backgroundColor);
@@ -112,7 +112,7 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.obstacleCount = String(environment.obstacles.length);
     this.#renderer.domElement.setAttribute(
       "aria-label",
-      `NIBBLES 第七階段第一人稱字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
+      `NIBBLES 第八階段第一人稱字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
     );
   }
 

@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("以中文座艙介面選擇獨立字彙並開始第七階段貨艙環境", async ({ page }) => {
+test("以中文座艙介面選擇獨立字彙並開始第八階段貨艙環境", async ({ page }) => {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("./");
 
-  await expect(page).toHaveTitle("NIBBLES — 第七階段");
+  await expect(page).toHaveTitle("NIBBLES — 第八階段");
   await expect(page.getByTestId("vocabulary-select")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();

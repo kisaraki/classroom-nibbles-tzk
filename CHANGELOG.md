@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Phase 8 — 2026-08-22
+
+### Added
+- A dependency-free Web Audio presentation layer with synthesized feedback for menus, tokens, collisions, power-ups, weapons, typing, pause/resume, scene entry and mission completion.
+- Five distinct low-level ambient soundscapes, one per environment, plus a Traditional Chinese sound toggle whose mute preference persists in localStorage and degrades safely to silent play when audio is unavailable.
+- Animated cockpit-door cards for every scene entry, user pause/resume, visibility-triggered automatic pause and final mission completion, with reduced-motion handling.
+- A KOSMOS TOOLKITS 探真拓知酷 credits screen summarizing all five environments and 25 completed words, with a clean return to vocabulary/seed selection for replay.
+- Typed gameplay presentation events and unit/Chromium coverage for audio definitions, mute persistence, collection/impact cues, exact-state pause/resume, visibility behavior, doors and credits.
+
+### Changed
+- Made `TRANSITION_IN` a real timer-pausing state between scenes instead of transitioning through it synchronously.
+- Added `P` pause/resume for normal gameplay and automatic pause when the document becomes hidden; typing tests remain real-time and cannot be paused with `P`.
+- Advanced browser metadata, accessibility text, default seed and visible phase markers to Phase 8.
+
+### Fixed
+- Preserved the exact prior `HUNTING`, `STUNNED`, `RECOVERY`, or `MAP_EXPANDED` state across pause/resume and delayed state restoration until the door-open animation completes.
+- Reset transient run presentation and initial snake length before replay so a completed mission can begin a clean new run without duplicated HUD elements.
+
 ## Phase 7 — 2026-08-22
 
 ### Added
@@ -13,9 +31,6 @@
 - Reset the snake pose and trail to the safe arena center between scenes while preserving earned length and cumulative ammo.
 - Rebuilt tokens and power-ups outside each new obstacle field and cleared only active bullets during scene changes.
 - Reported environment mechanics, obstacle collisions and obstacle shot impacts in the Chinese cockpit HUD.
-
-### Known Issues
-- Phase 8 presentation work—audio, door transitions and credits—has not been implemented.
 
 ## Phase 6 — 2026-08-22
 

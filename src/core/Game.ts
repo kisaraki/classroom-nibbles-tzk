@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { AudioManager, SoundCue } from "../audio/AudioManager";
 import { Arena } from "../gameplay/Arena";
 import { CollisionSystem } from "../gameplay/CollisionSystem";
 import { EnvironmentController } from "../gameplay/Environment";
@@ -15,16 +16,23 @@ import {
   TypingTestSession,
   TypingTestState,
 } from "../gameplay/TypingTestSession";
-import { VocabularyGameplaySession } from "../gameplay/VocabularyGameplaySession";
+import {
+  TokenCollectionKind,
+  VocabularyGameplaySession,
+} from "../gameplay/VocabularyGameplaySession";
 import { DirectionInput } from "../input/DirectionInput";
+import { PauseInput } from "../input/PauseInput";
 import { TacticalMapInput } from "../input/TacticalMapInput";
 import { WeaponInput } from "../input/WeaponInput";
 import { PhaseThreeScene } from "../rendering/PhaseThreeScene";
 import { BootScreen } from "../ui/BootScreen";
+import { AudioControl } from "../ui/AudioControl";
 import { CockpitOverlay } from "../ui/CockpitOverlay";
+import { CreditsScreen } from "../ui/CreditsScreen";
 import { PhaseThreePanel } from "../ui/PhaseThreePanel";
 import { RadarMap } from "../ui/RadarMap";
 import { TypingTestModal } from "../ui/TypingTestModal";
+import { TransitionOverlay } from "../ui/TransitionOverlay";
 import {
   VocabularySelectScreen,
   type VocabularySelection,
@@ -35,6 +43,7 @@ import { WordSelector } from "../vocabulary/WordSelector";
 import { GAMEPLAY_CONFIG, getVocabularyUrl } from "./Config";
 import { FixedStepRunner } from "./FixedStepRunner";
 import { createGameStateMachine, GameState } from "./GameState";
+import { PauseController, PauseReason } from "./PauseController";
 import { SeededRandom } from "./SeededRandom";
 import { TacticalMapController } from "./TacticalMapController";
 
@@ -67,7 +76,7 @@ export class Game {
     this.#snakeSimulation.requestDirection(direction);
   });
   readonly #weaponInput = new WeaponInput(() => {
-    this.#powerUpWeapon?.fire();
+    if (this.#powerUpWeapon?.fire()) this.#audio.play(SoundCue.SHOT);
   });
   readonly #tacticalMapController = new TacticalMapController(this.#stateMachine);
   readonly #tacticalMapInput = new TacticalMapInput({
@@ -75,7 +84,13 @@ export class Game {
     close: () => this.#tacticalMapController.close(),
   });
   readonly #recentHistory = new RecentTargetHistory();
+  readonly #audio = new AudioManager();
+  readonly #transitionOverlay: TransitionOverlay;
+  readonly #pauseController: PauseController;
+  readonly #pauseInput: PauseInput;
+  readonly #audioControl: AudioControl;
   readonly #unsubscribeStateChange: () => void;
+  readonly #unsubscribeCollision: () => void;
   #scene: PhaseThreeScene | null = null;
   #selectionScreen: VocabularySelectScreen | null = null;
   #panel: PhaseThreePanel | null = null;
@@ -86,12 +101,27 @@ export class Game {
   #powerUpWeapon: PowerUpWeaponSession | null = null;
   #typingTest: TypingTestSession | null = null;
   #typingModal: TypingTestModal | null = null;
+  #creditsScreen: CreditsScreen | null = null;
   #timer: THREE.Timer | null = null;
 
   constructor(container: HTMLElement) {
     this.#container = container;
     this.#bootScreen = new BootScreen(container);
+    this.#transitionOverlay = new TransitionOverlay(container);
+    this.#pauseController = new PauseController(
+      this.#stateMachine,
+      this.#transitionOverlay,
+    );
+    this.#pauseInput = new PauseInput(() => this.#pauseController.toggle());
+    this.#audioControl = new AudioControl(
+      container,
+      this.#audio.muted,
+      () => this.#audio.toggleMuted(),
+    );
     this.#unsubscribeStateChange = this.#stateMachine.subscribe(this.#onStateChange);
+    this.#unsubscribeCollision = this.#snakeSimulation.subscribeToCollisions(() => {
+      this.#audio.play(SoundCue.COLLISION);
+    });
     document.addEventListener("visibilitychange", this.#onVisibilityChange);
   }
 
@@ -116,6 +146,7 @@ export class Game {
         this.#repository.metadata,
         this.#startRun,
       );
+      this.#pauseInput.attach();
       this.#bootScreen.hide();
     } catch (error) {
       this.#bootScreen.showError(error);
@@ -126,12 +157,16 @@ export class Game {
     this.#input.detach();
     this.#weaponInput.detach();
     this.#tacticalMapInput.detach();
+    this.#pauseInput.detach();
     this.#stopTypingTest();
+    this.#disposeRunPresentation();
     this.#unsubscribeStateChange();
+    this.#unsubscribeCollision();
     document.removeEventListener("visibilitychange", this.#onVisibilityChange);
     this.#selectionScreen?.dispose();
-    this.#cockpitOverlay?.dispose();
-    this.#radarMap?.dispose();
+    this.#audioControl.dispose();
+    this.#transitionOverlay.dispose();
+    this.#audio.dispose();
     this.#scene?.dispose();
     this.#timer?.dispose();
   }
@@ -139,6 +174,9 @@ export class Game {
   readonly #startRun = (selection: VocabularySelection): void => {
     if (!this.#repository || !this.#selectionScreen) return;
     try {
+      this.#disposeRunPresentation();
+      this.#snake.resetPose({ length: GAMEPLAY_CONFIG.snake.initialLength });
+      this.#fixedStepRunner.reset();
       const selector = new WordSelector(this.#repository.eligibleEntries);
       const plan = selector.createRun(
         selection.mode,
@@ -147,6 +185,10 @@ export class Game {
       );
       const initialEnvironment = this.#environment.select(plan.scenes[0]!.gameLevel);
       this.#scene?.setEnvironment(initialEnvironment);
+      this.#audio.setEnvironment(initialEnvironment.kind);
+      void this.#audio.unlock().then(() => {
+        this.#audio.play(SoundCue.MENU_ACCEPT);
+      });
       const spawnManager = new SpawnManager(
         this.#arena,
         new SeededRandom(`${selection.seed}:spawns`),
@@ -201,16 +243,29 @@ export class Game {
         },
       );
       gameplay.subscribeToWordStarted((entry) => this.#recentHistory.remember(entry.target));
+      gameplay.subscribeToTokenCollections((result) => {
+        this.#audio.play(
+          result.kind === TokenCollectionKind.CORRECT
+            ? SoundCue.CORRECT_TOKEN
+            : SoundCue.WRONG_TOKEN,
+        );
+      });
       gameplay.subscribeToSceneStarted((scenePlan) => {
         const environment = this.#environment.select(scenePlan.gameLevel);
         this.#snakeSimulation.resetForScene();
         this.#fixedStepRunner.reset();
         this.#scene?.setEnvironment(environment);
+        this.#audio.setEnvironment(environment.kind);
         powerUpWeapon.resetEnvironment();
         tokenPool.reset(this.#snake);
       });
+      powerUpWeapon.subscribeToPowerUpCollections(() => {
+        this.#audio.play(SoundCue.POWER_UP);
+      });
+      powerUpWeapon.subscribeToBulletImpacts(() => {
+        this.#audio.play(SoundCue.BULLET_IMPACT);
+      });
 
-      this.#stateMachine.transition(GameState.TRANSITION_IN);
       this.#gameplay = gameplay;
       this.#powerUpWeapon = powerUpWeapon;
       this.#panel = new PhaseThreePanel(this.#container);
@@ -224,8 +279,8 @@ export class Game {
       );
       this.#tacticalMapInput.attach();
       this.#selectionScreen.hide();
-      this.#stateMachine.transition(GameState.HUNTING);
       this.#recentHistory.remember(gameplay.status.entry.target);
+      this.#stateMachine.transition(GameState.TRANSITION_IN);
     } catch (error) {
       this.#selectionScreen.showError(error);
     }
@@ -284,11 +339,42 @@ export class Game {
       current === GameState.MAP_EXPANDED,
       current === GameState.MAP_EXPANDED ? this.#tacticalMapController.timeScale : 1,
     );
+    if (current === GameState.TRANSITION_IN) {
+      this.#input.detach();
+      this.#weaponInput.detach();
+      this.#transitionOverlay.playSceneTransition(this.#environment.current, () => {
+        if (this.#stateMachine.state !== GameState.TRANSITION_IN) return;
+        this.#audio.play(SoundCue.SCENE_ENTER);
+        this.#stateMachine.transition(GameState.HUNTING);
+      });
+      return;
+    }
+    if (current === GameState.PAUSED) {
+      this.#audio.play(SoundCue.PAUSE);
+      return;
+    }
+    if (previous === GameState.PAUSED) this.#audio.play(SoundCue.RESUME);
     if (current === GameState.TYPING_TEST) {
       this.#startTypingTest();
       return;
     }
     if (previous === GameState.TYPING_TEST) this.#stopTypingTest();
+    if (current === GameState.GAME_CLEAR) {
+      this.#input.detach();
+      this.#weaponInput.detach();
+      this.#audio.play(SoundCue.GAME_CLEAR);
+      this.#transitionOverlay.playMissionComplete(() => {
+        if (this.#stateMachine.state === GameState.GAME_CLEAR) {
+          this.#stateMachine.transition(GameState.CREDITS);
+        }
+      });
+      return;
+    }
+    if (current === GameState.CREDITS) {
+      this.#creditsScreen?.dispose();
+      this.#creditsScreen = new CreditsScreen(this.#container, this.#returnToSelection);
+      return;
+    }
     if (current === GameState.HUNTING) {
       this.#input.attach();
       this.#weaponInput.attach();
@@ -297,6 +383,7 @@ export class Game {
 
   readonly #onVisibilityChange = (): void => {
     this.#updateTypingTest(performance.now());
+    if (document.hidden) this.#pauseController.pause(PauseReason.VISIBILITY);
   };
 
   #startTypingTest(): void {
@@ -334,9 +421,15 @@ export class Game {
     this.#typingModal?.update(this.#typingTest.status);
     if (!result) return;
     if (result.kind === TypingAttemptKind.TIMED_OUT) {
+      this.#audio.play(SoundCue.TYPING_WRONG);
       this.#gameplay.handleTypingTimeout();
     } else if (result.completed) {
+      this.#audio.play(SoundCue.TYPING_COMPLETE);
       this.#gameplay.advanceAfterTypingSuccess();
+    } else if (result.kind === TypingAttemptKind.CORRECT) {
+      this.#audio.play(SoundCue.TYPING_CORRECT);
+    } else {
+      this.#audio.play(SoundCue.TYPING_WRONG);
     }
   };
 
@@ -345,7 +438,33 @@ export class Game {
     const status = this.#typingTest.update(nowMilliseconds);
     this.#typingModal?.update(status);
     if (status.state === TypingTestState.TIMED_OUT) {
+      this.#audio.play(SoundCue.TYPING_WRONG);
       this.#gameplay.handleTypingTimeout();
     }
+  }
+
+  readonly #returnToSelection = (): void => {
+    if (this.#stateMachine.state !== GameState.CREDITS) return;
+    this.#disposeRunPresentation();
+    this.#stateMachine.transition(GameState.MAIN_MENU);
+    this.#stateMachine.transition(GameState.VOCABULARY_SELECT);
+    this.#selectionScreen?.show();
+  };
+
+  #disposeRunPresentation(): void {
+    this.#input.detach();
+    this.#weaponInput.detach();
+    this.#tacticalMapInput.detach();
+    this.#stopTypingTest();
+    this.#panel?.dispose();
+    this.#cockpitOverlay?.dispose();
+    this.#radarMap?.dispose();
+    this.#creditsScreen?.dispose();
+    this.#panel = null;
+    this.#cockpitOverlay = null;
+    this.#radarMap = null;
+    this.#creditsScreen = null;
+    this.#gameplay = null;
+    this.#powerUpWeapon = null;
   }
 }

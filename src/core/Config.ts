@@ -1,6 +1,6 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "第七階段",
+  phaseLabel: "第八階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     cameraFieldOfView: 60,
@@ -14,6 +14,20 @@ export const APP_CONFIG = Object.freeze({
     maxPixelRatio: 2,
     snakeHeadColor: 0x86ffe1,
     snakeBodyColor: 0x25bda5,
+  }),
+});
+
+export const PRESENTATION_CONFIG = Object.freeze({
+  sceneTransition: Object.freeze({
+    closeMilliseconds: 260,
+    holdMilliseconds: 520,
+    openMilliseconds: 360,
+  }),
+  pauseTransitionMilliseconds: 280,
+  audio: Object.freeze({
+    masterGain: 0.2,
+    ambientGain: 0.035,
+    mutedStorageKey: "nibbles.audio.muted",
   }),
 });
 

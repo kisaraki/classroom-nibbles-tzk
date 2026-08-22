@@ -55,6 +55,7 @@ export interface VocabularyGameplayStatus {
 
 export type WordStartedListener = (entry: VocabularyEntry) => void;
 export type SceneStartedListener = (scene: RunScenePlan) => void;
+export type TokenCollectionListener = (result: TokenCollectionResult) => void;
 
 export class VocabularyGameplaySession {
   readonly #plan: VocabularyRunPlan;
@@ -64,6 +65,7 @@ export class VocabularyGameplaySession {
   readonly #tokenCollisions: TokenCollisionSystem;
   readonly #wordStartedListeners = new Set<WordStartedListener>();
   readonly #sceneStartedListeners = new Set<SceneStartedListener>();
+  readonly #tokenCollectionListeners = new Set<TokenCollectionListener>();
   #sceneIndex = 0;
   #wordIndex = 0;
   #progressIndex = 0;
@@ -163,22 +165,26 @@ export class VocabularyGameplaySession {
       } else if (nextToken === entity.token) {
         this.#tokenPool.ensureToken(nextToken, this.#snakeSimulation.snake);
       }
-      return Object.freeze({
+      const result = Object.freeze({
         kind: TokenCollectionKind.CORRECT,
         token: entity.token,
         progressIndex: this.#progressIndex,
       });
+      this.#emitTokenCollection(result);
+      return result;
     }
 
     this.#snakeSimulation.snake.grow();
     this.#pendingWrongToken = entity.token;
     this.#latestCollection = TokenCollectionKind.WRONG;
     this.#snakeSimulation.applyWrongTokenCollision(entity.position);
-    return Object.freeze({
+    const result = Object.freeze({
       kind: TokenCollectionKind.WRONG,
       token: entity.token,
       progressIndex: this.#progressIndex,
     });
+    this.#emitTokenCollection(result);
+    return result;
   }
 
   advanceAfterTypingSuccess(): boolean {
@@ -196,7 +202,6 @@ export class VocabularyGameplaySession {
       for (const listener of this.#sceneStartedListeners) listener(this.#currentScene);
       this.#resetForCurrentWord();
       this.#stateMachine.transition(GameState.TRANSITION_IN);
-      this.#stateMachine.transition(GameState.HUNTING);
       return true;
     }
 
@@ -256,6 +261,15 @@ export class VocabularyGameplaySession {
   subscribeToSceneStarted(listener: SceneStartedListener): () => void {
     this.#sceneStartedListeners.add(listener);
     return () => this.#sceneStartedListeners.delete(listener);
+  }
+
+  subscribeToTokenCollections(listener: TokenCollectionListener): () => void {
+    this.#tokenCollectionListeners.add(listener);
+    return () => this.#tokenCollectionListeners.delete(listener);
+  }
+
+  #emitTokenCollection(result: TokenCollectionResult): void {
+    for (const listener of this.#tokenCollectionListeners) listener(result);
   }
 
   get #currentScene(): VocabularyRunPlan["scenes"][number] {

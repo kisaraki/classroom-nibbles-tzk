@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D cockpit vocabulary game based on class
 
 ## Current status
 
-Phase 7 is complete. All five Game Levels now use distinct functional 3D environments whose solid obstacles participate in non-lethal collision, seeded spawning, projectile impact and radar display while preserving the Phase 6 cockpit and tactical-map systems.
+Phase 8 is complete. NIBBLES now adds synthesized Web Audio, five environment-specific ambient soundscapes, animated door transitions, spec-compliant pause/visibility behavior, and a KOSMOS TOOLKITS completion/credits screen while preserving all Phase 7 gameplay.
 
 ## Requirements
 
@@ -19,9 +19,9 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the interactive Phase 7 vocabulary run.
+Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the interactive Phase 8 vocabulary run.
 
-## Phase 7 gameplay and controls
+## Phase 8 gameplay and controls
 
 - Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
 - A seed creates a reproducible five-scene × five-word run without repeated ids or targets.
@@ -39,6 +39,10 @@ Vite prints the local development URL. Choose a vocabulary mode and deterministi
 - The single snake-eye camera follows the snake's heading with a short visual smoothing transition; the cockpit mask and reticle stay fixed around the view.
 - The lower-left mini-map shows SOLID/WRAP boundaries, all tokens and power-ups, active bullets, environment obstacles, the snake head and the complete snake trail.
 - Click the mini-map or press `M` to open the enlarged tactical map. Gameplay, collection, firing and the main timer continue at 0.25 speed; press `Esc` or `M` to close it.
+- Press `P` during normal gameplay to pause through a closing cockpit-door transition. Press `P` again to resume after the door opens; the exact prior hunting, stun, recovery, or tactical-map state is restored.
+- Leaving or hiding the page automatically pauses normal gameplay and requires `P` to resume. `P` never pauses the typing test, whose timer continues in real time while hidden.
+- Use the Chinese `音效：開／關` control to persist the sound preference. Audio is synthesized with native Web Audio and gracefully falls back to silent play if audio is unavailable.
+- Scene changes use closed-door mission cards. Completing all 25 words opens the KOSMOS TOOLKITS 探真拓知酷 credits and a return-to-mission-settings action.
 
 Completing the final token pauses movement and the main timer in `TYPING_TEST` and opens the typing reinforcement modal:
 
@@ -99,6 +103,7 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 - Phase 5 tests cover persistent mutually spaced power-ups, signed timer effects, cumulative ammo, firing restrictions, projectile motion, WRAP travel, solid-wall removal and non-activating shot repositioning.
 - Phase 6 tests cover the snake-eye camera rig, smoothed cardinal turns, tactical-map state/input, 0.25 time scaling and continued gameplay while the enlarged map is open.
 - Phase 7 tests cover all five environment profiles, obstacle-safe arena capacity, level switching, safe pose reset, non-lethal obstacle collision and projectile blocking.
+- Phase 8 tests cover synthesized cue/ambient definitions, mute persistence, token/power-up/impact event routing, exact-state pause/resume, hidden-page auto-pause, door transitions and credits/replay presentation.
 - Playwright checks vocabulary selection, independent Game/Vocabulary labels, the Cargo Bay environment and obstacle markers, the 30-token and five-power-up scene, cockpit and complete-trail mini-map, steering/firing rules, tactical-map controls, continued quarter-speed movement, typing-modal submission and modal-scoped clipboard blocking.
 - `.github/workflows/ci.yml` runs quality gates on pushes and pull requests, with E2E isolated in its own job.
 - `.github/workflows/deploy-pages.yml` validates and builds `dist/` before deploying it through official GitHub Pages actions on `main`.
@@ -106,7 +111,8 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 ## Directory overview
 
 ```text
-src/core/          Boot coordination, state machine, fixed-step loop, and configuration
+src/audio/         Native Web Audio cues, ambient soundscapes, and mute preference
+src/core/          Boot coordination, state machine, fixed-step loop, pause, and configuration
 src/gameplay/      Snake, arena, five environment profiles, collision, spawning, and simulation
 src/input/         Keyboard direction, weapon, and tactical-map input adapters
 src/rendering/     Three.js arena/environment/entity views plus the snake-eye camera rig
@@ -120,4 +126,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract. Phase 8 has not started.
+See `SPEC.md` for the full product contract. Phase 8 is complete; Phase 9 has not started.

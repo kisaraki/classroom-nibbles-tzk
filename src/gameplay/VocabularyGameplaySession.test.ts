@@ -110,6 +110,19 @@ function createSession(target: string, initialLength = 8): SessionFixture {
 }
 
 describe("VocabularyGameplaySession", () => {
+  it("publishes typed correct and wrong token collection events", () => {
+    const { session } = createSession("AB");
+    const events: string[] = [];
+    session.subscribeToTokenCollections((result) => events.push(result.kind));
+
+    const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
+    session.resolveTokenCollision(correct.id);
+    const wrong = session.tokenEntities.find((entity) => entity.token === "Z")!;
+    session.resolveTokenCollision(wrong.id);
+
+    expect(events).toEqual([TokenCollectionKind.CORRECT, TokenCollectionKind.WRONG]);
+  });
+
   it("shortens for correct repeated tokens and immediately respawns the next copy", () => {
     const { session, snake } = createSession("AA");
     const firstA = session.tokenEntities.find((entity) => entity.token === "A")!;
@@ -230,7 +243,7 @@ describe("VocabularyGameplaySession", () => {
   });
 
   it("advances across all five scenes only through the future typing-success hook", () => {
-    const { session } = createSession("A");
+    const { session, stateMachine } = createSession("A");
     const startedScenes: number[] = [];
     session.subscribeToSceneStarted((scene) => startedScenes.push(scene.gameLevel));
 
@@ -243,6 +256,10 @@ describe("VocabularyGameplaySession", () => {
       if (completedWords === 4) {
         expect(session.status.gameLevel).toBe(2);
         expect(session.status.timeRemainingSeconds).toBe(90);
+      }
+      if ([4, 9, 14, 19].includes(completedWords)) {
+        expect(session.status.state).toBe(GameState.TRANSITION_IN);
+        stateMachine.transition(GameState.HUNTING);
       }
     }
 

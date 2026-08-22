@@ -42,6 +42,9 @@ export interface PowerUpWeaponStatus {
   readonly latestBulletImpact: BulletImpactKindValue | null;
 }
 
+export type PowerUpCollectionListener = (result: PowerUpCollectionResult) => void;
+export type BulletImpactListener = (kind: BulletImpactKindValue) => void;
+
 export class PowerUpWeaponSession {
   readonly #stateMachine: StateMachine<GameStateValue>;
   readonly #snake: Snake;
@@ -52,6 +55,8 @@ export class PowerUpWeaponSession {
   readonly #headRadius: number;
   readonly #attackAmmoReward: number;
   readonly #adjustMainTime: (deltaSeconds: number) => void;
+  readonly #powerUpCollectionListeners = new Set<PowerUpCollectionListener>();
+  readonly #bulletImpactListeners = new Set<BulletImpactListener>();
   #latestPowerUp: PowerUpKindValue | null = null;
   #latestBulletImpact: BulletImpactKindValue | null = null;
 
@@ -124,6 +129,7 @@ export class PowerUpWeaponSession {
     for (const impact of impacts) {
       if (impact.kind !== BulletImpactKind.EXPIRED) {
         this.#latestBulletImpact = impact.kind;
+        for (const listener of this.#bulletImpactListeners) listener(impact.kind);
       }
       if (impact.kind === BulletImpactKind.TOKEN && impact.targetId) {
         this.#tokenPool.reposition(impact.targetId, this.#snake);
@@ -148,7 +154,19 @@ export class PowerUpWeaponSession {
     if (timeDeltaSeconds !== 0) this.#adjustMainTime(timeDeltaSeconds);
     if (ammoDelta !== 0) this.#weapon.addAmmo(ammoDelta);
     this.#latestPowerUp = entity.kind;
-    return Object.freeze({ kind: entity.kind, timeDeltaSeconds, ammoDelta });
+    const result = Object.freeze({ kind: entity.kind, timeDeltaSeconds, ammoDelta });
+    for (const listener of this.#powerUpCollectionListeners) listener(result);
+    return result;
+  }
+
+  subscribeToPowerUpCollections(listener: PowerUpCollectionListener): () => void {
+    this.#powerUpCollectionListeners.add(listener);
+    return () => this.#powerUpCollectionListeners.delete(listener);
+  }
+
+  subscribeToBulletImpacts(listener: BulletImpactListener): () => void {
+    this.#bulletImpactListeners.add(listener);
+    return () => this.#bulletImpactListeners.delete(listener);
   }
 
   #detectPowerUpCollision(): PowerUpEntity | null {

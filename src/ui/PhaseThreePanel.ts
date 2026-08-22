@@ -126,7 +126,7 @@ export class PhaseThreePanel {
     this.#element.dataset.testid = "phase-three-panel";
     const heading = createElement("header", "phase-three-panel__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 07"),
+      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 08"),
       createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
     );
 
@@ -175,7 +175,7 @@ export class PhaseThreePanel {
     const controls = createElement(
       "p",
       "phase-three-panel__controls",
-      "WASD / 方向鍵轉向 · 空白鍵發射 · M 展開戰術地圖 · Esc 關閉",
+      "WASD / 方向鍵轉向 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
     );
     this.#element.append(
       heading,
@@ -238,6 +238,10 @@ export class PhaseThreePanel {
             : gameplay.typingTimeoutNoticeActive
               ? `打字測驗逾時：已補回主計時 5 秒，請重新收集最後一個字元（第 ${gameplay.typingTimeoutCount} 次）`
               : "";
+  }
+
+  dispose(): void {
+    this.#element.remove();
   }
 
   #renderTarget(gameplay: VocabularyGameplayStatus): void {
