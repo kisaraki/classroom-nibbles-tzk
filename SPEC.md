@@ -42,8 +42,6 @@ Use one explicit main state machine, not combinations of booleans:
 
 Main timer runs in HUNTING, STUNNED, RECOVERY and MAP_EXPANDED. It pauses in PAUSED, TRANSITION_IN, TYPING_TEST and terminal/transition states. Tactical map uses `timeScale = 0.25` for gameplay and main timer. Typing timer always uses real time.
 
-The no-progress timer follows the same running/paused states as the main timer. Collecting any correct character resets it to 20 seconds. During its final 10 seconds the HUD must show an urgent visible countdown. If it reaches zero, restart the current Game Level from its first word using the same selected word plan: restore the scene main timer, snake initial position/direction/length, ordered-token progress and complete character pool. This restart is non-lethal and does not reroll vocabulary.
-
 ## 5. Collision rules
 
 Correct character: snake length -1. Wrong character: length +1, stun 1 second, controls/fire disabled, then respawn/spit character. SOLID wall: stun 1 second, no length change. Self collision: same as SOLID wall. After wall/self stun, provide 500 ms RECOVERY: snake remains stationary, turning is allowed, firing is not. WRAP walls transport crossing segments to the opposite boundary; do not teleport the entire snake at once.

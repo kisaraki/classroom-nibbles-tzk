@@ -89,7 +89,6 @@ export class PhaseThreePanel {
   readonly #progress: HTMLElement;
   readonly #collision: HTMLElement;
   readonly #collection: HTMLElement;
-  readonly #noProgressWarning: HTMLElement;
   readonly #phaseMessage: HTMLElement;
   #renderedEntryId = "";
   #renderedProgress = -1;
@@ -125,12 +124,6 @@ export class PhaseThreePanel {
     this.#progress.dataset.testid = "token-progress";
     targetBlock.append(this.#target, this.#meaning, this.#partOfSpeech, this.#progress);
 
-    this.#noProgressWarning = createElement("p", "phase-three-panel__countdown");
-    this.#noProgressWarning.dataset.testid = "no-progress-countdown";
-    this.#noProgressWarning.setAttribute("role", "timer");
-    this.#noProgressWarning.setAttribute("aria-live", "assertive");
-    this.#noProgressWarning.hidden = true;
-
     const telemetry = createElement("dl", "phase-three-panel__telemetry");
     this.#state = this.#appendMetric(telemetry, "狀態", "—", "simulation-state");
     this.#heading = this.#appendMetric(telemetry, "方向", "—", "snake-heading");
@@ -151,7 +144,6 @@ export class PhaseThreePanel {
       heading,
       mission,
       targetBlock,
-      this.#noProgressWarning,
       telemetry,
       this.#phaseMessage,
       controls,
@@ -176,12 +168,6 @@ export class PhaseThreePanel {
     this.#progress.textContent =
       `${gameplay.progressIndex}/${gameplay.entry.tokenLength} 個字元 · 下一個：${tokenName(gameplay.nextToken)}`;
 
-    const countdownSeconds = Math.max(0, Math.ceil(gameplay.noProgressTimeRemainingSeconds));
-    this.#noProgressWarning.hidden = !gameplay.noProgressWarningActive;
-    this.#noProgressWarning.textContent = gameplay.noProgressWarningActive
-      ? `尚未取得正確字元，本關將在 ${countdownSeconds} 秒後重新開始`
-      : "";
-
     if (
       this.#renderedEntryId !== gameplay.entry.id ||
       this.#renderedProgress !== gameplay.progressIndex
@@ -193,7 +179,6 @@ export class PhaseThreePanel {
       gameplay.state !== "TYPING_TEST" &&
       gameplay.state !== "LEVEL_FAILED" &&
       gameplay.state !== "GAME_CLEAR" &&
-      !gameplay.restartNoticeActive &&
       !gameplay.typingTimeoutNoticeActive;
     this.#phaseMessage.textContent =
       gameplay.state === "TYPING_TEST"
@@ -202,8 +187,6 @@ export class PhaseThreePanel {
           ? "本關主計時已結束"
           : gameplay.state === "GAME_CLEAR"
             ? "25 個單字皆已完成打字強化測驗"
-          : gameplay.restartNoticeActive
-            ? `20 秒未取得正確字元，本關已重新開始（第 ${gameplay.levelRestartCount} 次）`
             : gameplay.typingTimeoutNoticeActive
               ? `打字測驗逾時：已補回主計時 5 秒，請重新收集最後一個字元（第 ${gameplay.typingTimeoutCount} 次）`
               : "";

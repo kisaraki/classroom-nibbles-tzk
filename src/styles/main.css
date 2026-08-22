@@ -221,25 +221,6 @@ body {
   display: none;
 }
 
-.phase-three-panel__countdown {
-  margin: 0 0 0.75rem;
-  padding: 0.8rem;
-  border: 2px solid var(--warning);
-  background: rgb(112 65 0 / 48%);
-  box-shadow: 0 0 1.5rem rgb(255 209 102 / 22%);
-  color: #fff4c9;
-  font-family: ui-monospace, "Cascadia Code", monospace;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  line-height: 1.5;
-  animation: countdown-alert 0.65s ease-in-out infinite alternate;
-}
-
-.phase-three-panel__countdown[hidden] {
-  display: none;
-}
-
 .vocabulary-select {
   position: absolute;
   inset: 0;
@@ -547,17 +528,6 @@ body {
   }
 }
 
-@keyframes countdown-alert {
-  from {
-    border-color: var(--warning);
-    transform: scale(1);
-  }
-  to {
-    border-color: #fff;
-    transform: scale(1.012);
-  }
-}
-
 .boot-screen {
   display: grid;
   width: 100%;
@@ -767,10 +737,6 @@ body {
   }
 
   .phase-three-panel__target-token[data-status="next"] {
-    animation: none;
-  }
-
-  .phase-three-panel__countdown {
     animation: none;
   }
 }

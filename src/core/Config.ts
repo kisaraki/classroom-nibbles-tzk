@@ -36,10 +36,6 @@ export const GAMEPLAY_CONFIG = Object.freeze({
     stunDurationSeconds: 1,
     recoveryDurationSeconds: 0.5,
   }),
-  noProgress: Object.freeze({
-    restartAfterSeconds: 20,
-    warningAtSeconds: 10,
-  }),
   typingTest: Object.freeze({
     durationSeconds: 30,
     requiredConsecutiveSuccesses: 3,

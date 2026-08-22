@@ -187,7 +187,6 @@ describe("VocabularyGameplaySession", () => {
     expect(session.status.progressIndex).toBe(1);
     expect(session.status.nextToken).toBe("B");
     expect(session.status.timeRemainingSeconds).toBe(125);
-    expect(session.status.noProgressTimeRemainingSeconds).toBe(20);
     expect(session.status.typingTimeoutCount).toBe(1);
     expect(session.status.typingTimeoutNoticeActive).toBe(true);
     expect(session.tokenEntities.some((entity) => entity.token === "B")).toBe(true);
@@ -195,40 +194,16 @@ describe("VocabularyGameplaySession", () => {
     expect(snake.length).toBe(6);
   });
 
-  it("shows the final ten-second warning and resets it after a correct token", () => {
-    const { session } = createSession("AB");
-
-    session.update(10);
-
-    expect(session.status.noProgressWarningActive).toBe(true);
-    expect(session.status.noProgressTimeRemainingSeconds).toBeCloseTo(10);
-
-    const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
-    session.resolveTokenCollision(correct.id);
-
-    expect(session.status.noProgressWarningActive).toBe(false);
-    expect(session.status.noProgressTimeRemainingSeconds).toBe(20);
-  });
-
-  it("restarts the current level after twenty seconds without a correct token", () => {
-    const { session, snake } = createSession("A");
-    const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
-    session.resolveTokenCollision(correct.id);
-    session.advanceAfterTypingSuccess();
-    expect(session.status.wordNumber).toBe(2);
-    expect(snake.length).toBe(7);
+  it("keeps the current word after twenty seconds without a correct token", () => {
+    const { session, stateMachine } = createSession("AB");
+    stateMachine.transition(GameState.MAP_EXPANDED);
 
     session.update(20);
 
-    expect(session.status.state).toBe(GameState.HUNTING);
+    expect(session.status.state).toBe(GameState.MAP_EXPANDED);
     expect(session.status.wordNumber).toBe(1);
-    expect(session.status.timeRemainingSeconds).toBe(120);
-    expect(session.status.noProgressTimeRemainingSeconds).toBe(20);
-    expect(session.status.levelRestartCount).toBe(1);
-    expect(session.status.restartNoticeActive).toBe(true);
-    expect(session.tokenEntities).toHaveLength(30);
-    expect(snake.headPosition).toEqual({ x: 0, z: 0 });
-    expect(snake.length).toBe(8);
+    expect(session.status.progressIndex).toBe(0);
+    expect(session.status.timeRemainingSeconds).toBe(100);
   });
 
   it("advances across all five scenes only through the future typing-success hook", () => {

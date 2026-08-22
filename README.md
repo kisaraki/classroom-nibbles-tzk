@@ -30,7 +30,6 @@ Vite prints the local development URL. Choose a vocabulary mode and deterministi
 - Collect the outlined/pulsing next token shown in the target sequence.
 - A correct token advances progress and shortens the snake by one segment, with a minimum length of 3.
 - A wrong token lengthens the snake by one segment, with a maximum length of 40, stuns for one second, then respawns.
-- Each correct token resets a 20-second progress deadline. The HUD warns during the final 10 seconds; expiry restarts the current Game Level from its first word with the same word plan, restored scene timer, snake and token pool.
 - All 30 gameplay token types—A–Z, SPACE, PERIOD, APOSTROPHE, and HYPHEN—exist at the start of every word.
 - Red east/west walls are `SOLID`; blue north/south gates are `WRAP`.
 - Wall and self collisions retain the Phase 2 non-lethal stun/recovery behavior.
@@ -81,7 +80,7 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 
 - Vitest covers runtime schema parsing, CEEC level/token invariants, token lengths, counts, and malformed data rejection.
 - Vitest also covers fixed-step timing, cardinal movement, trail sampling, length limits, per-segment wrapping, SOLID walls, self collision, stun, and recovery.
-- Phase 3 tests cover deterministic run selection, Progressive mapping, filter relaxation, spawn constraints/fallback, token-pool normalization, ordered progress, repeated tokens, wrong-token respawn, length rewards/penalties, timer pausing, final-10-second warnings and no-progress level restarts.
+- Phase 3 tests cover deterministic run selection, Progressive mapping, filter relaxation, spawn constraints/fallback, token-pool normalization, ordered progress, repeated tokens, wrong-token respawn, length rewards/penalties and timer pausing.
 - Phase 4 tests cover answer normalization, exact internal punctuation/spacing, consecutive-success streaks, real-time timeout, final-token rollback and the five-second timer bonus.
 - Playwright checks vocabulary selection, independent Game/Vocabulary labels, the 30-token scene, non-color target cue, steering rules, typing-modal submission and modal-scoped clipboard blocking.
 - `.github/workflows/ci.yml` runs quality gates on pushes and pull requests, with E2E isolated in its own job.

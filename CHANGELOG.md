@@ -8,13 +8,16 @@
 - Case-insensitive answer comparison after trimming leading/trailing whitespace while preserving exact internal spaces, periods, apostrophes and hyphens.
 - Three-consecutive-success progression with immediate streak reset after every wrong submission.
 - Enter-key/form submission and copy/cut/paste prevention scoped only to the typing modal.
-- Typing-timeout recovery that rolls back only the final token, adds five seconds to the scene timer and resets the 20-second progress deadline.
+- Typing-timeout recovery that rolls back only the final token and adds five seconds to the scene timer.
 - Unit and Chromium coverage for comparison, streaks, timeout, rollback, keyboard submission, focus and clipboard scope.
 
 ### Changed
 - Advanced browser metadata and visible phase markers to Phase 4.
 - Suspended movement input throughout `TYPING_TEST` and restored it only when gameplay returns to `HUNTING`.
 - Completed the existing word/scene progression hook so a successful typing test continues the 25-word run through `GAME_CLEAR`.
+
+### Removed
+- Removed the custom 20-second no-progress deadline, final-10-second HUD warning and automatic current-level restart. The configured scene main timer remains the only hunting time limit.
 
 ### Fixed
 - Typing time now uses an absolute `performance.now()` deadline instead of the fixed-step gameplay clock, so hiding the page cannot pause the test.
