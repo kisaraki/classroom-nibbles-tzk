@@ -231,6 +231,8 @@ describe("VocabularyGameplaySession", () => {
 
   it("advances across all five scenes only through the future typing-success hook", () => {
     const { session } = createSession("A");
+    const startedScenes: number[] = [];
+    session.subscribeToSceneStarted((scene) => startedScenes.push(scene.gameLevel));
 
     for (let completedWords = 0; completedWords < 25; completedWords += 1) {
       const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
@@ -246,5 +248,6 @@ describe("VocabularyGameplaySession", () => {
 
     expect(session.status.state).toBe(GameState.GAME_CLEAR);
     expect(session.status.wordNumber).toBe(25);
+    expect(startedScenes).toEqual([2, 3, 4, 5]);
   });
 });

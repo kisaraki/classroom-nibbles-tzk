@@ -12,6 +12,7 @@ function createActiveSimulation(
   initial: SnakeInitialState = {},
   length: number = GAMEPLAY_CONFIG.snake.initialLength,
   expandedMap = false,
+  obstacles: readonly { readonly position: { readonly x: number; readonly z: number }; readonly radius: number }[] = [],
 ): SnakeSimulation {
   const stateMachine = createGameStateMachine();
   stateMachine.transition(GameState.MAIN_MENU);
@@ -30,6 +31,7 @@ function createActiveSimulation(
     collisions,
     stateMachine,
     GAMEPLAY_CONFIG.collision,
+    () => obstacles,
   );
 }
 
@@ -114,6 +116,56 @@ describe("SnakeSimulation", () => {
     simulation.update(0.5);
     expect(simulation.status.state).toBe(GameState.HUNTING);
     expect(simulation.snake.headPosition).toEqual(startPosition);
+  });
+
+  it("applies the same non-lethal stun and recovery to environment obstacles", () => {
+    const arena = new Arena({
+      halfWidth: 9,
+      halfDepth: 9,
+      xBoundaryMode: BoundaryMode.SOLID,
+      zBoundaryMode: BoundaryMode.WRAP,
+    });
+    const simulation = createActiveSimulation(
+      arena,
+      { position: { x: 0, z: 0 }, direction: Direction.NORTH },
+      8,
+      false,
+      [{ position: { x: 0, z: -1 }, radius: 0.6 }],
+    );
+    const startLength = simulation.snake.length;
+
+    for (let index = 0; index < 10 && simulation.status.state === GameState.HUNTING; index += 1) {
+      simulation.update(1 / 60);
+    }
+
+    expect(simulation.status.state).toBe(GameState.STUNNED);
+    expect(simulation.status.latestCollision).toBe(CollisionKind.SOLID_OBSTACLE);
+    expect(simulation.snake.length).toBe(startLength);
+    simulation.update(1);
+    expect(simulation.status.state).toBe(GameState.RECOVERY);
+    simulation.update(0.5);
+    expect(simulation.status.state).toBe(GameState.HUNTING);
+  });
+
+  it("clears collision telemetry and restores a safe pose between environments", () => {
+    const arena = new Arena({
+      halfWidth: 5,
+      halfDepth: 5,
+      xBoundaryMode: BoundaryMode.SOLID,
+      zBoundaryMode: BoundaryMode.WRAP,
+    });
+    const simulation = createActiveSimulation(arena, {
+      position: { x: 4.65, z: 0 },
+      direction: Direction.EAST,
+    });
+    simulation.update(1 / 60);
+    expect(simulation.status.latestCollision).toBe(CollisionKind.SOLID_WALL);
+
+    simulation.resetForScene();
+
+    expect(simulation.snake.headPosition).toEqual({ x: 0, z: 0 });
+    expect(simulation.snake.direction).toBe(Direction.NORTH);
+    expect(simulation.status.latestCollision).toBeNull();
   });
 
   it("prevents two rapid corners from bypassing the direct-reversal guard", () => {

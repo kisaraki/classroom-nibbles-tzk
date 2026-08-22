@@ -48,7 +48,7 @@ export class TypingTestModal {
     const heading = createElement("h2", "typing-test-modal__title", "打字強化測驗");
     heading.id = "typing-test-title";
     panel.append(
-      createElement("p", "typing-test-modal__eyebrow", "打字強化 / 06"),
+      createElement("p", "typing-test-modal__eyebrow", "打字強化 / 07"),
       heading,
       createElement(
         "p",

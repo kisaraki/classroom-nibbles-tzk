@@ -1,9 +1,8 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "第六階段",
+  phaseLabel: "第七階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
-    backgroundColor: 0x050b16,
     cameraFieldOfView: 60,
     cameraNear: 0.05,
     cameraFar: 100,
@@ -13,9 +12,6 @@ export const APP_CONFIG = Object.freeze({
     cameraLookHeight: 0.72,
     cameraTurnSmoothingSeconds: 0.15,
     maxPixelRatio: 2,
-    floorColor: 0x091827,
-    solidWallColor: 0xff6b6b,
-    wrapGateColor: 0x6f8cff,
     snakeHeadColor: 0x86ffe1,
     snakeBodyColor: 0x25bda5,
   }),

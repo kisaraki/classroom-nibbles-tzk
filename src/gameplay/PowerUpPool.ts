@@ -79,6 +79,11 @@ export class PowerUpPool {
     for (const kind of POWER_UP_KINDS) this.ensurePowerUp(kind, snake);
   }
 
+  reset(snake: Snake): void {
+    this.#entities.clear();
+    this.normalize(snake);
+  }
+
   ensurePowerUp(kind: PowerUpKind, snake: Snake): PowerUpEntity {
     const existing = this.entities.find((entity) => entity.kind === kind);
     return existing ?? this.#spawn(kind, snake);

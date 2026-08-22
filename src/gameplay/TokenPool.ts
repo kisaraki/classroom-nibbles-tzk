@@ -38,6 +38,11 @@ export class TokenPool {
     for (const token of CHARACTER_TOKENS) this.ensureToken(token, snake);
   }
 
+  reset(snake: Snake): void {
+    this.#entities.clear();
+    this.normalize(snake);
+  }
+
   ensureToken(token: CharacterToken, snake: Snake): TokenEntity {
     const existing = this.entities.find((entity) => entity.token === token);
     return existing ?? this.spawn(token, snake);

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Arena } from "../gameplay/Arena";
 import { CollisionSystem } from "../gameplay/CollisionSystem";
+import { EnvironmentController } from "../gameplay/Environment";
 import { PowerUpPool } from "../gameplay/PowerUpPool";
 import { PowerUpWeaponSession } from "../gameplay/PowerUpWeaponSession";
 import { Snake } from "../gameplay/Snake";
@@ -42,6 +43,7 @@ export class Game {
   readonly #bootScreen: BootScreen;
   readonly #stateMachine = createGameStateMachine();
   readonly #arena = new Arena(GAMEPLAY_CONFIG.arena);
+  readonly #environment = new EnvironmentController();
   readonly #snake = new Snake(GAMEPLAY_CONFIG.snake);
   readonly #collisionSystem = new CollisionSystem({
     headRadius: GAMEPLAY_CONFIG.snake.headCollisionRadius,
@@ -54,6 +56,7 @@ export class Game {
     this.#collisionSystem,
     this.#stateMachine,
     GAMEPLAY_CONFIG.collision,
+    () => this.#environment.obstacles,
   );
   readonly #fixedStepRunner = new FixedStepRunner({
     stepSeconds: GAMEPLAY_CONFIG.fixedStepSeconds,
@@ -95,7 +98,11 @@ export class Game {
   async start(): Promise<void> {
     this.#bootScreen.setLoading();
     try {
-      this.#scene = new PhaseThreeScene(this.#container, this.#arena);
+      this.#scene = new PhaseThreeScene(
+        this.#container,
+        this.#arena,
+        this.#environment.current,
+      );
       const timer = new THREE.Timer();
       timer.connect(document);
       this.#timer = timer;
@@ -138,6 +145,8 @@ export class Game {
         selection.seed,
         this.#recentHistory.load(),
       );
+      const initialEnvironment = this.#environment.select(plan.scenes[0]!.gameLevel);
+      this.#scene?.setEnvironment(initialEnvironment);
       const spawnManager = new SpawnManager(
         this.#arena,
         new SeededRandom(`${selection.seed}:spawns`),
@@ -148,6 +157,7 @@ export class Game {
           maximumRandomAttempts: GAMEPLAY_CONFIG.token.maximumRandomAttempts,
           fallbackGridSpacing: GAMEPLAY_CONFIG.token.fallbackGridSpacing,
         },
+        () => this.#environment.obstacles,
       );
       let powerUpPool: PowerUpPool | null = null;
       const tokenPool = new TokenPool(
@@ -179,7 +189,11 @@ export class Game {
         this.#arena,
         tokenPool,
         powerUpPool,
-        new WeaponSystem(this.#arena, GAMEPLAY_CONFIG.weapon),
+        new WeaponSystem(
+          this.#arena,
+          GAMEPLAY_CONFIG.weapon,
+          () => this.#environment.obstacles,
+        ),
         GAMEPLAY_CONFIG.snake.headCollisionRadius,
         GAMEPLAY_CONFIG.powerUp.attackAmmoReward,
         (deltaSeconds) => {
@@ -187,6 +201,14 @@ export class Game {
         },
       );
       gameplay.subscribeToWordStarted((entry) => this.#recentHistory.remember(entry.target));
+      gameplay.subscribeToSceneStarted((scenePlan) => {
+        const environment = this.#environment.select(scenePlan.gameLevel);
+        this.#snakeSimulation.resetForScene();
+        this.#fixedStepRunner.reset();
+        this.#scene?.setEnvironment(environment);
+        powerUpWeapon.resetEnvironment();
+        tokenPool.reset(this.#snake);
+      });
 
       this.#stateMachine.transition(GameState.TRANSITION_IN);
       this.#gameplay = gameplay;
@@ -240,7 +262,7 @@ export class Game {
         tokens: this.#gameplay?.tokenEntities ?? [],
         powerUps: this.#powerUpWeapon.powerUpEntities,
         bullets: this.#powerUpWeapon.bulletEntities,
-        obstacles: [],
+        obstacles: this.#environment.obstacles,
         nextToken: gameplayStatus.nextToken,
       });
     }
@@ -249,6 +271,7 @@ export class Game {
         gameplayStatus,
         this.#snakeSimulation.status,
         this.#powerUpWeapon.status,
+        this.#environment.current,
       );
     }
   };

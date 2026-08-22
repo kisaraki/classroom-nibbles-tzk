@@ -4,6 +4,14 @@ import type { PowerUpEntity } from "./PowerUpPool";
 import type { TokenEntity } from "./TokenPool";
 import type { XZPoint } from "./Trail";
 
+export interface WeaponObstacle {
+  readonly id: string;
+  readonly position: XZPoint;
+  readonly radius: number;
+}
+
+export type WeaponObstacleProvider = () => readonly WeaponObstacle[];
+
 export interface WeaponConfig {
   readonly bulletRadius: number;
   readonly bulletSpeed: number;
@@ -28,6 +36,7 @@ interface ActiveBullet {
 
 export const BulletImpactKind = Object.freeze({
   SOLID_WALL: "SOLID_WALL",
+  SOLID_OBSTACLE: "SOLID_OBSTACLE",
   TOKEN: "TOKEN",
   POWER_UP: "POWER_UP",
   EXPIRED: "EXPIRED",
@@ -45,11 +54,16 @@ export interface BulletImpact {
 export class WeaponSystem {
   readonly #arena: Arena;
   readonly #config: WeaponConfig;
+  readonly #obstacles: WeaponObstacleProvider;
   readonly #bullets = new Map<string, ActiveBullet>();
   #ammo = 0;
   #nextBulletId = 1;
 
-  constructor(arena: Arena, config: WeaponConfig) {
+  constructor(
+    arena: Arena,
+    config: WeaponConfig,
+    obstacles: WeaponObstacleProvider = () => [],
+  ) {
     if (
       config.bulletRadius <= 0 ||
       config.bulletSpeed <= 0 ||
@@ -60,6 +74,7 @@ export class WeaponSystem {
     }
     this.#arena = arena;
     this.#config = Object.freeze({ ...config });
+    this.#obstacles = obstacles;
   }
 
   get ammo(): number {
@@ -85,6 +100,10 @@ export class WeaponSystem {
     }
     this.#ammo += amount;
     return this.#ammo;
+  }
+
+  clearBullets(): void {
+    this.#bullets.clear();
   }
 
   fire(origin: XZPoint, direction: Direction): BulletEntity | null {
@@ -140,6 +159,13 @@ export class WeaponSystem {
         continue;
       }
       bullet.position = this.#arena.toDisplayPoint(candidate);
+
+      const obstacle = this.#detectTarget(bullet, this.#obstacles());
+      if (obstacle) {
+        this.#bullets.delete(bullet.id);
+        impacts.push(this.#impact(bullet.id, BulletImpactKind.SOLID_OBSTACLE));
+        continue;
+      }
 
       const token = this.#detectTarget(bullet, tokens);
       if (token) {

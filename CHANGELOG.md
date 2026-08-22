@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## Phase 7 — 2026-08-22
+
+### Added
+- Five typed environment profiles for Cargo Bay, Ship Pipeline, Asteroid Belt, Dense Atmosphere and Alien Forest with distinct palettes, fog ranges, obstacle layouts and Traditional Chinese mechanism labels.
+- Instanced Three.js cargo, pipe, asteroid, pressure-pylon and alien-tree treatments that switch with the active Game Level.
+- Solid environment geometry in snake collision, seeded token/power-up spawning, projectile impact and both radar sizes.
+- Scene-start notifications plus unit and Chromium coverage for five-environment completeness, arena capacity, switching, collision, bullet blocking and live Cargo Bay markers.
+
+### Changed
+- Advanced browser metadata, default seed and visible phase markers to Phase 7.
+- Reset the snake pose and trail to the safe arena center between scenes while preserving earned length and cumulative ammo.
+- Rebuilt tokens and power-ups outside each new obstacle field and cleared only active bullets during scene changes.
+- Reported environment mechanics, obstacle collisions and obstacle shot impacts in the Chinese cockpit HUD.
+
+### Known Issues
+- Phase 8 presentation work—audio, door transitions and credits—has not been implemented.
+
 ## Phase 6 — 2026-08-22
 
 ### Added

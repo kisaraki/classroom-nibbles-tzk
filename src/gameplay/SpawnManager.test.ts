@@ -98,4 +98,35 @@ describe("SpawnManager and TokenPool", () => {
     expect(randomCalls).toBe(6);
     expect(arena.distanceSquared(position, { x: 0, z: 0 })).toBeGreaterThanOrEqual(16);
   });
+
+  it("keeps seeded token spawns outside the active environment geometry", () => {
+    const arena = createArena();
+    const obstacle = Object.freeze({
+      position: Object.freeze({ x: 5, z: 5 }),
+      radius: 2,
+    });
+    const manager = new SpawnManager(
+      arena,
+      new SeededRandom("obstacle-aware"),
+      {
+        minimumHeadDistance: 4,
+        minimumEntitySpacing: 0.82,
+        bodyClearance: 0.68,
+        maximumRandomAttempts: 100,
+        fallbackGridSpacing: 1.15,
+      },
+      () => [obstacle],
+    );
+    const snake = new Snake(GAMEPLAY_CONFIG.snake);
+    const pool = new TokenPool(manager, GAMEPLAY_CONFIG.token.collisionRadius);
+
+    pool.normalize(snake);
+
+    for (const entity of pool.entities) {
+      const clearance = entity.radius + obstacle.radius;
+      expect(
+        arena.distanceSquared(entity.position, obstacle.position),
+      ).toBeGreaterThanOrEqual(clearance * clearance);
+    }
+  });
 });

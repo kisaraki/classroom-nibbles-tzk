@@ -68,4 +68,21 @@ describe("Snake", () => {
     snake.grow(100);
     expect(snake.length).toBe(40);
   });
+
+  it("resets the scene pose and trail without discarding earned length", () => {
+    const snake = new Snake(GAMEPLAY_CONFIG.snake);
+    snake.grow(3);
+    snake.advance(1);
+    snake.trySetDirection(Direction.EAST);
+    snake.advance(1);
+
+    snake.resetPose();
+
+    expect(snake.headPosition).toEqual({ x: 0, z: 0 });
+    expect(snake.direction).toBe(Direction.NORTH);
+    expect(snake.length).toBe(11);
+    expect(snake.getSegmentPositions()[1]).toEqual({ x: 0, z: 0.75 });
+    expect(snake.trySetDirection(Direction.EAST)).toBe(true);
+    expect(snake.trySetDirection(Direction.SOUTH)).toBe(false);
+  });
 });

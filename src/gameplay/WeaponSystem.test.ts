@@ -78,6 +78,30 @@ describe("WeaponSystem", () => {
     expect(weapon.bullets[0]?.position.z).toBeCloseTo(7.92);
   });
 
+  it("removes bullets on functional environment obstacles", () => {
+    const obstacle = Object.freeze({
+      id: "environment-obstacle",
+      position: Object.freeze({ x: 0, z: -1.88 }),
+      radius: 0.6,
+    });
+    const weapon = new WeaponSystem(
+      createArena(),
+      GAMEPLAY_CONFIG.weapon,
+      () => [obstacle],
+    );
+    weapon.addAmmo(1);
+    weapon.fire({ x: 0, z: 0 }, Direction.NORTH);
+
+    expect(weapon.update(0.1, [], [])).toEqual([
+      {
+        bulletId: "bullet-1",
+        kind: BulletImpactKind.SOLID_OBSTACLE,
+        targetId: null,
+      },
+    ]);
+    expect(weapon.bullets).toHaveLength(0);
+  });
+
   it("expires otherwise unspent bullets after the configured lifetime", () => {
     const weapon = new WeaponSystem(createArena(), GAMEPLAY_CONFIG.weapon);
     weapon.addAmmo(1);
@@ -87,5 +111,16 @@ describe("WeaponSystem", () => {
       { bulletId: "bullet-1", kind: BulletImpactKind.EXPIRED, targetId: null },
     ]);
     expect(weapon.bullets).toHaveLength(0);
+  });
+
+  it("clears in-flight rounds between environments without discarding ammo", () => {
+    const weapon = new WeaponSystem(createArena(), GAMEPLAY_CONFIG.weapon);
+    weapon.addAmmo(3);
+    weapon.fire({ x: 0, z: 0 }, Direction.NORTH);
+
+    weapon.clearBullets();
+
+    expect(weapon.bullets).toHaveLength(0);
+    expect(weapon.ammo).toBe(2);
   });
 });

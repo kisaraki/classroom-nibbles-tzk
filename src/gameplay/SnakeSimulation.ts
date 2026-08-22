@@ -1,7 +1,11 @@
 import { GameState, type GameState as GameStateValue } from "../core/GameState";
 import type { StateMachine } from "../core/StateMachine";
 import { Arena } from "./Arena";
-import { CollisionKind, CollisionSystem } from "./CollisionSystem";
+import {
+  CollisionKind,
+  CollisionSystem,
+  type SolidObstacle,
+} from "./CollisionSystem";
 import type { Direction } from "./Direction";
 import { Snake } from "./Snake";
 import type { XZPoint } from "./Trail";
@@ -26,6 +30,7 @@ export interface SnakeSimulationStatus {
 }
 
 export type CollisionListener = (event: CollisionEvent) => void;
+export type SolidObstacleProvider = () => readonly SolidObstacle[];
 
 export class SnakeSimulation {
   readonly #snake: Snake;
@@ -33,6 +38,7 @@ export class SnakeSimulation {
   readonly #collisionSystem: CollisionSystem;
   readonly #stateMachine: StateMachine<GameStateValue>;
   readonly #config: SnakeSimulationConfig;
+  readonly #obstacles: SolidObstacleProvider;
   readonly #collisionListeners = new Set<CollisionListener>();
   #delayRemainingSeconds = 0;
   #latestCollision: CollisionKind | null = null;
@@ -45,6 +51,7 @@ export class SnakeSimulation {
     collisionSystem: CollisionSystem,
     stateMachine: StateMachine<GameStateValue>,
     config: SnakeSimulationConfig,
+    obstacles: SolidObstacleProvider = () => [],
   ) {
     if (config.stunDurationSeconds <= 0 || config.recoveryDurationSeconds <= 0) {
       throw new Error("Collision delay durations must be positive.");
@@ -54,6 +61,7 @@ export class SnakeSimulation {
     this.#collisionSystem = collisionSystem;
     this.#stateMachine = stateMachine;
     this.#config = Object.freeze({ ...config });
+    this.#obstacles = obstacles;
   }
 
   get snake(): Snake {
@@ -109,7 +117,12 @@ export class SnakeSimulation {
     ) return;
 
     const candidate = this.#snake.previewPosition(deltaSeconds);
-    const collision = this.#collisionSystem.detect(candidate, this.#snake, this.#arena);
+    const collision = this.#collisionSystem.detect(
+      candidate,
+      this.#snake,
+      this.#arena,
+      this.#obstacles(),
+    );
     if (collision) {
       this.#enterStun(collision, candidate);
       return;
@@ -129,6 +142,14 @@ export class SnakeSimulation {
   subscribeToCollisions(listener: CollisionListener): () => void {
     this.#collisionListeners.add(listener);
     return () => this.#collisionListeners.delete(listener);
+  }
+
+  resetForScene(): void {
+    this.#snake.resetPose();
+    this.#delayRemainingSeconds = 0;
+    this.#latestCollision = null;
+    this.#recoveryRequired = false;
+    this.#recoveryTurnUsed = false;
   }
 
   #enterStun(

@@ -3,7 +3,10 @@ import { GameState, type GameState as GameStateValue } from "../core/GameState";
 import type { StateMachine } from "../core/StateMachine";
 import type { CharacterToken, VocabularyEntry } from "../vocabulary/types";
 import { vocabularyModeLabel } from "../vocabulary/VocabularyMode";
-import type { VocabularyRunPlan } from "../vocabulary/WordSelector";
+import type {
+  RunScenePlan,
+  VocabularyRunPlan,
+} from "../vocabulary/WordSelector";
 import type { SnakeSimulation } from "./SnakeSimulation";
 import { TokenCollisionSystem } from "./TokenCollisionSystem";
 import { TokenPool, type TokenEntity } from "./TokenPool";
@@ -51,6 +54,7 @@ export interface VocabularyGameplayStatus {
 }
 
 export type WordStartedListener = (entry: VocabularyEntry) => void;
+export type SceneStartedListener = (scene: RunScenePlan) => void;
 
 export class VocabularyGameplaySession {
   readonly #plan: VocabularyRunPlan;
@@ -59,6 +63,7 @@ export class VocabularyGameplaySession {
   readonly #tokenPool: TokenPool;
   readonly #tokenCollisions: TokenCollisionSystem;
   readonly #wordStartedListeners = new Set<WordStartedListener>();
+  readonly #sceneStartedListeners = new Set<SceneStartedListener>();
   #sceneIndex = 0;
   #wordIndex = 0;
   #progressIndex = 0;
@@ -188,6 +193,7 @@ export class VocabularyGameplaySession {
       this.#sceneIndex += 1;
       this.#wordIndex = 0;
       this.#timeRemainingSeconds = this.#currentScene.durationSeconds;
+      for (const listener of this.#sceneStartedListeners) listener(this.#currentScene);
       this.#resetForCurrentWord();
       this.#stateMachine.transition(GameState.TRANSITION_IN);
       this.#stateMachine.transition(GameState.HUNTING);
@@ -245,6 +251,11 @@ export class VocabularyGameplaySession {
   subscribeToWordStarted(listener: WordStartedListener): () => void {
     this.#wordStartedListeners.add(listener);
     return () => this.#wordStartedListeners.delete(listener);
+  }
+
+  subscribeToSceneStarted(listener: SceneStartedListener): () => void {
+    this.#sceneStartedListeners.add(listener);
+    return () => this.#sceneStartedListeners.delete(listener);
   }
 
   get #currentScene(): VocabularyRunPlan["scenes"][number] {

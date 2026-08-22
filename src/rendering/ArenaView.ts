@@ -1,20 +1,21 @@
 import * as THREE from "three";
-import { APP_CONFIG } from "../core/Config";
 import { Arena, BoundaryMode } from "../gameplay/Arena";
+import type { EnvironmentProfile } from "../gameplay/Environment";
 
 export class ArenaView {
   readonly #floorGeometry: THREE.PlaneGeometry;
   readonly #floorMaterial: THREE.MeshStandardMaterial;
+  readonly #grid: THREE.GridHelper;
   readonly #xBoundaryGeometry: THREE.BoxGeometry;
   readonly #zBoundaryGeometry: THREE.BoxGeometry;
   readonly #solidMaterial: THREE.MeshStandardMaterial;
   readonly #wrapMaterial: THREE.MeshStandardMaterial;
 
-  constructor(scene: THREE.Scene, arena: Arena) {
+  constructor(scene: THREE.Scene, arena: Arena, environment: EnvironmentProfile) {
     const { halfWidth, halfDepth, xBoundaryMode, zBoundaryMode } = arena.config;
     this.#floorGeometry = new THREE.PlaneGeometry(halfWidth * 2, halfDepth * 2);
     this.#floorMaterial = new THREE.MeshStandardMaterial({
-      color: APP_CONFIG.scene.floorColor,
+      color: environment.palette.floorColor,
       metalness: 0.35,
       roughness: 0.82,
     });
@@ -23,23 +24,23 @@ export class ArenaView {
     floor.position.y = -0.08;
     scene.add(floor);
 
-    const grid = new THREE.GridHelper(
+    this.#grid = new THREE.GridHelper(
       Math.max(halfWidth, halfDepth) * 2,
       Math.max(halfWidth, halfDepth) * 2,
-      0x367d7c,
-      0x173f4b,
+      environment.palette.gridCenterColor,
+      environment.palette.gridLineColor,
     );
-    grid.position.y = -0.04;
-    scene.add(grid);
+    this.#grid.position.y = -0.04;
+    scene.add(this.#grid);
 
     this.#solidMaterial = new THREE.MeshStandardMaterial({
-      color: APP_CONFIG.scene.solidWallColor,
+      color: environment.palette.solidWallColor,
       emissive: 0x351018,
       metalness: 0.5,
       roughness: 0.35,
     });
     this.#wrapMaterial = new THREE.MeshStandardMaterial({
-      color: APP_CONFIG.scene.wrapGateColor,
+      color: environment.palette.wrapGateColor,
       emissive: 0x182c68,
       transparent: true,
       opacity: 0.8,
@@ -68,6 +69,24 @@ export class ArenaView {
     scene.add(xBoundaries, zBoundaries);
   }
 
+  setEnvironment(environment: EnvironmentProfile): void {
+    const { palette } = environment;
+    this.#floorMaterial.color.setHex(palette.floorColor);
+    this.#solidMaterial.color.setHex(palette.solidWallColor);
+    this.#solidMaterial.emissive.setHex(palette.solidWallColor).multiplyScalar(0.18);
+    this.#wrapMaterial.color.setHex(palette.wrapGateColor);
+    this.#wrapMaterial.emissive.setHex(palette.wrapGateColor).multiplyScalar(0.22);
+    const gridMaterials = Array.isArray(this.#grid.material)
+      ? this.#grid.material
+      : [this.#grid.material];
+    if (gridMaterials[0] instanceof THREE.LineBasicMaterial) {
+      gridMaterials[0].color.setHex(palette.gridCenterColor);
+    }
+    if (gridMaterials[1] instanceof THREE.LineBasicMaterial) {
+      gridMaterials[1].color.setHex(palette.gridLineColor);
+    }
+  }
+
   dispose(): void {
     this.#floorGeometry.dispose();
     this.#floorMaterial.dispose();
@@ -75,6 +94,11 @@ export class ArenaView {
     this.#zBoundaryGeometry.dispose();
     this.#solidMaterial.dispose();
     this.#wrapMaterial.dispose();
+    this.#grid.geometry.dispose();
+    const gridMaterials = Array.isArray(this.#grid.material)
+      ? this.#grid.material
+      : [this.#grid.material];
+    for (const material of gridMaterials) material.dispose();
   }
 
   #createBoundaryInstances(

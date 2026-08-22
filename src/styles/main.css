@@ -255,6 +255,7 @@ body {
 }
 
 .phase-three-panel__eyebrow,
+.phase-three-panel__environment,
 .phase-three-panel__metric-label,
 .phase-three-panel__label,
 .phase-three-panel__progress,
@@ -263,6 +264,16 @@ body {
   font-family: ui-monospace, "Cascadia Code", monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.phase-three-panel__environment {
+  margin: 0.55rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-left: 2px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.58rem;
+  line-height: 1.45;
 }
 
 .phase-three-panel__eyebrow {

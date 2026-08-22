@@ -22,6 +22,8 @@ export interface SpawnRequest {
   readonly occupied: readonly SpawnOccupant[];
 }
 
+export type SolidGeometryProvider = () => readonly SpawnOccupant[];
+
 export class SpawnError extends Error {
   constructor(message: string) {
     super(message);
@@ -34,8 +36,14 @@ export class SpawnManager {
   readonly #random: RandomSource;
   readonly #config: SpawnManagerConfig;
   readonly #fallbackPoints: readonly XZPoint[];
+  readonly #solidGeometry: SolidGeometryProvider;
 
-  constructor(arena: Arena, random: RandomSource, config: SpawnManagerConfig) {
+  constructor(
+    arena: Arena,
+    random: RandomSource,
+    config: SpawnManagerConfig,
+    solidGeometry: SolidGeometryProvider = () => [],
+  ) {
     if (
       config.minimumHeadDistance < 0 ||
       config.minimumEntitySpacing <= 0 ||
@@ -49,6 +57,7 @@ export class SpawnManager {
     this.#arena = arena;
     this.#random = random;
     this.#config = Object.freeze({ ...config });
+    this.#solidGeometry = solidGeometry;
     this.#fallbackPoints = Object.freeze(this.#createFallbackPoints());
   }
 
@@ -92,6 +101,18 @@ export class SpawnManager {
       request.snakeSegments.some(
         (segment) => this.#arena.distanceSquared(candidate, segment) < bodyClearanceSquared,
       )
+    ) {
+      return false;
+    }
+
+    if (
+      this.#solidGeometry().some((obstacle) => {
+        const clearance = request.radius + obstacle.radius;
+        return (
+          this.#arena.distanceSquared(candidate, obstacle.position) <
+          clearance * clearance
+        );
+      })
     ) {
       return false;
     }

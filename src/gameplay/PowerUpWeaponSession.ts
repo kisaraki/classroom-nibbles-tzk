@@ -103,6 +103,13 @@ export class PowerUpWeaponSession {
     return this.#weapon.fire(this.#snake.headPosition, this.#snake.direction) !== null;
   }
 
+  resetEnvironment(): void {
+    this.#weapon.clearBullets();
+    this.#powerUpPool.reset(this.#snake);
+    this.#latestPowerUp = null;
+    this.#latestBulletImpact = null;
+  }
+
   update(deltaSeconds: number): void {
     if (!Number.isFinite(deltaSeconds) || deltaSeconds < 0) {
       throw new Error("Power-up and weapon deltaSeconds must be finite and non-negative.");

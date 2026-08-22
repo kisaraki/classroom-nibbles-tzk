@@ -112,6 +112,15 @@ export class Snake {
     this.#length = clampLength(length, this.#config);
   }
 
+  resetPose(initial: SnakeInitialState = {}): void {
+    this.#headPosition = initial.position ? { ...initial.position } : { x: 0, z: 0 };
+    this.#direction = initial.direction ?? Direction.NORTH;
+    this.#directionBeforeLastTurn = this.#direction;
+    this.#distanceSinceLastTurn = Number.POSITIVE_INFINITY;
+    if (initial.length !== undefined) this.#length = clampLength(initial.length, this.#config);
+    this.#trail.reset(this.#headPosition, this.#direction);
+  }
+
   grow(amount = 1): void {
     this.setLength(this.#length + amount);
   }

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { APP_CONFIG } from "../core/Config";
 import { Arena } from "../gameplay/Arena";
+import type { EnvironmentProfile } from "../gameplay/Environment";
 import type { PowerUpEntity } from "../gameplay/PowerUpPool";
 import { Snake } from "../gameplay/Snake";
 import type { TokenEntity } from "../gameplay/TokenPool";
@@ -9,6 +10,7 @@ import type { CharacterToken } from "../vocabulary/types";
 import { ArenaView } from "./ArenaView";
 import { BulletView } from "./BulletView";
 import { CockpitCameraRig } from "./CockpitCameraRig";
+import { EnvironmentView } from "./EnvironmentView";
 import { PowerUpView } from "./PowerUpView";
 import { SnakeView } from "./SnakeView";
 import { TokenView } from "./TokenView";
@@ -22,12 +24,19 @@ export class PhaseThreeScene {
   readonly #camera: THREE.PerspectiveCamera;
   readonly #cameraRig: CockpitCameraRig;
   readonly #arenaView: ArenaView;
+  readonly #environmentView: EnvironmentView;
+  readonly #hemisphereLight: THREE.HemisphereLight;
+  readonly #keyLight: THREE.DirectionalLight;
   readonly #snakeView: SnakeView;
   readonly #tokenView: TokenView;
   readonly #powerUpView: PowerUpView;
   readonly #bulletView: BulletView;
 
-  constructor(container: HTMLElement, arena: Arena) {
+  constructor(
+    container: HTMLElement,
+    arena: Arena,
+    environment: EnvironmentProfile,
+  ) {
     this.#container = container;
     this.#renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     this.#renderer.setPixelRatio(
@@ -38,11 +47,15 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
     this.#renderer.domElement.dataset.cameraMode = "snake-eye";
     this.#renderer.domElement.dataset.cameraCount = "1";
-    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第六階段第一人稱字彙遊戲場");
+    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第七階段第一人稱字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
-    this.#scene.background = new THREE.Color(APP_CONFIG.scene.backgroundColor);
-    this.#scene.fog = new THREE.Fog(APP_CONFIG.scene.backgroundColor, 18, 32);
+    this.#scene.background = new THREE.Color(environment.palette.backgroundColor);
+    this.#scene.fog = new THREE.Fog(
+      environment.palette.backgroundColor,
+      environment.palette.fogNear,
+      environment.palette.fogFar,
+    );
     this.#camera = new THREE.PerspectiveCamera(
       APP_CONFIG.scene.cameraFieldOfView,
       1,
@@ -57,18 +70,50 @@ export class PhaseThreeScene {
       turnSmoothingSeconds: APP_CONFIG.scene.cameraTurnSmoothingSeconds,
     });
 
-    this.#scene.add(new THREE.HemisphereLight(0xbcecff, 0x08101e, 2.5));
-    const keyLight = new THREE.DirectionalLight(0x73ffe1, 3.5);
-    keyLight.position.set(5, 12, 7);
-    this.#scene.add(keyLight);
+    this.#hemisphereLight = new THREE.HemisphereLight(
+      environment.palette.hemisphereSkyColor,
+      environment.palette.hemisphereGroundColor,
+      2.5,
+    );
+    this.#keyLight = new THREE.DirectionalLight(environment.palette.keyLightColor, 3.5);
+    this.#keyLight.position.set(5, 12, 7);
+    this.#scene.add(this.#hemisphereLight, this.#keyLight);
 
-    this.#arenaView = new ArenaView(this.#scene, arena);
+    this.#arenaView = new ArenaView(this.#scene, arena, environment);
+    this.#environmentView = new EnvironmentView(this.#scene);
     this.#snakeView = new SnakeView(this.#scene);
     this.#tokenView = new TokenView(this.#scene);
     this.#powerUpView = new PowerUpView(this.#scene);
     this.#bulletView = new BulletView(this.#scene);
     window.addEventListener("resize", this.#resize);
     this.#resize();
+    this.setEnvironment(environment);
+  }
+
+  setEnvironment(environment: EnvironmentProfile): void {
+    const { palette } = environment;
+    if (this.#scene.background instanceof THREE.Color) {
+      this.#scene.background.setHex(palette.backgroundColor);
+    }
+    this.#scene.fog = new THREE.Fog(
+      palette.backgroundColor,
+      palette.fogNear,
+      palette.fogFar,
+    );
+    this.#hemisphereLight.color.setHex(palette.hemisphereSkyColor);
+    this.#hemisphereLight.groundColor.setHex(palette.hemisphereGroundColor);
+    this.#keyLight.color.setHex(palette.keyLightColor);
+    this.#arenaView.setEnvironment(environment);
+    this.#environmentView.setEnvironment(environment);
+    this.#renderer.domElement.dataset.environmentKind = environment.kind
+      .toLowerCase()
+      .replaceAll("_", "-");
+    this.#renderer.domElement.dataset.environmentName = environment.sceneName;
+    this.#renderer.domElement.dataset.obstacleCount = String(environment.obstacles.length);
+    this.#renderer.domElement.setAttribute(
+      "aria-label",
+      `NIBBLES 第七階段第一人稱字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
+    );
   }
 
   setAnimationLoop(handler: AnimationFrameHandler | null): void {
@@ -100,6 +145,7 @@ export class PhaseThreeScene {
     window.removeEventListener("resize", this.#resize);
     this.#renderer.setAnimationLoop(null);
     this.#arenaView.dispose();
+    this.#environmentView.dispose();
     this.#snakeView.dispose();
     this.#tokenView.dispose();
     this.#powerUpView.dispose();

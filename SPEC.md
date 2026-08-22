@@ -71,6 +71,8 @@ Supported gameplay character tokens: `A-Z`, `SPACE`, `PERIOD`, `APOSTROPHE`, `HY
 - Game Level 4: Dense Atmosphere, unlimited token length, 5 words, 90 seconds.
 - Game Level 5: Alien Forest, unlimited token length, 5 words, 60 seconds.
 
+Each scene has a distinct palette, fog range, solid obstacle layout and 3D obstacle treatment. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, appear on both map sizes and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
+
 If a vocabulary filter yields fewer than 5 candidates, relax recent-history filtering first, then increase max token length one token at a time until sufficient.
 
 ## 8. HUD and cockpit

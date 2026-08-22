@@ -1,5 +1,6 @@
 import { APP_CONFIG, GAMEPLAY_CONFIG } from "../core/Config";
 import { CollisionKind } from "../gameplay/CollisionSystem";
+import type { EnvironmentProfile } from "../gameplay/Environment";
 import { PowerUpKind } from "../gameplay/PowerUpPool";
 import type { PowerUpWeaponStatus } from "../gameplay/PowerUpWeaponSession";
 import type { SnakeSimulationStatus } from "../gameplay/SnakeSimulation";
@@ -30,6 +31,7 @@ function formatTime(seconds: number): string {
 
 function collisionLabel(collision: SnakeSimulationStatus["latestCollision"]): string {
   if (collision === CollisionKind.SOLID_WALL) return "撞上實體牆";
+  if (collision === CollisionKind.SOLID_OBSTACLE) return "撞上環境障礙";
   if (collision === CollisionKind.SELF) return "撞到自身";
   if (collision === CollisionKind.WRONG_TOKEN) return "錯誤字元";
   return "無";
@@ -91,6 +93,7 @@ function bulletImpactLabel(impact: PowerUpWeaponStatus["latestBulletImpact"]): s
   if (impact === BulletImpactKind.TOKEN) return "字元已重新配置";
   if (impact === BulletImpactKind.POWER_UP) return "道具已重新配置";
   if (impact === BulletImpactKind.SOLID_WALL) return "命中實體牆";
+  if (impact === BulletImpactKind.SOLID_OBSTACLE) return "命中環境障礙";
   return "無";
 }
 
@@ -100,6 +103,7 @@ export class PhaseThreePanel {
   readonly #vocabularyLevel: HTMLElement;
   readonly #wordNumber: HTMLElement;
   readonly #timer: HTMLElement;
+  readonly #environmentFeature: HTMLElement;
   readonly #state: HTMLElement;
   readonly #heading: HTMLElement;
   readonly #speed: HTMLElement;
@@ -122,7 +126,7 @@ export class PhaseThreePanel {
     this.#element.dataset.testid = "phase-three-panel";
     const heading = createElement("header", "phase-three-panel__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 06"),
+      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 07"),
       createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
     );
 
@@ -136,6 +140,12 @@ export class PhaseThreePanel {
     );
     this.#wordNumber = this.#appendMetric(mission, "單字", "—", "word-number");
     this.#timer = this.#appendMetric(mission, "主計時", "—", "main-timer");
+    this.#environmentFeature = createElement(
+      "p",
+      "phase-three-panel__environment",
+      "環境機制：—",
+    );
+    this.#environmentFeature.dataset.testid = "environment-feature";
 
     const targetBlock = createElement("article", "phase-three-panel__target-block");
     targetBlock.append(createElement("p", "phase-three-panel__label", "目標單字"));
@@ -170,6 +180,7 @@ export class PhaseThreePanel {
     this.#element.append(
       heading,
       mission,
+      this.#environmentFeature,
       targetBlock,
       telemetry,
       this.#phaseMessage,
@@ -182,12 +193,15 @@ export class PhaseThreePanel {
     gameplay: VocabularyGameplayStatus,
     snake: SnakeSimulationStatus,
     powerUpWeapon: PowerUpWeaponStatus,
+    environment: EnvironmentProfile,
   ): void {
     this.#element.dataset.state = gameplay.state;
+    this.#element.dataset.environment = environment.kind;
     this.#gameLevel.textContent = `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`;
     this.#vocabularyLevel.textContent = gameplay.vocabularyMode;
     this.#wordNumber.textContent = `${gameplay.wordNumber}/${gameplay.totalWords}`;
     this.#timer.textContent = formatTime(gameplay.timeRemainingSeconds);
+    this.#environmentFeature.textContent = `環境機制：${environment.featureLabel}`;
     this.#state.textContent = stateLabel(gameplay.state);
     this.#heading.textContent = directionLabel(snake.direction);
     this.#speed.textContent = `${snake.speed.toFixed(1)} 單位/秒`;
