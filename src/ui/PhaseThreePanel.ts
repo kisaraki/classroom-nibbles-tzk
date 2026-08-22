@@ -99,7 +99,7 @@ export class PhaseThreePanel {
     this.#element.dataset.testid = "phase-three-panel";
     const heading = createElement("header", "phase-three-panel__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "字元獵取 / 03"),
+      createElement("p", "phase-three-panel__eyebrow", "字元獵取 / 04"),
       createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
     );
 
@@ -192,15 +192,21 @@ export class PhaseThreePanel {
     this.#phaseMessage.hidden =
       gameplay.state !== "TYPING_TEST" &&
       gameplay.state !== "LEVEL_FAILED" &&
-      !gameplay.restartNoticeActive;
+      gameplay.state !== "GAME_CLEAR" &&
+      !gameplay.restartNoticeActive &&
+      !gameplay.typingTimeoutNoticeActive;
     this.#phaseMessage.textContent =
       gameplay.state === "TYPING_TEST"
-        ? "單字已收集完成—打字強化測驗將於第四階段加入"
+        ? "單字已收集完成—正在進行 30 秒打字強化測驗"
         : gameplay.state === "LEVEL_FAILED"
           ? "本關主計時已結束"
+          : gameplay.state === "GAME_CLEAR"
+            ? "25 個單字皆已完成打字強化測驗"
           : gameplay.restartNoticeActive
             ? `20 秒未取得正確字元，本關已重新開始（第 ${gameplay.levelRestartCount} 次）`
-            : "";
+            : gameplay.typingTimeoutNoticeActive
+              ? `打字測驗逾時：已補回主計時 5 秒，請重新收集最後一個字元（第 ${gameplay.typingTimeoutCount} 次）`
+              : "";
   }
 
   #renderTarget(gameplay: VocabularyGameplayStatus): void {

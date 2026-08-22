@@ -171,6 +171,30 @@ describe("VocabularyGameplaySession", () => {
     expect(session.status.timeRemainingSeconds).toBe(remaining);
   });
 
+  it("rolls back only the last token and adds five main-timer seconds on typing timeout", () => {
+    const { session, snake } = createSession("AB");
+    const first = session.tokenEntities.find((entity) => entity.token === "A")!;
+    session.resolveTokenCollision(first.id);
+    const last = session.tokenEntities.find((entity) => entity.token === "B")!;
+    session.resolveTokenCollision(last.id);
+    expect(session.status.state).toBe(GameState.TYPING_TEST);
+    expect(session.status.progressIndex).toBe(2);
+    expect(snake.length).toBe(6);
+
+    expect(session.handleTypingTimeout()).toBe(true);
+
+    expect(session.status.state).toBe(GameState.HUNTING);
+    expect(session.status.progressIndex).toBe(1);
+    expect(session.status.nextToken).toBe("B");
+    expect(session.status.timeRemainingSeconds).toBe(125);
+    expect(session.status.noProgressTimeRemainingSeconds).toBe(20);
+    expect(session.status.typingTimeoutCount).toBe(1);
+    expect(session.status.typingTimeoutNoticeActive).toBe(true);
+    expect(session.tokenEntities.some((entity) => entity.token === "B")).toBe(true);
+    expect(session.tokenEntities.some((entity) => entity.token === "A")).toBe(false);
+    expect(snake.length).toBe(6);
+  });
+
   it("shows the final ten-second warning and resets it after a correct token", () => {
     const { session } = createSession("AB");
 

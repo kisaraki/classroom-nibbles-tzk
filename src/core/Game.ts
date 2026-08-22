@@ -6,11 +6,17 @@ import { SnakeSimulation } from "../gameplay/SnakeSimulation";
 import { SpawnManager } from "../gameplay/SpawnManager";
 import { TokenCollisionSystem } from "../gameplay/TokenCollisionSystem";
 import { TokenPool } from "../gameplay/TokenPool";
+import {
+  TypingAttemptKind,
+  TypingTestSession,
+  TypingTestState,
+} from "../gameplay/TypingTestSession";
 import { VocabularyGameplaySession } from "../gameplay/VocabularyGameplaySession";
 import { DirectionInput } from "../input/DirectionInput";
 import { PhaseThreeScene } from "../rendering/PhaseThreeScene";
 import { BootScreen } from "../ui/BootScreen";
 import { PhaseThreePanel } from "../ui/PhaseThreePanel";
+import { TypingTestModal } from "../ui/TypingTestModal";
 import {
   VocabularySelectScreen,
   type VocabularySelection,
@@ -50,16 +56,21 @@ export class Game {
     this.#snakeSimulation.requestDirection(direction);
   });
   readonly #recentHistory = new RecentTargetHistory();
+  readonly #unsubscribeStateChange: () => void;
   #scene: PhaseThreeScene | null = null;
   #selectionScreen: VocabularySelectScreen | null = null;
   #panel: PhaseThreePanel | null = null;
   #repository: VocabularyRepository | null = null;
   #gameplay: VocabularyGameplaySession | null = null;
+  #typingTest: TypingTestSession | null = null;
+  #typingModal: TypingTestModal | null = null;
   #timer: THREE.Timer | null = null;
 
   constructor(container: HTMLElement) {
     this.#container = container;
     this.#bootScreen = new BootScreen(container);
+    this.#unsubscribeStateChange = this.#stateMachine.subscribe(this.#onStateChange);
+    document.addEventListener("visibilitychange", this.#onVisibilityChange);
   }
 
   async start(): Promise<void> {
@@ -87,6 +98,9 @@ export class Game {
 
   dispose(): void {
     this.#input.detach();
+    this.#stopTypingTest();
+    this.#unsubscribeStateChange();
+    document.removeEventListener("visibilitychange", this.#onVisibilityChange);
     this.#selectionScreen?.dispose();
     this.#scene?.dispose();
     this.#timer?.dispose();
@@ -131,7 +145,6 @@ export class Game {
       this.#selectionScreen.hide();
       this.#stateMachine.transition(GameState.HUNTING);
       this.#recentHistory.remember(gameplay.status.entry.target);
-      this.#input.attach();
     } catch (error) {
       this.#selectionScreen.showError(error);
     }
@@ -140,6 +153,7 @@ export class Game {
   readonly #render = (): void => {
     if (!this.#scene || !this.#timer) return;
     this.#timer.update();
+    this.#updateTypingTest(performance.now());
     this.#fixedStepRunner.advance(this.#timer.getDelta(), (stepSeconds) => {
       this.#gameplay?.update(stepSeconds);
     });
@@ -154,4 +168,69 @@ export class Game {
     );
     if (gameplayStatus) this.#panel?.update(gameplayStatus, this.#snakeSimulation.status);
   };
+
+  readonly #onStateChange = (
+    current: ReturnType<typeof createGameStateMachine>["state"],
+    previous: ReturnType<typeof createGameStateMachine>["state"],
+  ): void => {
+    if (current === GameState.TYPING_TEST) {
+      this.#startTypingTest();
+      return;
+    }
+    if (previous === GameState.TYPING_TEST) this.#stopTypingTest();
+    if (current === GameState.HUNTING) this.#input.attach();
+  };
+
+  readonly #onVisibilityChange = (): void => {
+    this.#updateTypingTest(performance.now());
+  };
+
+  #startTypingTest(): void {
+    if (!this.#gameplay) return;
+    this.#input.detach();
+    this.#stopTypingTest();
+    const config = GAMEPLAY_CONFIG.typingTest;
+    const typingTest = new TypingTestSession(
+      this.#gameplay.status.entry.target,
+      performance.now(),
+      {
+        durationSeconds: config.durationSeconds,
+        requiredConsecutiveSuccesses: config.requiredConsecutiveSuccesses,
+      },
+    );
+    this.#typingTest = typingTest;
+    this.#typingModal = new TypingTestModal(
+      this.#container,
+      this.#gameplay.status.entry,
+      typingTest.status,
+      this.#submitTypingAnswer,
+    );
+  }
+
+  #stopTypingTest(): void {
+    this.#typingModal?.dispose();
+    this.#typingModal = null;
+    this.#typingTest = null;
+  }
+
+  readonly #submitTypingAnswer = (value: string): void => {
+    if (!this.#typingTest || !this.#gameplay) return;
+    const result = this.#typingTest.submit(value, performance.now());
+    this.#typingModal?.update(this.#typingTest.status);
+    if (!result) return;
+    if (result.kind === TypingAttemptKind.TIMED_OUT) {
+      this.#gameplay.handleTypingTimeout();
+    } else if (result.completed) {
+      this.#gameplay.advanceAfterTypingSuccess();
+    }
+  };
+
+  #updateTypingTest(nowMilliseconds: number): void {
+    if (!this.#typingTest || !this.#gameplay) return;
+    const status = this.#typingTest.update(nowMilliseconds);
+    this.#typingModal?.update(status);
+    if (status.state === TypingTestState.TIMED_OUT) {
+      this.#gameplay.handleTypingTimeout();
+    }
+  }
 }

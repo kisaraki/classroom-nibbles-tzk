@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("以中文介面選擇獨立字彙並開始第三階段", async ({ page }) => {
+test("以中文介面選擇獨立字彙並開始第四階段", async ({ page }) => {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("./");
 
-  await expect(page).toHaveTitle("NIBBLES — 第三階段");
+  await expect(page).toHaveTitle("NIBBLES — 第四階段");
   await expect(page.getByTestId("vocabulary-select")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
@@ -14,7 +14,7 @@ test("以中文介面選擇獨立字彙並開始第三階段", async ({ page }) 
   await expect(page.getByTestId("phase-three-canvas")).toBeVisible();
 
   await page.getByTestId("vocabulary-mode").selectOption("CEEC_3");
-  await page.getByTestId("run-seed").fill("phase-three-e2e");
+  await page.getByTestId("run-seed").fill("phase-four-e2e");
   await page.getByTestId("start-run").click();
 
   await expect(page.getByTestId("vocabulary-select")).toBeHidden();

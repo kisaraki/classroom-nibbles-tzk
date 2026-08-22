@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## Phase 4 — 2026-08-22
+
+### Added
+- Traditional Chinese typing reinforcement modal with target, Chinese meaning, real-time countdown, streak, feedback and auto-focused input.
+- Thirty-second absolute-time `TypingTestSession` that remains accurate across animation pauses and hidden-tab intervals.
+- Case-insensitive answer comparison after trimming leading/trailing whitespace while preserving exact internal spaces, periods, apostrophes and hyphens.
+- Three-consecutive-success progression with immediate streak reset after every wrong submission.
+- Enter-key/form submission and copy/cut/paste prevention scoped only to the typing modal.
+- Typing-timeout recovery that rolls back only the final token, adds five seconds to the scene timer and resets the 20-second progress deadline.
+- Unit and Chromium coverage for comparison, streaks, timeout, rollback, keyboard submission, focus and clipboard scope.
+
+### Changed
+- Advanced browser metadata and visible phase markers to Phase 4.
+- Suspended movement input throughout `TYPING_TEST` and restored it only when gameplay returns to `HUNTING`.
+- Completed the existing word/scene progression hook so a successful typing test continues the 25-word run through `GAME_CLEAR`.
+
+### Fixed
+- Typing time now uses an absolute `performance.now()` deadline instead of the fixed-step gameplay clock, so hiding the page cannot pause the test.
+
+### Known Issues
+- Power-ups, weapon and ammo remain intentionally unavailable until Phase 5.
+- The current isometric scene and telemetry overlay remain temporary until the cockpit HUD and mini-map work in Phase 6.
+
 ## Phase 3 — 2026-08-22
 
 ### Added

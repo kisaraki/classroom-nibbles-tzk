@@ -1,6 +1,6 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "第三階段",
+  phaseLabel: "第四階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     backgroundColor: 0x050b16,
@@ -38,6 +38,11 @@ export const GAMEPLAY_CONFIG = Object.freeze({
   noProgress: Object.freeze({
     restartAfterSeconds: 20,
     warningAtSeconds: 10,
+  }),
+  typingTest: Object.freeze({
+    durationSeconds: 30,
+    requiredConsecutiveSuccesses: 3,
+    timeoutMainTimeBonusSeconds: 5,
   }),
   token: Object.freeze({
     radius: 0.34,

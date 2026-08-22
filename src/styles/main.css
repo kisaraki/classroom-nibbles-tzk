@@ -364,6 +364,180 @@ body {
   margin: 1.25rem 0 0;
 }
 
+.typing-test-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  padding: clamp(1rem, 4vw, 3rem);
+  overflow: auto;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 38%, rgb(18 89 91 / 38%), transparent 36%),
+    rgb(2 7 15 / 88%);
+  backdrop-filter: blur(13px);
+}
+
+.typing-test-modal__panel {
+  width: min(37rem, 100%);
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid var(--accent);
+  background: rgb(5 13 27 / 98%);
+  box-shadow: 0 2rem 7rem rgb(0 0 0 / 65%);
+}
+
+.typing-test-modal__eyebrow,
+.typing-test-modal__label,
+.typing-test-modal__metric-label,
+.typing-test-modal__submit,
+.typing-test-modal__clipboard {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  letter-spacing: 0.08em;
+}
+
+.typing-test-modal__eyebrow,
+.typing-test-modal__label,
+.typing-test-modal__metric-label {
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
+.typing-test-modal__eyebrow {
+  margin: 0 0 0.5rem;
+}
+
+.typing-test-modal__title {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  letter-spacing: -0.05em;
+}
+
+.typing-test-modal__intro {
+  margin: 0.8rem 0 1.2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.typing-test-modal__target {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: rgb(4 20 31 / 95%);
+}
+
+.typing-test-modal__label,
+.typing-test-modal__word,
+.typing-test-modal__meaning,
+.typing-test-modal__part-of-speech {
+  margin: 0;
+}
+
+.typing-test-modal__word {
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+  color: #fff;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: clamp(1.6rem, 5vw, 2.7rem);
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.typing-test-modal__meaning {
+  margin-top: 0.45rem;
+  font-size: 0.95rem;
+}
+
+.typing-test-modal__part-of-speech {
+  margin-top: 0.25rem;
+  color: var(--accent);
+  font-size: 0.72rem;
+}
+
+.typing-test-modal__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0.75rem 0;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.typing-test-modal__metric {
+  padding: 0.8rem;
+  background: #071426;
+}
+
+.typing-test-modal__metric-value {
+  margin: 0.3rem 0 0;
+  color: #fff;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 1.25rem;
+}
+
+.typing-test-modal[data-warning="true"] [data-testid="typing-test-timer"] {
+  color: var(--warning);
+  text-shadow: 0 0 0.8rem rgb(255 209 102 / 45%);
+}
+
+.typing-test-modal__form,
+.typing-test-modal__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.typing-test-modal__form {
+  gap: 0.75rem;
+}
+
+.typing-test-modal__input {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  outline: none;
+  background: #020913;
+  color: #fff;
+  font: 1.05rem ui-monospace, "Cascadia Code", monospace;
+}
+
+.typing-test-modal__input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.typing-test-modal__submit {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.7rem;
+}
+
+.typing-test-modal__submit:hover,
+.typing-test-modal__submit:focus-visible {
+  background: var(--accent);
+  color: #03100e;
+}
+
+.typing-test-modal__feedback {
+  min-height: 1.4rem;
+  margin: 0;
+  color: #e9fff9;
+  font-size: 0.82rem;
+}
+
+.typing-test-modal[data-state="SUCCESS"] .typing-test-modal__feedback {
+  color: var(--accent);
+}
+
+.typing-test-modal__clipboard {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.56rem;
+  line-height: 1.5;
+}
+
 @keyframes target-outline {
   from {
     outline-offset: 1px;

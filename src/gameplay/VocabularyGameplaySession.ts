@@ -45,6 +45,8 @@ export interface VocabularyGameplayStatus {
   readonly noProgressWarningActive: boolean;
   readonly levelRestartCount: number;
   readonly restartNoticeActive: boolean;
+  readonly typingTimeoutCount: number;
+  readonly typingTimeoutNoticeActive: boolean;
 }
 
 export interface NoProgressConfig {
@@ -71,6 +73,8 @@ export class VocabularyGameplaySession {
   #noProgressTimeRemainingSeconds: number;
   #levelRestartCount = 0;
   #restartNoticeActive = false;
+  #typingTimeoutCount = 0;
+  #typingTimeoutNoticeActive = false;
 
   constructor(
     plan: VocabularyRunPlan,
@@ -125,6 +129,8 @@ export class VocabularyGameplaySession {
         this.#noProgressTimeRemainingSeconds <= this.#noProgressConfig.warningAtSeconds,
       levelRestartCount: this.#levelRestartCount,
       restartNoticeActive: this.#restartNoticeActive,
+      typingTimeoutCount: this.#typingTimeoutCount,
+      typingTimeoutNoticeActive: this.#typingTimeoutNoticeActive,
     });
   }
 
@@ -176,6 +182,7 @@ export class VocabularyGameplaySession {
       this.#latestCollection = TokenCollectionKind.CORRECT;
       this.#noProgressTimeRemainingSeconds = this.#noProgressConfig.restartAfterSeconds;
       this.#restartNoticeActive = false;
+      this.#typingTimeoutNoticeActive = false;
       const nextToken = this.#currentEntry.tokens[this.#progressIndex];
       if (!nextToken) {
         this.#stateMachine.transition(GameState.TYPING_TEST);
@@ -224,11 +231,34 @@ export class VocabularyGameplaySession {
     return true;
   }
 
+  handleTypingTimeout(
+    mainTimeBonusSeconds = GAMEPLAY_CONFIG.typingTest.timeoutMainTimeBonusSeconds,
+  ): boolean {
+    if (this.#stateMachine.state !== GameState.TYPING_TEST) return false;
+    if (!Number.isFinite(mainTimeBonusSeconds) || mainTimeBonusSeconds < 0) {
+      throw new Error("Typing timeout main-time bonus must be finite and non-negative.");
+    }
+    const lastToken = this.#currentEntry.tokens[this.#currentEntry.tokens.length - 1];
+    if (!lastToken) throw new Error("Typing timeout requires a non-empty target.");
+
+    this.#progressIndex = Math.max(0, this.#currentEntry.tokenLength - 1);
+    this.#timeRemainingSeconds += mainTimeBonusSeconds;
+    this.#noProgressTimeRemainingSeconds = this.#noProgressConfig.restartAfterSeconds;
+    this.#latestCollection = null;
+    this.#restartNoticeActive = false;
+    this.#typingTimeoutCount += 1;
+    this.#typingTimeoutNoticeActive = true;
+    this.#tokenPool.ensureToken(lastToken, this.#snakeSimulation.snake);
+    this.#stateMachine.transition(GameState.HUNTING);
+    return true;
+  }
+
   #resetForCurrentWord(): void {
     this.#progressIndex = 0;
     this.#latestCollection = null;
     this.#noProgressTimeRemainingSeconds = this.#noProgressConfig.restartAfterSeconds;
     this.#restartNoticeActive = false;
+    this.#typingTimeoutNoticeActive = false;
     this.#tokenPool.normalize(this.#snakeSimulation.snake);
     for (const listener of this.#wordStartedListeners) listener(this.#currentEntry);
   }
@@ -243,6 +273,7 @@ export class VocabularyGameplaySession {
     this.#latestCollection = null;
     this.#levelRestartCount += 1;
     this.#restartNoticeActive = true;
+    this.#typingTimeoutNoticeActive = false;
     this.#snakeSimulation.reset();
     this.#tokenPool.clear();
     this.#tokenPool.normalize(this.#snakeSimulation.snake);
