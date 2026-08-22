@@ -3,14 +3,25 @@ import { Arena } from "../gameplay/Arena";
 import { CollisionSystem } from "../gameplay/CollisionSystem";
 import { Snake } from "../gameplay/Snake";
 import { SnakeSimulation } from "../gameplay/SnakeSimulation";
+import { SpawnManager } from "../gameplay/SpawnManager";
+import { TokenCollisionSystem } from "../gameplay/TokenCollisionSystem";
+import { TokenPool } from "../gameplay/TokenPool";
+import { VocabularyGameplaySession } from "../gameplay/VocabularyGameplaySession";
 import { DirectionInput } from "../input/DirectionInput";
-import { PhaseTwoScene } from "../rendering/PhaseTwoScene";
+import { PhaseThreeScene } from "../rendering/PhaseThreeScene";
 import { BootScreen } from "../ui/BootScreen";
-import { PhaseTwoPanel } from "../ui/PhaseTwoPanel";
+import { PhaseThreePanel } from "../ui/PhaseThreePanel";
+import {
+  VocabularySelectScreen,
+  type VocabularySelection,
+} from "../ui/VocabularySelectScreen";
+import { RecentTargetHistory } from "../vocabulary/RecentTargetHistory";
 import { VocabularyRepository } from "../vocabulary/VocabularyRepository";
+import { WordSelector } from "../vocabulary/WordSelector";
 import { GAMEPLAY_CONFIG, getVocabularyUrl } from "./Config";
 import { FixedStepRunner } from "./FixedStepRunner";
 import { createGameStateMachine, GameState } from "./GameState";
+import { SeededRandom } from "./SeededRandom";
 
 export class Game {
   readonly #container: HTMLElement;
@@ -23,7 +34,7 @@ export class Game {
     bodyRadius: GAMEPLAY_CONFIG.snake.bodyCollisionRadius,
     ignoredLeadingSegments: GAMEPLAY_CONFIG.snake.selfCollisionIgnoreSegments,
   });
-  readonly #simulation = new SnakeSimulation(
+  readonly #snakeSimulation = new SnakeSimulation(
     this.#snake,
     this.#arena,
     this.#collisionSystem,
@@ -36,10 +47,14 @@ export class Game {
     maximumUpdatesPerFrame: GAMEPLAY_CONFIG.maximumUpdatesPerFrame,
   });
   readonly #input = new DirectionInput((direction) => {
-    this.#simulation.requestDirection(direction);
+    this.#snakeSimulation.requestDirection(direction);
   });
-  #scene: PhaseTwoScene | null = null;
-  #panel: PhaseTwoPanel | null = null;
+  readonly #recentHistory = new RecentTargetHistory();
+  #scene: PhaseThreeScene | null = null;
+  #selectionScreen: VocabularySelectScreen | null = null;
+  #panel: PhaseThreePanel | null = null;
+  #repository: VocabularyRepository | null = null;
+  #gameplay: VocabularyGameplaySession | null = null;
   #timer: THREE.Timer | null = null;
 
   constructor(container: HTMLElement) {
@@ -50,23 +65,21 @@ export class Game {
   async start(): Promise<void> {
     this.#bootScreen.setLoading();
     try {
-      this.#scene = new PhaseTwoScene(this.#container, this.#arena);
+      this.#scene = new PhaseThreeScene(this.#container, this.#arena);
       const timer = new THREE.Timer();
       timer.connect(document);
       this.#timer = timer;
       this.#scene.setAnimationLoop(this.#render);
 
-      const vocabulary = await VocabularyRepository.load(getVocabularyUrl());
-      this.#panel = new PhaseTwoPanel(
+      this.#repository = await VocabularyRepository.load(getVocabularyUrl());
+      this.#stateMachine.transition(GameState.MAIN_MENU);
+      this.#stateMachine.transition(GameState.VOCABULARY_SELECT);
+      this.#selectionScreen = new VocabularySelectScreen(
         this.#container,
-        vocabulary.metadata,
-        this.#arena.config,
+        this.#repository.metadata,
+        this.#startRun,
       );
       this.#bootScreen.hide();
-      this.#stateMachine.transition(GameState.MAIN_MENU);
-      this.#stateMachine.transition(GameState.TRANSITION_IN);
-      this.#stateMachine.transition(GameState.HUNTING);
-      this.#input.attach();
     } catch (error) {
       this.#bootScreen.showError(error);
     }
@@ -74,17 +87,71 @@ export class Game {
 
   dispose(): void {
     this.#input.detach();
+    this.#selectionScreen?.dispose();
     this.#scene?.dispose();
     this.#timer?.dispose();
   }
+
+  readonly #startRun = (selection: VocabularySelection): void => {
+    if (!this.#repository || !this.#selectionScreen) return;
+    try {
+      const selector = new WordSelector(this.#repository.eligibleEntries);
+      const plan = selector.createRun(
+        selection.mode,
+        selection.seed,
+        this.#recentHistory.load(),
+      );
+      const spawnManager = new SpawnManager(
+        this.#arena,
+        new SeededRandom(`${selection.seed}:spawns`),
+        {
+          minimumHeadDistance: GAMEPLAY_CONFIG.token.minimumHeadDistance,
+          minimumEntitySpacing: GAMEPLAY_CONFIG.token.minimumEntitySpacing,
+          bodyClearance: GAMEPLAY_CONFIG.token.bodyClearance,
+          maximumRandomAttempts: GAMEPLAY_CONFIG.token.maximumRandomAttempts,
+          fallbackGridSpacing: GAMEPLAY_CONFIG.token.fallbackGridSpacing,
+        },
+      );
+      const tokenPool = new TokenPool(spawnManager, GAMEPLAY_CONFIG.token.collisionRadius);
+      const tokenCollisions = new TokenCollisionSystem(
+        GAMEPLAY_CONFIG.snake.headCollisionRadius,
+      );
+      const gameplay = new VocabularyGameplaySession(
+        plan,
+        this.#stateMachine,
+        this.#snakeSimulation,
+        tokenPool,
+        tokenCollisions,
+      );
+      gameplay.subscribeToWordStarted((entry) => this.#recentHistory.remember(entry.target));
+
+      this.#stateMachine.transition(GameState.TRANSITION_IN);
+      this.#gameplay = gameplay;
+      this.#panel = new PhaseThreePanel(this.#container);
+      this.#selectionScreen.hide();
+      this.#stateMachine.transition(GameState.HUNTING);
+      this.#recentHistory.remember(gameplay.status.entry.target);
+      this.#input.attach();
+    } catch (error) {
+      this.#selectionScreen.showError(error);
+    }
+  };
 
   readonly #render = (): void => {
     if (!this.#scene || !this.#timer) return;
     this.#timer.update();
     this.#fixedStepRunner.advance(this.#timer.getDelta(), (stepSeconds) => {
-      this.#simulation.update(stepSeconds);
+      this.#gameplay?.update(stepSeconds);
     });
-    this.#scene.render(this.#snake, this.#arena);
-    this.#panel?.update(this.#simulation.status);
+
+    const gameplayStatus = this.#gameplay?.status;
+    this.#scene.render(
+      this.#snake,
+      this.#arena,
+      this.#gameplay?.tokenEntities ?? [],
+      gameplayStatus?.nextToken ?? null,
+      this.#timer.getElapsed(),
+    );
+    if (gameplayStatus) this.#panel?.update(gameplayStatus, this.#snakeSimulation.status);
   };
 }

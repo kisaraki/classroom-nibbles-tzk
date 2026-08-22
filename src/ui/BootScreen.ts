@@ -30,7 +30,7 @@ export class BootScreen {
     this.#element = createElement("section", "boot-screen");
     this.#element.dataset.testid = "boot-screen";
 
-    const eyebrow = createElement("p", "boot-screen__eyebrow", "SYSTEM BOOTSTRAP / 02");
+    const eyebrow = createElement("p", "boot-screen__eyebrow", "SYSTEM BOOTSTRAP / 03");
     const heading = createElement("h1", "boot-screen__title", APP_CONFIG.title);
     const phase = createElement("p", "boot-screen__phase", `${APP_CONFIG.phaseLabel} — DATA LINK`);
 

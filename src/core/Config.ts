@@ -1,6 +1,6 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "PHASE 2",
+  phaseLabel: "PHASE 3",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     backgroundColor: 0x050b16,
@@ -35,6 +35,15 @@ export const GAMEPLAY_CONFIG = Object.freeze({
     stunDurationSeconds: 1,
     recoveryDurationSeconds: 0.5,
   }),
+  token: Object.freeze({
+    radius: 0.34,
+    collisionRadius: 0.36,
+    minimumHeadDistance: 4,
+    minimumEntitySpacing: 0.82,
+    bodyClearance: 0.68,
+    maximumRandomAttempts: 100,
+    fallbackGridSpacing: 1.15,
+  }),
   arena: Object.freeze({
     halfWidth: 9,
     halfDepth: 9,
@@ -42,6 +51,44 @@ export const GAMEPLAY_CONFIG = Object.freeze({
     zBoundaryMode: "WRAP" as const,
   }),
 });
+
+export const GAME_LEVEL_CONFIGS = Object.freeze([
+  Object.freeze({
+    gameLevel: 1 as const,
+    sceneName: "Cargo Bay",
+    maximumTokenLength: 5 as number | null,
+    wordsPerScene: 5,
+    durationSeconds: 120,
+  }),
+  Object.freeze({
+    gameLevel: 2 as const,
+    sceneName: "Ship Pipeline",
+    maximumTokenLength: 8 as number | null,
+    wordsPerScene: 5,
+    durationSeconds: 90,
+  }),
+  Object.freeze({
+    gameLevel: 3 as const,
+    sceneName: "Asteroid Belt",
+    maximumTokenLength: 10 as number | null,
+    wordsPerScene: 5,
+    durationSeconds: 90,
+  }),
+  Object.freeze({
+    gameLevel: 4 as const,
+    sceneName: "Dense Atmosphere",
+    maximumTokenLength: null,
+    wordsPerScene: 5,
+    durationSeconds: 90,
+  }),
+  Object.freeze({
+    gameLevel: 5 as const,
+    sceneName: "Alien Forest",
+    maximumTokenLength: null,
+    wordsPerScene: 5,
+    durationSeconds: 60,
+  }),
+]);
 
 export function getVocabularyUrl(baseUrl: string = import.meta.env.BASE_URL): string {
   return `${baseUrl}${APP_CONFIG.vocabularyPath}`;

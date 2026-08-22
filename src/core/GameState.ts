@@ -38,7 +38,11 @@ const GAME_TRANSITIONS: TransitionMap<GameState> = Object.freeze({
     GameState.LEVEL_CLEAR,
     GameState.LEVEL_FAILED,
   ]),
-  [GameState.STUNNED]: Object.freeze([GameState.RECOVERY, GameState.LEVEL_FAILED]),
+  [GameState.STUNNED]: Object.freeze([
+    GameState.HUNTING,
+    GameState.RECOVERY,
+    GameState.LEVEL_FAILED,
+  ]),
   [GameState.RECOVERY]: Object.freeze([
     GameState.HUNTING,
     GameState.PAUSED,

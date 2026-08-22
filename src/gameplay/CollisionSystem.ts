@@ -5,6 +5,7 @@ import type { XZPoint } from "./Trail";
 export const CollisionKind = Object.freeze({
   SOLID_WALL: "SOLID_WALL",
   SELF: "SELF",
+  WRONG_TOKEN: "WRONG_TOKEN",
 } as const);
 
 export type CollisionKind = (typeof CollisionKind)[keyof typeof CollisionKind];

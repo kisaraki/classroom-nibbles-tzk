@@ -1,7 +1,7 @@
 import { GameState, type GameState as GameStateValue } from "../core/GameState";
 import type { StateMachine } from "../core/StateMachine";
 import { Arena } from "./Arena";
-import { CollisionSystem, type CollisionKind } from "./CollisionSystem";
+import { CollisionKind, CollisionSystem } from "./CollisionSystem";
 import type { Direction } from "./Direction";
 import { Snake } from "./Snake";
 import type { XZPoint } from "./Trail";
@@ -36,6 +36,7 @@ export class SnakeSimulation {
   readonly #collisionListeners = new Set<CollisionListener>();
   #delayRemainingSeconds = 0;
   #latestCollision: CollisionKind | null = null;
+  #recoveryRequired = false;
 
   constructor(
     snake: Snake,
@@ -107,13 +108,24 @@ export class SnakeSimulation {
     this.#snake.advance(deltaSeconds);
   }
 
+  applyWrongTokenCollision(position: XZPoint): boolean {
+    if (this.#stateMachine.state !== GameState.HUNTING) return false;
+    this.#enterStun(CollisionKind.WRONG_TOKEN, position, false);
+    return true;
+  }
+
   subscribeToCollisions(listener: CollisionListener): () => void {
     this.#collisionListeners.add(listener);
     return () => this.#collisionListeners.delete(listener);
   }
 
-  #enterStun(kind: CollisionKind, attemptedPosition: XZPoint): void {
+  #enterStun(
+    kind: CollisionKind,
+    attemptedPosition: XZPoint,
+    recoveryRequired = true,
+  ): void {
     this.#latestCollision = kind;
+    this.#recoveryRequired = recoveryRequired;
     this.#delayRemainingSeconds = this.#config.stunDurationSeconds;
     this.#stateMachine.transition(GameState.STUNNED);
     const event = Object.freeze({
@@ -126,6 +138,11 @@ export class SnakeSimulation {
   #advanceStun(deltaSeconds: number): void {
     this.#delayRemainingSeconds -= deltaSeconds;
     if (this.#delayRemainingSeconds > 0) return;
+    if (!this.#recoveryRequired) {
+      this.#delayRemainingSeconds = 0;
+      this.#stateMachine.transition(GameState.HUNTING);
+      return;
+    }
     this.#delayRemainingSeconds = this.#config.recoveryDurationSeconds;
     this.#stateMachine.transition(GameState.RECOVERY);
   }

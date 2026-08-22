@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## Phase 3 — 2026-08-22
+
+### Added
+- Independent vocabulary selection for CEEC Level 1–6, PROGRESSIVE and MIXED 1–6 modes.
+- Seeded deterministic random source shared by word selection and spawning; gameplay call sites do not use `Math.random()`.
+- Five-scene × five-word run planning with unique ids/targets, scene token-length limits and the specified Progressive mapping.
+- Recent-target filtering with the required relaxation order: history first, then maximum token length one token at a time.
+- Central SpawnManager with 100 bounded random attempts, deterministic fallback points, arena/body/entity exclusion and four-unit head clearance.
+- Runtime token pool containing A–Z plus SPACE, PERIOD, APOSTROPHE and HYPHEN at each new word.
+- Ordered token collection, repeated-token immediate respawn, correct shortening and wrong-token growth/stun/respawn.
+- Scene main timer and Phase 3 handoff to `TYPING_TEST` after a word is fully collected.
+- A Phase 4-facing success hook that advances words and scenes, resets each new scene timer, and reaches `GAME_CLEAR` after word 25.
+- Three.js token sprites, pulsing target token, vocabulary selection screen and progress/meaning/level telemetry.
+- Unit and E2E coverage for selection, spawning, pool normalization, token outcomes and the Phase 3 browser flow.
+
+### Changed
+- Advanced the boot flow through `VOCABULARY_SELECT` before entering `HUNTING`.
+- Distinguished wrong-token stun from wall/self collision: wrong tokens return directly to hunting, while wall/self collisions retain RECOVERY.
+- Updated the browser title, documentation and test expectations to Phase 3.
+
+### Fixed
+- Preserved timer pause and stationary movement at the Phase 4 typing-test boundary without implementing the typing test early.
+
+### Known Issues
+- Phase 3 stops after the first completed word because the required three-success typing reinforcement is Phase 4.
+- The current isometric scene and telemetry overlay are temporary; the final cockpit HUD and mini-map belong to Phase 6.
+
 ## Phase 2 — 2026-08-22
 
 ### Added

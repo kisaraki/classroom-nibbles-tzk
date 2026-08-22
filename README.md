@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D cockpit vocabulary game based on class
 
 ## Current status
 
-Phase 2 is complete. The browser now runs a test arena with continuous snake movement on the XZ plane, cardinal steering, recorded-trail body following, per-segment wrapping, SOLID wall collision, self collision, and the required non-lethal stun/recovery sequence. Vocabulary collection and spawning remain Phase 3 work.
+Phase 3 is complete. The browser supports independent vocabulary-mode selection, deterministic 25-word run planning, token spawning, ordered collection, snake-length rewards/penalties, scene timing, and target/progress telemetry on top of the Phase 2 movement and collision systems. The typing reinforcement modal remains Phase 4 work.
 
 ## Requirements
 
@@ -19,19 +19,21 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. The Phase 2 movement lab loads the vocabulary metadata, then starts an interactive Three.js arena.
+Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the interactive Phase 3 token hunt.
 
-## Phase 2 controls and arena
+## Phase 3 gameplay and controls
 
+- Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
+- A seed creates a reproducible five-scene × five-word run without repeated ids or targets.
 - Steer with `WASD` or the arrow keys.
-- Movement is continuous at 4.5 world units per second on the horizontal XZ plane.
-- Direct 180-degree reversal is rejected.
-- The red east/west walls are `SOLID`; a hit causes 1 second of `STUNNED` followed by 500 ms of stationary `RECOVERY`.
-- The blue north/south gates are `WRAP`; the head and each body segment cross independently.
-- Steering is disabled while stunned and enabled during recovery.
-- Wall and self collisions are delay penalties, never death, and do not change snake length.
+- Collect the outlined/pulsing next token shown in the target sequence.
+- A correct token advances progress and shortens the snake by one segment, with a minimum length of 3.
+- A wrong token lengthens the snake by one segment, with a maximum length of 40, stuns for one second, then respawns.
+- All 30 gameplay token types—A–Z, SPACE, PERIOD, APOSTROPHE, and HYPHEN—exist at the start of every word.
+- Red east/west walls are `SOLID`; blue north/south gates are `WRAP`.
+- Wall and self collisions retain the Phase 2 non-lethal stun/recovery behavior.
 
-The isometric movement-lab camera and diagnostic panel are Phase 2 development presentation. The final cockpit HUD belongs to later phases.
+Completing the final token pauses movement and the main timer in `TYPING_TEST`. Phase 3 deliberately shows a handoff message instead of implementing the Phase 4 typing modal. The isometric camera and diagnostic HUD remain development presentation until the cockpit/HUD phase.
 
 ## Quality and build commands
 
@@ -69,7 +71,8 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 
 - Vitest covers runtime schema parsing, CEEC level/token invariants, token lengths, counts, and malformed data rejection.
 - Vitest also covers fixed-step timing, cardinal movement, trail sampling, length limits, per-segment wrapping, SOLID walls, self collision, stun, and recovery.
-- Playwright checks that the Phase 2 UI, metadata, and Three.js canvas load, accepts a legal turn, rejects a reversal, and reports a wall collision without changing length.
+- Phase 3 tests cover deterministic run selection, Progressive mapping, filter relaxation, spawn constraints/fallback, token-pool normalization, ordered progress, repeated tokens, wrong-token respawn, length rewards/penalties, and timer pausing.
+- Playwright checks vocabulary selection, independent Game/Vocabulary labels, the 30-token scene, non-color target cue, and steering rules.
 - `.github/workflows/ci.yml` runs quality gates on pushes and pull requests, with E2E isolated in its own job.
 - `.github/workflows/deploy-pages.yml` validates and builds `dist/` before deploying it through official GitHub Pages actions on `main`.
 
@@ -79,9 +82,9 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 src/core/          Boot coordination, state machine, fixed-step loop, and configuration
 src/gameplay/      Three.js-independent snake, trail, arena, collision, and simulation logic
 src/input/         Keyboard-to-direction input adapter
-src/rendering/     Three.js arena and instanced snake presentation
-src/ui/            Boot/error UI and Phase 2 diagnostic panel
-src/vocabulary/    Typed runtime vocabulary repository and tests
+src/rendering/     Three.js arena, instanced snake, and token-sprite presentation
+src/ui/            Boot/error UI, vocabulary selection, and Phase 3 telemetry
+src/vocabulary/    Runtime repository, modes, deterministic WordSelector, and tests
 e2e/               Playwright smoke test
 public/data/       Runtime vocabulary dataset and Phase 0 audit report
 data/source/       Parsed source rows retained from Phase 0
@@ -90,4 +93,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract. Phase 3 has not started.
+See `SPEC.md` for the full product contract. Phase 4 has not started.

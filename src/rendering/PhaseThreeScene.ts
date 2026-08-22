@@ -2,18 +2,22 @@ import * as THREE from "three";
 import { APP_CONFIG } from "../core/Config";
 import { Arena } from "../gameplay/Arena";
 import { Snake } from "../gameplay/Snake";
+import type { TokenEntity } from "../gameplay/TokenPool";
+import type { CharacterToken } from "../vocabulary/types";
 import { ArenaView } from "./ArenaView";
 import { SnakeView } from "./SnakeView";
+import { TokenView } from "./TokenView";
 
 export type AnimationFrameHandler = () => void;
 
-export class PhaseTwoScene {
+export class PhaseThreeScene {
   readonly #container: HTMLElement;
   readonly #renderer: THREE.WebGLRenderer;
   readonly #scene = new THREE.Scene();
   readonly #camera: THREE.PerspectiveCamera;
   readonly #arenaView: ArenaView;
   readonly #snakeView: SnakeView;
+  readonly #tokenView: TokenView;
 
   constructor(container: HTMLElement, arena: Arena) {
     this.#container = container;
@@ -22,9 +26,9 @@ export class PhaseTwoScene {
       Math.min(window.devicePixelRatio, APP_CONFIG.scene.maxPixelRatio),
     );
     this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.#renderer.domElement.className = "phase-two-scene";
-    this.#renderer.domElement.dataset.testid = "phase-two-canvas";
-    this.#renderer.domElement.setAttribute("aria-label", "Three.js Phase 2 movement arena");
+    this.#renderer.domElement.className = "phase-three-scene";
+    this.#renderer.domElement.dataset.testid = "phase-three-canvas";
+    this.#renderer.domElement.setAttribute("aria-label", "Three.js Phase 3 vocabulary arena");
     container.prepend(this.#renderer.domElement);
 
     this.#scene.background = new THREE.Color(APP_CONFIG.scene.backgroundColor);
@@ -46,6 +50,7 @@ export class PhaseTwoScene {
 
     this.#arenaView = new ArenaView(this.#scene, arena);
     this.#snakeView = new SnakeView(this.#scene);
+    this.#tokenView = new TokenView(this.#scene);
     window.addEventListener("resize", this.#resize);
     this.#resize();
   }
@@ -54,8 +59,16 @@ export class PhaseTwoScene {
     this.#renderer.setAnimationLoop(handler);
   }
 
-  render(snake: Snake, arena: Arena): void {
+  render(
+    snake: Snake,
+    arena: Arena,
+    tokens: readonly TokenEntity[],
+    nextToken: CharacterToken | null,
+    elapsedSeconds: number,
+  ): void {
+    this.#renderer.domElement.dataset.tokenCount = String(tokens.length);
     this.#snakeView.update(snake, arena);
+    this.#tokenView.update(tokens, arena, nextToken, elapsedSeconds);
     this.#renderer.render(this.#scene, this.#camera);
   }
 
@@ -64,6 +77,7 @@ export class PhaseTwoScene {
     this.#renderer.setAnimationLoop(null);
     this.#arenaView.dispose();
     this.#snakeView.dispose();
+    this.#tokenView.dispose();
     this.#renderer.dispose();
   }
 
