@@ -28,9 +28,9 @@ export class BootScreen {
 
   constructor(container: HTMLElement) {
     this.#element = createElement("section", "boot-screen");
-    this.#element.dataset.testid = "phase-1-boot";
+    this.#element.dataset.testid = "boot-screen";
 
-    const eyebrow = createElement("p", "boot-screen__eyebrow", "SYSTEM BOOTSTRAP / 01");
+    const eyebrow = createElement("p", "boot-screen__eyebrow", "SYSTEM BOOTSTRAP / 02");
     const heading = createElement("h1", "boot-screen__title", APP_CONFIG.title);
     const phase = createElement("p", "boot-screen__phase", `${APP_CONFIG.phaseLabel} — DATA LINK`);
 
@@ -108,11 +108,16 @@ export class BootScreen {
   }
 
   showError(error: unknown): void {
+    this.#element.hidden = false;
     this.#element.dataset.state = "error";
     this.#status.textContent = "BOOT DEGRADED";
     this.#errorMessage.textContent =
       error instanceof Error ? error.message : "An unknown boot error occurred.";
     this.#errorPanel.hidden = false;
+  }
+
+  hide(): void {
+    this.#element.hidden = true;
   }
 
   #appendMetric(

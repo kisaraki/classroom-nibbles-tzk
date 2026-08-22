@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D cockpit vocabulary game based on class
 
 ## Current status
 
-Phase 1 is complete: the repository has a runnable project scaffold, a Three.js smoke scene, a typed vocabulary repository, automated validation/tests, and GitHub Pages workflows. Snake movement and all gameplay systems belong to later phases and are not implemented yet.
+Phase 2 is complete. The browser now runs a test arena with continuous snake movement on the XZ plane, cardinal steering, recorded-trail body following, per-segment wrapping, SOLID wall collision, self collision, and the required non-lethal stun/recovery sequence. Vocabulary collection and spawning remain Phase 3 work.
 
 ## Requirements
 
@@ -19,7 +19,19 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. The Phase 1 screen should display a rotating Three.js primitive and the vocabulary dataset version/counts.
+Vite prints the local development URL. The Phase 2 movement lab loads the vocabulary metadata, then starts an interactive Three.js arena.
+
+## Phase 2 controls and arena
+
+- Steer with `WASD` or the arrow keys.
+- Movement is continuous at 4.5 world units per second on the horizontal XZ plane.
+- Direct 180-degree reversal is rejected.
+- The red east/west walls are `SOLID`; a hit causes 1 second of `STUNNED` followed by 500 ms of stationary `RECOVERY`.
+- The blue north/south gates are `WRAP`; the head and each body segment cross independently.
+- Steering is disabled while stunned and enabled during recovery.
+- Wall and self collisions are delay penalties, never death, and do not change snake length.
+
+The isometric movement-lab camera and diagnostic panel are Phase 2 development presentation. The final cockpit HUD belongs to later phases.
 
 ## Quality and build commands
 
@@ -56,15 +68,19 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 ## Tests and continuous integration
 
 - Vitest covers runtime schema parsing, CEEC level/token invariants, token lengths, counts, and malformed data rejection.
-- Playwright checks that the boot UI, metadata, and Three.js canvas load without a vocabulary error.
+- Vitest also covers fixed-step timing, cardinal movement, trail sampling, length limits, per-segment wrapping, SOLID walls, self collision, stun, and recovery.
+- Playwright checks that the Phase 2 UI, metadata, and Three.js canvas load, accepts a legal turn, rejects a reversal, and reports a wall collision without changing length.
 - `.github/workflows/ci.yml` runs quality gates on pushes and pull requests, with E2E isolated in its own job.
 - `.github/workflows/deploy-pages.yml` validates and builds `dist/` before deploying it through official GitHub Pages actions on `main`.
 
 ## Directory overview
 
 ```text
-src/core/          Phase 1 boot coordinator, state model, and configuration
-src/ui/            Boot metadata/error overlay
+src/core/          Boot coordination, state machine, fixed-step loop, and configuration
+src/gameplay/      Three.js-independent snake, trail, arena, collision, and simulation logic
+src/input/         Keyboard-to-direction input adapter
+src/rendering/     Three.js arena and instanced snake presentation
+src/ui/            Boot/error UI and Phase 2 diagnostic panel
 src/vocabulary/    Typed runtime vocabulary repository and tests
 e2e/               Playwright smoke test
 public/data/       Runtime vocabulary dataset and Phase 0 audit report
@@ -74,4 +90,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract and `PHASE-01-CODEX.md` for Phase 1 acceptance criteria.
+See `SPEC.md` for the full product contract. Phase 3 has not started.

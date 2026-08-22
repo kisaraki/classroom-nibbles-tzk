@@ -38,13 +38,127 @@ body {
   isolation: isolate;
 }
 
-.smoke-scene {
+.smoke-scene,
+.phase-two-scene {
   position: absolute;
   inset: 0;
   z-index: -1;
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.boot-screen[hidden] {
+  display: none;
+}
+
+.phase-two-panel {
+  position: absolute;
+  top: clamp(0.8rem, 2.5vw, 2rem);
+  left: clamp(0.8rem, 2.5vw, 2rem);
+  z-index: 2;
+  width: min(27rem, calc(100% - 1.6rem));
+  padding: clamp(1rem, 2.5vw, 1.6rem);
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  background: rgb(5 13 27 / 88%);
+  box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 38%);
+  pointer-events: none;
+  backdrop-filter: blur(16px);
+}
+
+.phase-two-panel__eyebrow,
+.phase-two-panel__phase,
+.phase-two-panel__data,
+.phase-two-panel__metric-label,
+.phase-two-panel__boundaries,
+.phase-two-panel__controls {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.phase-two-panel__eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.phase-two-panel__title {
+  margin: 0;
+  font-size: clamp(2.5rem, 6vw, 4.3rem);
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+}
+
+.phase-two-panel__phase {
+  margin: 0.65rem 0 1.1rem;
+  color: var(--accent);
+  font-size: 0.68rem;
+}
+
+.phase-two-panel__data {
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-left: 2px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.62rem;
+}
+
+.phase-two-panel__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.phase-two-panel__metric {
+  min-width: 0;
+  padding: 0.68rem;
+  background: rgb(6 18 33 / 96%);
+}
+
+.phase-two-panel__metric-label {
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.55rem;
+}
+
+.phase-two-panel__metric-value {
+  margin: 0;
+  overflow: hidden;
+  color: #e9fff9;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phase-two-panel[data-state="STUNNED"] [data-testid="simulation-state"],
+.phase-two-panel[data-state="STUNNED"] [data-testid="latest-collision"] {
+  color: var(--error);
+}
+
+.phase-two-panel[data-state="RECOVERY"] [data-testid="simulation-state"] {
+  color: #ffd166;
+}
+
+.phase-two-panel__boundaries,
+.phase-two-panel__controls {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.58rem;
+  line-height: 1.55;
+}
+
+.phase-two-panel__key {
+  padding: 0.12rem 0.3rem;
+  border: 1px solid var(--line);
+  color: var(--accent);
 }
 
 .boot-screen {
@@ -234,6 +348,11 @@ body {
   .boot-screen__summary,
   .boot-screen__levels {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .phase-two-panel {
+    max-height: calc(100% - 1.6rem);
+    overflow: auto;
   }
 }
 

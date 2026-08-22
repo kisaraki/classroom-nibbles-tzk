@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## Phase 2 — 2026-08-22
+
+### Added
+- Continuous cardinal snake movement on the horizontal XZ plane at a fixed 1/60 simulation step.
+- Recorded polyline trail sampling so body segments follow turns at 0.75-unit spacing rather than moving in grid jumps.
+- Central snake configuration for initial/minimum/maximum length, speed, spacing and collision radii.
+- Per-axis `SOLID` and `WRAP` arena boundaries with per-segment wrap presentation.
+- Predictive SOLID wall and self-collision detection, including wrap-aware seam distance.
+- Non-lethal 1-second `STUNNED` and 500 ms stationary `RECOVERY` state sequence; recovery allows steering.
+- Keyboard steering through WASD and arrow keys with direct 180-degree reversal rejection.
+- Instanced Three.js body rendering and an interactive Phase 2 movement-lab scene.
+- Unit and E2E coverage for movement, trail behavior, wrapping, collisions, delay states and input rules.
+
+### Changed
+- Expanded the explicit main state transition map for Phase 2 collision states and future spec-defined states.
+- Replaced the Phase 1 rotating-primitive smoke screen with a functional movement sandbox.
+- Updated the development status, controls and architecture documentation for Phase 2.
+
+### Fixed
+- Removed the Phase 1-only scene loop in favor of a clamped fixed-step gameplay accumulator.
+
+### Known Issues
+- The Phase 2 isometric camera and diagnostic overlay are temporary development presentation; the cockpit HUD and mini-map belong to later phases.
+- Vocabulary targets, token spawning and collection are intentionally not implemented until Phase 3.
+
 ## Phase 1 — 2026-08-22
 
 ### Added
