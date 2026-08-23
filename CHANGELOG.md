@@ -3,13 +3,13 @@
 ## Version 1.3 — 2026-08-23
 
 ### Changed
-- Raised the dynamic Three.js render-buffer budget from 800×450 to 1152×648 (about 2.07× the former pixel count) for a sharper table, snake and token presentation while retaining the 30 FPS release floor.
+- Raised the dynamic Three.js render-buffer budget from 800×450 to 960×540 (44% more pixels) for a sharper table, snake and token presentation while retaining the 30 FPS release floor in CI WebGL.
 - Defined `W`/`↑`, `S`/`↓`, `A`/`←` and `D`/`→` from the fixed player's table position: forward/north, backward/south, left/west and right/east, independent of the current machine nose.
 - Generalized the former relative rear maneuver into a safe two-corner completion whenever an absolute player-view request is directly opposite the current heading.
 - Updated Traditional Chinese control help and public release metadata to Version 1.3.
 
 ### Added
-- Unit and Chromium coverage for fixed player-view direction semantics, safe opposite-direction completion, the 1152×648 render budget and retained 1920×1080 performance.
+- Unit and Chromium coverage for fixed player-view direction semantics, safe opposite-direction completion, the 960×540 render budget and retained 1920×1080 performance.
 
 ## Version 1.2 — 2026-08-23
 

@@ -65,7 +65,7 @@ test("1920×1080 發行場景維持繪圖呼叫與幀率預算", async ({ page }
   expect(viewport.renderWidth).toBeGreaterThan(0);
   expect(viewport.renderHeight).toBeGreaterThan(0);
   expect(viewport.renderWidth * viewport.renderHeight).toBeGreaterThan(800 * 450);
-  expect(viewport.renderWidth * viewport.renderHeight).toBeLessThanOrEqual(1152 * 648);
+  expect(viewport.renderWidth * viewport.renderHeight).toBeLessThanOrEqual(960 * 540);
   expect(pageErrors).toEqual([]);
   expect(failedResponses).toEqual([]);
 });

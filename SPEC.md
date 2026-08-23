@@ -81,7 +81,7 @@ If a vocabulary filter yields fewer than 5 candidates, relax recent-history filt
 
 Use one PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver also performs one visual first-person backward rotation and returns to the exact table pose while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
 
-The Three.js canvas retains the full CSS viewport and dynamically limits its internal buffer to at most 1152×648 pixels at a 16:9 desktop viewport. This is approximately 2.07 times the former 800×450 pixel count. It must exceed the former budget at 1920×1080 while retaining the 30 FPS minimum release gate.
+The Three.js canvas retains the full CSS viewport and dynamically limits its internal buffer to at most 960×540 pixels at a 16:9 desktop viewport. This is 44% more pixels than the former 800×450 budget. It must exceed the former budget at 1920×1080 while retaining the 30 FPS minimum release gate in both local and CI WebGL environments.
 
 Mini-map in lower left shows arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. It runs gameplay at 0.25 speed; `Esc` or `M` closes it.
 

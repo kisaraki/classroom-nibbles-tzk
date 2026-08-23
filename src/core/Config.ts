@@ -15,7 +15,7 @@ export const APP_CONFIG = Object.freeze({
     cameraLookDepthRatio: -0.15,
     cameraBackflipDurationSeconds: 0.8,
     antialias: false,
-    maximumRenderPixelCount: 1152 * 648,
+    maximumRenderPixelCount: 960 * 540,
     maxPixelRatio: 2,
     snakeHeadColor: 0x86ffe1,
     snakeBodyColor: 0x25bda5,
