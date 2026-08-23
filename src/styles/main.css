@@ -69,102 +69,86 @@ body {
   pointer-events: none;
 }
 
-.cockpit-overlay {
+.pinball-table-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
   overflow: hidden;
   background:
-    linear-gradient(108deg, rgb(1 6 13 / 92%) 0 5.5%, transparent 6% 94%, rgb(1 6 13 / 92%) 94.5%),
-    linear-gradient(180deg, rgb(1 6 13 / 88%) 0 4.5%, transparent 8% 78%, rgb(1 6 13 / 96%) 92% 100%);
+    radial-gradient(ellipse at 50% 62%, transparent 45%, rgb(1 6 13 / 38%) 100%),
+    linear-gradient(180deg, rgb(1 6 13 / 58%) 0 2.5%, transparent 10% 88%, rgb(1 6 13 / 82%) 100%);
   box-shadow:
-    inset 0 0 5rem rgb(0 0 0 / 78%),
-    inset 0 -6rem 8rem rgb(0 0 0 / 70%);
+    inset 0 0 3rem rgb(0 0 0 / 48%),
+    inset 0 -3rem 5rem rgb(0 0 0 / 58%);
   pointer-events: none;
 }
 
-.cockpit-overlay::before,
-.cockpit-overlay::after {
+.pinball-table-overlay::before,
+.pinball-table-overlay::after {
   position: absolute;
-  bottom: -3.5rem;
-  width: 38%;
-  height: 10rem;
-  border: 1px solid rgb(80 227 194 / 22%);
-  background: linear-gradient(180deg, #0b1a27, #02060d 72%);
-  box-shadow: 0 -0.8rem 3rem rgb(0 0 0 / 65%);
-  content: "";
-}
-
-.cockpit-overlay::before {
-  left: -4%;
-  transform: skewX(16deg);
-}
-
-.cockpit-overlay::after {
-  right: -4%;
-  transform: skewX(-16deg);
-}
-
-.cockpit-overlay__reticle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 2.6rem;
-  height: 2.6rem;
-  border: 1px solid rgb(134 255 225 / 58%);
-  border-radius: 50%;
-  box-shadow: 0 0 1rem rgb(80 227 194 / 18%);
-  transform: translate(-50%, -50%);
-}
-
-.cockpit-overlay__reticle::before,
-.cockpit-overlay__reticle::after {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  background: rgb(233 255 249 / 70%);
-  content: "";
-  transform: translate(-50%, -50%);
-}
-
-.cockpit-overlay__reticle::before {
-  width: 3.8rem;
-  height: 1px;
-}
-
-.cockpit-overlay__reticle::after {
+  top: 0;
+  bottom: 0;
   width: 1px;
-  height: 3.8rem;
+  background: linear-gradient(180deg, transparent 4%, rgb(80 227 194 / 20%) 28%, rgb(80 227 194 / 55%) 82%, transparent 98%);
+  box-shadow: 0 0 1.5rem rgb(80 227 194 / 18%);
+  content: "";
 }
 
-.cockpit-overlay__horizon {
+.pinball-table-overlay::before {
+  left: 22%;
+  transform: rotate(-8deg);
+  transform-origin: bottom;
+}
+
+.pinball-table-overlay::after {
+  right: 22%;
+  transform: rotate(8deg);
+  transform-origin: bottom;
+}
+
+.pinball-table-overlay__rail {
   position: absolute;
-  top: 58%;
+  top: 5%;
+  bottom: 2.5rem;
+  width: clamp(1.4rem, 4vw, 4rem);
+  border: 1px solid rgb(80 227 194 / 24%);
+  background:
+    linear-gradient(90deg, #02070e, #142535 48%, #02070e),
+    repeating-linear-gradient(180deg, transparent 0 2rem, rgb(80 227 194 / 18%) 2rem 2.05rem);
+  box-shadow: 0 0 2rem rgb(0 0 0 / 68%), inset 0 0 1rem rgb(80 227 194 / 8%);
+}
+
+.pinball-table-overlay__rail--left {
+  left: -0.5rem;
+  clip-path: polygon(0 0, 42% 0, 100% 100%, 0 100%);
+}
+
+.pinball-table-overlay__rail--right {
+  right: -0.5rem;
+  clip-path: polygon(58% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.pinball-table-overlay__apron {
+  position: absolute;
+  bottom: -1.25rem;
   left: 50%;
-  width: min(28rem, 42vw);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(80 227 194 / 28%), transparent);
+  width: min(34rem, 56vw);
+  height: 6rem;
+  border: 1px solid rgb(80 227 194 / 30%);
+  background: linear-gradient(180deg, rgb(16 37 53 / 88%), rgb(2 6 13 / 98%) 72%);
+  box-shadow: 0 -0.75rem 2.5rem rgb(0 0 0 / 62%);
+  clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
   transform: translateX(-50%);
 }
 
-.cockpit-overlay__strut {
+.pinball-table-overlay__label {
   position: absolute;
-  top: 0;
-  width: 1.1rem;
-  height: 43%;
-  background: linear-gradient(90deg, #02070e, #142535, #02070e);
-  box-shadow: 0 0 1rem rgb(0 0 0 / 70%);
-  transform-origin: top;
-}
-
-.cockpit-overlay__strut--left {
-  left: 16%;
-  transform: skewX(-18deg);
-}
-
-.cockpit-overlay__strut--right {
-  right: 16%;
-  transform: skewX(18deg);
+  bottom: 0.72rem;
+  left: 50%;
+  color: rgb(80 227 194 / 72%);
+  font: 0.54rem ui-monospace, "Cascadia Code", monospace;
+  letter-spacing: 0.16em;
+  transform: translateX(-50%);
 }
 
 .radar-map {

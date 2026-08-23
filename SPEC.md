@@ -1,13 +1,13 @@
 # NIBBLES — Engineering Specification
 
-Version: 1.3 (Version 1.0 release hardened)
+Version: 1.4 (Version 1.1 pinball controls and camera)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
 
 ## 1. Product goal
 
-NIBBLES is a first-person 3D cockpit vocabulary game based on classic snake mechanics. The learning loop is:
+NIBBLES is a first-person 3D pinball-table vocabulary game based on classic snake mechanics. The learning loop is:
 
 1. Show a target English vocabulary item and Chinese meaning.
 2. Drive the snake-mecha around a 3D arena on the horizontal XZ plane.
@@ -28,7 +28,7 @@ Vite must use `base: "./"`. Runtime assets/data must work from a repository subp
 
 ## 3. Spatial and movement model
 
-The world is true 3D, but gameplay movement is constrained to the XZ plane. Directions are NORTH (-Z), SOUTH (+Z), WEST (-X), EAST (+X). Direct 180-degree reversal is illegal. Physics direction changes immediately; camera/cockpit visual rotation may smooth over roughly 120–180 ms. Snake motion is continuous and the body follows a recorded trail, not grid jumps.
+The world is true 3D, but gameplay movement is constrained to the XZ plane. Directions are NORTH (-Z), SOUTH (+Z), WEST (-X), EAST (+X). Direct 180-degree reversal remains illegal for ordinary direction input. The Down Arrow requests a relative backward maneuver: turn 90 degrees clockwise, travel at least one segment spacing, then turn toward the original rear direction. Snake motion is continuous and the body follows a recorded trail, not grid jumps.
 
 Two rapid 90-degree inputs must not bypass the reversal rule and curl the head into its own trail. If a second corner would reverse the heading from before the previous turn, reject it until the head has travelled at least one segment spacing. During `RECOVERY`, allow one legal stationary turn, but never a direct reversal or a second stationary turn.
 
@@ -75,9 +75,9 @@ Each scene has a distinct palette, fog range, solid obstacle layout and 3D obsta
 
 If a vocabulary filter yields fewer than 5 candidates, relax recent-history filtering first, then increase max token length one token at a time until sufficient.
 
-## 8. HUD and cockpit
+## 8. HUD and pinball-table view
 
-Use one PerspectiveCamera plus a cockpit/snake-eye mask rather than stereo rendering in Version 1. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
+Use one PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. Pressing `J` performs one visual first-person backward rotation and returns to the exact table pose; it never changes XZ physics, collision, heading or gameplay state. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
 
 Mini-map in lower left shows arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. It runs gameplay at 0.25 speed; `Esc` or `M` closes it.
 
@@ -117,7 +117,7 @@ Use fixed-step gameplay update at 1/60 sec with accumulator. Clamp frame delta t
 - Phase 3 — vocabulary gameplay/selection/token spawning/HUD progress. **Completed.**
 - Phase 4 — typing test. **Completed.**
 - Phase 5 — power-ups and weapon. **Completed.**
-- Phase 6 — cockpit HUD, mini-map and tactical map. **Completed.**
+- Phase 6 — HUD, mini-map and tactical map. **Completed.**
 - Phase 7 — five functional environments. **Completed.**
 - Phase 8 — presentation/audio/transitions/credits. **Completed.**
 - Phase 9 — full QA and release hardening. **Completed for Version 1.0.**
@@ -126,4 +126,4 @@ Do not start the next phase until the current phase passes typecheck, tests and 
 
 ## 16. Definition of Done for Version 1.x
 
-A player can choose CEEC vocabulary mode, complete all five game scenes, collect target characters in order, experience length rewards/penalties without collision death, use radar/power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. A main-timer failure has a Chinese, keyboard-accessible route back to mission settings. Vocabulary validation, unit tests, 1920×1080 performance/accessibility E2E tests, production build, release-artifact budgets and GitHub Pages deployment all pass.
+A player can choose CEEC vocabulary mode, complete all five game scenes from the pinball-table player view, use the safe Down-Arrow backward maneuver and `J` visual backflip, collect target characters in order, experience length rewards/penalties without collision death, use radar/power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. A main-timer failure has a Chinese, keyboard-accessible route back to mission settings. Vocabulary validation, unit tests, 1920×1080 performance/accessibility E2E tests, production build, release-artifact budgets and GitHub Pages deployment all pass.

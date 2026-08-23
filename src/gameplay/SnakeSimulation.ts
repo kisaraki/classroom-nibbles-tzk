@@ -6,7 +6,11 @@ import {
   CollisionSystem,
   type SolidObstacle,
 } from "./CollisionSystem";
-import type { Direction } from "./Direction";
+import {
+  clockwiseDirection,
+  oppositeDirection,
+  type Direction,
+} from "./Direction";
 import { Snake } from "./Snake";
 import type { XZPoint } from "./Trail";
 
@@ -27,6 +31,7 @@ export interface SnakeSimulationStatus {
   readonly speed: number;
   readonly headPosition: XZPoint;
   readonly latestCollision: CollisionKind | null;
+  readonly backwardManeuverActive: boolean;
 }
 
 export type CollisionListener = (event: CollisionEvent) => void;
@@ -44,6 +49,7 @@ export class SnakeSimulation {
   #latestCollision: CollisionKind | null = null;
   #recoveryRequired = false;
   #recoveryTurnUsed = false;
+  #backwardTarget: Direction | null = null;
 
   constructor(
     snake: Snake,
@@ -80,6 +86,7 @@ export class SnakeSimulation {
       speed: this.#snake.speed,
       headPosition: this.#arena.toDisplayPoint(this.#snake.headPosition),
       latestCollision: this.#latestCollision,
+      backwardManeuverActive: this.#backwardTarget !== null,
     });
   }
 
@@ -88,7 +95,9 @@ export class SnakeSimulation {
       this.#stateMachine.state === GameState.HUNTING ||
       this.#stateMachine.state === GameState.MAP_EXPANDED
     ) {
-      return this.#snake.trySetDirection(direction);
+      const accepted = this.#snake.trySetDirection(direction);
+      if (accepted) this.#backwardTarget = null;
+      return accepted;
     }
     if (this.#stateMachine.state !== GameState.RECOVERY) return false;
     if (direction === this.#snake.direction) return true;
@@ -96,6 +105,21 @@ export class SnakeSimulation {
     const accepted = this.#snake.trySetDirection(direction, true);
     if (accepted) this.#recoveryTurnUsed = true;
     return accepted;
+  }
+
+  requestBackward(): boolean {
+    if (
+      this.#backwardTarget !== null ||
+      (this.#stateMachine.state !== GameState.HUNTING &&
+        this.#stateMachine.state !== GameState.MAP_EXPANDED)
+    ) return false;
+    const originalDirection = this.#snake.direction;
+    const accepted = this.#snake.trySetDirection(
+      clockwiseDirection(originalDirection),
+    );
+    if (!accepted) return false;
+    this.#backwardTarget = oppositeDirection(originalDirection);
+    return true;
   }
 
   update(deltaSeconds: number): void {
@@ -115,6 +139,13 @@ export class SnakeSimulation {
       this.#stateMachine.state !== GameState.HUNTING &&
       this.#stateMachine.state !== GameState.MAP_EXPANDED
     ) return;
+
+    if (
+      this.#backwardTarget !== null &&
+      this.#snake.trySetDirection(this.#backwardTarget)
+    ) {
+      this.#backwardTarget = null;
+    }
 
     const candidate = this.#snake.previewPosition(deltaSeconds);
     const collision = this.#collisionSystem.detect(
@@ -150,6 +181,7 @@ export class SnakeSimulation {
     this.#latestCollision = null;
     this.#recoveryRequired = false;
     this.#recoveryTurnUsed = false;
+    this.#backwardTarget = null;
   }
 
   #enterStun(
@@ -158,6 +190,7 @@ export class SnakeSimulation {
     recoveryRequired = true,
   ): void {
     this.#latestCollision = kind;
+    this.#backwardTarget = null;
     this.#recoveryRequired = recoveryRequired;
     this.#delayRemainingSeconds = this.#config.stunDurationSeconds;
     this.#stateMachine.transition(GameState.STUNNED);

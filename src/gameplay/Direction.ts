@@ -26,10 +26,25 @@ const OPPOSITE_DIRECTIONS: Readonly<Record<Direction, Direction>> = Object.freez
   [Direction.EAST]: Direction.WEST,
 });
 
+const CLOCKWISE_DIRECTIONS: Readonly<Record<Direction, Direction>> = Object.freeze({
+  [Direction.NORTH]: Direction.EAST,
+  [Direction.EAST]: Direction.SOUTH,
+  [Direction.SOUTH]: Direction.WEST,
+  [Direction.WEST]: Direction.NORTH,
+});
+
 export function directionVector(direction: Direction): XZVector {
   return DIRECTION_VECTORS[direction];
 }
 
 export function isOppositeDirection(current: Direction, requested: Direction): boolean {
   return OPPOSITE_DIRECTIONS[current] === requested;
+}
+
+export function oppositeDirection(direction: Direction): Direction {
+  return OPPOSITE_DIRECTIONS[direction];
+}
+
+export function clockwiseDirection(direction: Direction): Direction {
+  return CLOCKWISE_DIRECTIONS[direction];
 }

@@ -189,6 +189,30 @@ describe("SnakeSimulation", () => {
     expect(simulation.snake.direction).toBe(Direction.SOUTH);
   });
 
+  it("turns toward the relative rear through a segment-spaced safe maneuver", () => {
+    const arena = new Arena({
+      halfWidth: 20,
+      halfDepth: 20,
+      xBoundaryMode: BoundaryMode.SOLID,
+      zBoundaryMode: BoundaryMode.SOLID,
+    });
+    const simulation = createActiveSimulation(arena);
+
+    expect(simulation.requestBackward()).toBe(true);
+    expect(simulation.snake.direction).toBe(Direction.EAST);
+    expect(simulation.status.backwardManeuverActive).toBe(true);
+    expect(simulation.requestBackward()).toBe(false);
+
+    for (let step = 0; step < 20; step += 1) simulation.update(1 / 60);
+
+    expect(simulation.snake.direction).toBe(Direction.SOUTH);
+    expect(simulation.status.backwardManeuverActive).toBe(false);
+    expect(simulation.status.state).toBe(GameState.HUNTING);
+    expect(simulation.snake.headPosition.x).toBeGreaterThanOrEqual(
+      GAMEPLAY_CONFIG.snake.segmentSpacing,
+    );
+  });
+
   it("detects self collision as the same non-lethal delay penalty", () => {
     const arena = new Arena({
       halfWidth: 20,

@@ -72,9 +72,9 @@ export class TokenView {
     CHARACTER_TOKENS.length * VERTICES_PER_TOKEN * UV_VALUES_PER_VERTEX,
   );
   readonly #mesh: THREE.Mesh;
-  readonly #cameraDirection = new THREE.Vector3();
+  readonly #cameraQuaternion = new THREE.Quaternion();
   readonly #right = new THREE.Vector3();
-  readonly #up = new THREE.Vector3(0, 1, 0);
+  readonly #up = new THREE.Vector3();
 
   constructor(scene: THREE.Scene) {
     const indices = new Uint16Array(CHARACTER_TOKENS.length * INDICES_PER_TOKEN);
@@ -110,11 +110,9 @@ export class TokenView {
     nextToken: CharacterToken | null,
     elapsedSeconds: number,
   ): void {
-    camera.getWorldDirection(this.#cameraDirection);
-    this.#cameraDirection.y = 0;
-    if (this.#cameraDirection.lengthSq() === 0) this.#cameraDirection.set(0, 0, -1);
-    this.#cameraDirection.normalize();
-    this.#right.crossVectors(this.#cameraDirection, this.#up).normalize();
+    camera.getWorldQuaternion(this.#cameraQuaternion);
+    this.#right.set(1, 0, 0).applyQuaternion(this.#cameraQuaternion);
+    this.#up.set(0, 1, 0).applyQuaternion(this.#cameraQuaternion);
 
     entities.forEach((entity, index) => {
       const position = arena.toDisplayPoint(entity.position);
@@ -146,13 +144,17 @@ export class TokenView {
     halfSize: number,
   ): void {
     const rightX = this.#right.x * halfSize;
+    const rightY = this.#right.y * halfSize;
     const rightZ = this.#right.z * halfSize;
+    const upX = this.#up.x * halfSize;
+    const upY = this.#up.y * halfSize;
+    const upZ = this.#up.z * halfSize;
     const offset = index * VERTICES_PER_TOKEN * POSITION_VALUES_PER_VERTEX;
     this.#positions.set([
-      centerX - rightX, centerY - halfSize, centerZ - rightZ,
-      centerX + rightX, centerY - halfSize, centerZ + rightZ,
-      centerX + rightX, centerY + halfSize, centerZ + rightZ,
-      centerX - rightX, centerY + halfSize, centerZ - rightZ,
+      centerX - rightX - upX, centerY - rightY - upY, centerZ - rightZ - upZ,
+      centerX + rightX - upX, centerY + rightY - upY, centerZ + rightZ - upZ,
+      centerX + rightX + upX, centerY + rightY + upY, centerZ + rightZ + upZ,
+      centerX - rightX + upX, centerY - rightY + upY, centerZ - rightZ + upZ,
     ], offset);
   }
 

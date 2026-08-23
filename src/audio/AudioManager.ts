@@ -20,6 +20,7 @@ export const SoundCue = Object.freeze({
   RESUME: "RESUME",
   GAME_CLEAR: "GAME_CLEAR",
   LEVEL_FAILED: "LEVEL_FAILED",
+  BACKFLIP: "BACKFLIP",
 } as const);
 
 export type SoundCue = (typeof SoundCue)[keyof typeof SoundCue];
@@ -99,6 +100,12 @@ const SOUND_RECIPES: Readonly<Record<SoundCue, readonly ToneStep[]>> = Object.fr
     Object.freeze({ frequency: 220, delaySeconds: 0, durationSeconds: 0.16, gain: 0.26, waveform: "triangle" }),
     Object.freeze({ frequency: 165, delaySeconds: 0.14, durationSeconds: 0.22, gain: 0.24, waveform: "triangle" }),
     Object.freeze({ frequency: 110, delaySeconds: 0.34, durationSeconds: 0.34, gain: 0.22, waveform: "sine" }),
+  ]),
+  [SoundCue.BACKFLIP]: Object.freeze([
+    Object.freeze({ frequency: 261.63, delaySeconds: 0, durationSeconds: 0.12, gain: 0.2, waveform: "sine" }),
+    Object.freeze({ frequency: 392, delaySeconds: 0.1, durationSeconds: 0.16, gain: 0.18, waveform: "triangle" }),
+    Object.freeze({ frequency: 523.25, delaySeconds: 0.24, durationSeconds: 0.18, gain: 0.16, waveform: "sine" }),
+    Object.freeze({ frequency: 261.63, delaySeconds: 0.48, durationSeconds: 0.22, gain: 0.18, waveform: "sine" }),
   ]),
 });
 

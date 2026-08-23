@@ -21,16 +21,17 @@ import {
   VocabularyGameplaySession,
 } from "../gameplay/VocabularyGameplaySession";
 import { DirectionInput } from "../input/DirectionInput";
+import { ManeuverInput } from "../input/ManeuverInput";
 import { PauseInput } from "../input/PauseInput";
 import { TacticalMapInput } from "../input/TacticalMapInput";
 import { WeaponInput } from "../input/WeaponInput";
 import { PhaseThreeScene } from "../rendering/PhaseThreeScene";
 import { BootScreen } from "../ui/BootScreen";
 import { AudioControl } from "../ui/AudioControl";
-import { CockpitOverlay } from "../ui/CockpitOverlay";
 import { CreditsScreen } from "../ui/CreditsScreen";
 import { FailureScreen } from "../ui/FailureScreen";
 import { PhaseThreePanel } from "../ui/PhaseThreePanel";
+import { PinballTableOverlay } from "../ui/PinballTableOverlay";
 import { RadarMap } from "../ui/RadarMap";
 import { TypingTestModal } from "../ui/TypingTestModal";
 import { TransitionOverlay } from "../ui/TransitionOverlay";
@@ -81,6 +82,16 @@ export class Game {
   readonly #input = new DirectionInput((direction) => {
     this.#snakeSimulation.requestDirection(direction);
   });
+  readonly #maneuverInput = new ManeuverInput({
+    backward: () => {
+      this.#snakeSimulation.requestBackward();
+    },
+    backflip: () => {
+      const state = this.#stateMachine.state;
+      if (state !== GameState.HUNTING && state !== GameState.MAP_EXPANDED) return;
+      if (this.#scene?.triggerBackflip()) this.#audio.play(SoundCue.BACKFLIP);
+    },
+  });
   readonly #weaponInput = new WeaponInput(() => {
     if (this.#powerUpWeapon?.fire()) this.#audio.play(SoundCue.SHOT);
   });
@@ -100,7 +111,7 @@ export class Game {
   #scene: PhaseThreeScene | null = null;
   #selectionScreen: VocabularySelectScreen | null = null;
   #panel: PhaseThreePanel | null = null;
-  #cockpitOverlay: CockpitOverlay | null = null;
+  #pinballTableOverlay: PinballTableOverlay | null = null;
   #radarMap: RadarMap | null = null;
   #repository: VocabularyRepository | null = null;
   #gameplay: VocabularyGameplaySession | null = null;
@@ -165,6 +176,7 @@ export class Game {
 
   dispose(): void {
     this.#input.detach();
+    this.#maneuverInput.detach();
     this.#weaponInput.detach();
     this.#tacticalMapInput.detach();
     this.#pauseInput.detach();
@@ -284,7 +296,7 @@ export class Game {
       this.#gameplay = gameplay;
       this.#powerUpWeapon = powerUpWeapon;
       this.#panel = new PhaseThreePanel(this.#container);
-      this.#cockpitOverlay = new CockpitOverlay(this.#container);
+      this.#pinballTableOverlay = new PinballTableOverlay(this.#container);
       this.#radarMap = new RadarMap(
         this.#container,
         this.#arena,
@@ -335,17 +347,7 @@ export class Game {
     this.#lastTelemetryUpdateSeconds = elapsedSeconds;
 
     const gameplayStatus = this.#gameplay?.status;
-    if (gameplayStatus && this.#powerUpWeapon) {
-      this.#radarMap?.update({
-        snakeSegments: this.#snake.getSegmentPositions(),
-        snakeDirection: this.#snake.direction,
-        tokens,
-        powerUps,
-        bullets,
-        obstacles: this.#environment.obstacles,
-        nextToken: gameplayStatus.nextToken,
-      });
-    }
+    this.#updateRadar(gameplayStatus);
     this.#updatePanel(gameplayStatus);
   };
 
@@ -359,8 +361,10 @@ export class Game {
       current === GameState.MAP_EXPANDED,
       current === GameState.MAP_EXPANDED ? this.#tacticalMapController.timeScale : 1,
     );
+    this.#updateRadar(this.#gameplay?.status);
     if (current === GameState.TRANSITION_IN) {
       this.#input.detach();
+      this.#maneuverInput.detach();
       this.#weaponInput.detach();
       this.#transitionOverlay.playSceneTransition(this.#environment.current, () => {
         if (this.#stateMachine.state !== GameState.TRANSITION_IN) return;
@@ -381,6 +385,7 @@ export class Game {
     if (previous === GameState.TYPING_TEST) this.#stopTypingTest();
     if (current === GameState.LEVEL_FAILED) {
       this.#input.detach();
+      this.#maneuverInput.detach();
       this.#weaponInput.detach();
       this.#audio.play(SoundCue.LEVEL_FAILED);
       const status = this.#gameplay?.status;
@@ -401,6 +406,7 @@ export class Game {
     }
     if (current === GameState.GAME_CLEAR) {
       this.#input.detach();
+      this.#maneuverInput.detach();
       this.#weaponInput.detach();
       this.#audio.play(SoundCue.GAME_CLEAR);
       this.#transitionOverlay.playMissionComplete(() => {
@@ -417,6 +423,7 @@ export class Game {
     }
     if (current === GameState.HUNTING) {
       this.#input.attach();
+      this.#maneuverInput.attach();
       this.#weaponInput.attach();
     }
   };
@@ -433,6 +440,21 @@ export class Game {
     );
   }
 
+  #updateRadar(
+    gameplayStatus: VocabularyGameplaySession["status"] | undefined,
+  ): void {
+    if (!gameplayStatus || !this.#powerUpWeapon) return;
+    this.#radarMap?.update({
+      snakeSegments: this.#snake.getSegmentPositions(),
+      snakeDirection: this.#snake.direction,
+      tokens: this.#gameplay?.tokenEntities ?? [],
+      powerUps: this.#powerUpWeapon.powerUpEntities,
+      bullets: this.#powerUpWeapon.bulletEntities,
+      obstacles: this.#environment.obstacles,
+      nextToken: gameplayStatus.nextToken,
+    });
+  }
+
   readonly #onVisibilityChange = (): void => {
     this.#updateTypingTest(performance.now());
     if (document.hidden) this.#pauseController.pause(PauseReason.VISIBILITY);
@@ -441,6 +463,7 @@ export class Game {
   #startTypingTest(): void {
     if (!this.#gameplay) return;
     this.#input.detach();
+    this.#maneuverInput.detach();
     this.#weaponInput.detach();
     this.#stopTypingTest();
     const config = GAMEPLAY_CONFIG.typingTest;
@@ -508,16 +531,17 @@ export class Game {
 
   #disposeRunPresentation(): void {
     this.#input.detach();
+    this.#maneuverInput.detach();
     this.#weaponInput.detach();
     this.#tacticalMapInput.detach();
     this.#stopTypingTest();
     this.#panel?.dispose();
-    this.#cockpitOverlay?.dispose();
+    this.#pinballTableOverlay?.dispose();
     this.#radarMap?.dispose();
     this.#creditsScreen?.dispose();
     this.#failureScreen?.dispose();
     this.#panel = null;
-    this.#cockpitOverlay = null;
+    this.#pinballTableOverlay = null;
     this.#radarMap = null;
     this.#creditsScreen = null;
     this.#failureScreen = null;

@@ -9,7 +9,7 @@ import type { BulletEntity } from "../gameplay/WeaponSystem";
 import type { CharacterToken } from "../vocabulary/types";
 import { ArenaView } from "./ArenaView";
 import { BulletView } from "./BulletView";
-import { CockpitCameraRig } from "./CockpitCameraRig";
+import { PinballCameraRig } from "./PinballCameraRig";
 import { EnvironmentView } from "./EnvironmentView";
 import { PowerUpView } from "./PowerUpView";
 import { SnakeView } from "./SnakeView";
@@ -22,7 +22,7 @@ export class PhaseThreeScene {
   readonly #renderer: THREE.WebGLRenderer;
   readonly #scene = new THREE.Scene();
   readonly #camera: THREE.PerspectiveCamera;
-  readonly #cameraRig: CockpitCameraRig;
+  readonly #cameraRig: PinballCameraRig;
   readonly #arenaView: ArenaView;
   readonly #environmentView: EnvironmentView;
   readonly #hemisphereLight: THREE.HemisphereLight;
@@ -50,9 +50,10 @@ export class PhaseThreeScene {
     this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.#renderer.domElement.className = "phase-three-scene";
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
-    this.#renderer.domElement.dataset.cameraMode = "snake-eye";
+    this.#renderer.domElement.dataset.cameraMode = "pinball-player";
     this.#renderer.domElement.dataset.cameraCount = "1";
-    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第九階段第一人稱字彙遊戲場");
+    this.#renderer.domElement.dataset.backflipState = "idle";
+    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第九階段第一人稱彈珠台字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
     this.#scene.background = new THREE.Color(environment.palette.backgroundColor);
@@ -67,12 +68,12 @@ export class PhaseThreeScene {
       APP_CONFIG.scene.cameraNear,
       APP_CONFIG.scene.cameraFar,
     );
-    this.#cameraRig = new CockpitCameraRig(this.#camera, {
+    this.#cameraRig = new PinballCameraRig(this.#camera, {
       eyeHeight: APP_CONFIG.scene.cameraEyeHeight,
-      followDistance: APP_CONFIG.scene.cameraFollowDistance,
-      lookAhead: APP_CONFIG.scene.cameraLookAhead,
+      playerDistance: APP_CONFIG.scene.cameraPlayerDistance,
       lookHeight: APP_CONFIG.scene.cameraLookHeight,
-      turnSmoothingSeconds: APP_CONFIG.scene.cameraTurnSmoothingSeconds,
+      lookDepthRatio: APP_CONFIG.scene.cameraLookDepthRatio,
+      backflipDurationSeconds: APP_CONFIG.scene.cameraBackflipDurationSeconds,
     });
 
     this.#hemisphereLight = new THREE.HemisphereLight(
@@ -117,12 +118,16 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.obstacleCount = String(environment.obstacles.length);
     this.#renderer.domElement.setAttribute(
       "aria-label",
-      `NIBBLES 第九階段第一人稱字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
+      `NIBBLES 第九階段第一人稱彈珠台字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
     );
   }
 
   setAnimationLoop(handler: AnimationFrameHandler | null): void {
     this.#renderer.setAnimationLoop(handler);
+  }
+
+  triggerBackflip(): boolean {
+    return this.#cameraRig.triggerBackflip();
   }
 
   render(
@@ -138,8 +143,16 @@ export class PhaseThreeScene {
     this.#setRendererData("tokenCount", String(tokens.length));
     this.#setRendererData("powerUpCount", String(powerUps.length));
     this.#setRendererData("bulletCount", String(bullets.length));
-    this.#cameraRig.update(snake.headPosition, snake.direction, arena, frameDeltaSeconds);
-    this.#snakeView.update(snake, arena, false);
+    this.#cameraRig.update(arena, frameDeltaSeconds);
+    this.#setRendererData(
+      "backflipState",
+      this.#cameraRig.backflipActive ? "active" : "idle",
+    );
+    this.#setRendererData(
+      "backflipProgress",
+      this.#cameraRig.backflipProgress.toFixed(3),
+    );
+    this.#snakeView.update(snake, arena, true);
     this.#tokenView.update(tokens, arena, this.#camera, nextToken, elapsedSeconds);
     this.#powerUpView.update(powerUps, arena, elapsedSeconds);
     this.#bulletView.update(bullets, arena);

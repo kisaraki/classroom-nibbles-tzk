@@ -13,7 +13,7 @@ async function startRun(page: import("@playwright/test").Page): Promise<void> {
   await expect(page.getByTestId("transition-overlay")).toBeHidden();
 }
 
-test("P 鍵以艙門轉場暫停並在開門後精確恢復", async ({ page }) => {
+test("P 鍵以彈珠台護板轉場暫停並在開啟後精確恢復", async ({ page }) => {
   await startRun(page);
 
   await page.keyboard.press("p");
@@ -85,7 +85,7 @@ test("完成畫面顯示 KOSMOS TOOLKITS 製作名單並提供重玩入口", asy
   await expect(credits.getByText("KOSMOS TOOLKITS")).toBeVisible();
   await expect(credits.getByText("探真拓知酷")).toBeVisible();
   await expect(credits.getByText("任務完成", { exact: true })).toBeVisible();
-  await expect(credits.getByText("NIBBLES 1.0.0")).toBeVisible();
+  await expect(credits.getByText("NIBBLES 1.1.0")).toBeVisible();
   await expect(credits.getByText("25/25")).toBeVisible();
   await page.getByTestId("replay-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-replay-requested", "true");

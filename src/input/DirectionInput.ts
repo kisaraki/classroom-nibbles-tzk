@@ -5,7 +5,6 @@ export type DirectionInputListener = (direction: DirectionValue) => void;
 const KEY_DIRECTIONS: Readonly<Record<string, DirectionValue>> = Object.freeze({
   ArrowUp: Direction.NORTH,
   KeyW: Direction.NORTH,
-  ArrowDown: Direction.SOUTH,
   KeyS: Direction.SOUTH,
   ArrowLeft: Direction.WEST,
   KeyA: Direction.WEST,

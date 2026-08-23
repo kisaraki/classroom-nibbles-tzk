@@ -126,7 +126,7 @@ export class PhaseThreePanel {
     this.#element.dataset.testid = "phase-three-panel";
     const heading = createElement("header", "phase-three-panel__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 09"),
+      createElement("p", "phase-three-panel__eyebrow", "彈珠台任務 / 09"),
       createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
     );
 
@@ -175,7 +175,7 @@ export class PhaseThreePanel {
     const controls = createElement(
       "p",
       "phase-three-panel__controls",
-      "WASD / 方向鍵轉向 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
+      "WASD / ↑←→ 轉向 · ↓ 後退迴轉 · J 後空翻 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
     );
     this.#element.append(
       heading,
@@ -197,6 +197,7 @@ export class PhaseThreePanel {
   ): void {
     this.#element.dataset.state = gameplay.state;
     this.#element.dataset.environment = environment.kind;
+    this.#element.dataset.backwardManeuver = String(snake.backwardManeuverActive);
     this.#gameLevel.textContent = `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`;
     this.#vocabularyLevel.textContent = gameplay.vocabularyMode;
     this.#wordNumber.textContent = `${gameplay.wordNumber}/${gameplay.totalWords}`;

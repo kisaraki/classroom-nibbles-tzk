@@ -79,7 +79,7 @@ export class TransitionOverlay implements PausePresentation {
       "遊戲暫停",
       reason === PauseReason.VISIBILITY
         ? "偵測到視窗離開，已自動暫停 · 按 P 繼續"
-        : "艙門已關閉 · 按 P 繼續",
+        : "彈珠台護板已關閉 · 按 P 繼續",
     );
     this.#element.dataset.door = "open";
     this.#nextFrame(() => {
@@ -90,7 +90,7 @@ export class TransitionOverlay implements PausePresentation {
   openFromPause(complete: () => void): void {
     this.#clearTimers();
     this.#title.textContent = "返回任務";
-    this.#subtitle.textContent = "艙門開啟中";
+    this.#subtitle.textContent = "彈珠台護板開啟中";
     this.#element.dataset.door = "open";
     this.#schedule(() => {
       this.#hide();

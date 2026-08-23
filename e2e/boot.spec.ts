@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("以中文座艙介面選擇獨立字彙並開始第九階段貨艙環境", async ({ page }) => {
+test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環境", async ({ page }) => {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("./");
@@ -10,7 +10,7 @@ test("以中文座艙介面選擇獨立字彙並開始第九階段貨艙環境",
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
   await expect(page.getByTestId("phase-three-data-version")).toContainText("1.0.0-phase0");
-  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.0.0");
+  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.1.0");
   await expect(page.getByTestId("vocabulary-error")).toBeHidden();
   await expect(page.getByTestId("phase-three-canvas")).toBeVisible();
 
@@ -21,7 +21,7 @@ test("以中文座艙介面選擇獨立字彙並開始第九階段貨艙環境",
   await expect(page.getByTestId("vocabulary-select")).toBeHidden();
   await expect(page.getByTestId("phase-three-panel")).toBeVisible();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.0.0");
+  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.1.0");
   await expect(page.getByTestId("simulation-state")).toHaveText("進行中");
   await expect(page.getByTestId("game-level")).toContainText("第 1 關 · 貨艙");
   await expect(page.getByTestId("vocabulary-level")).toHaveText("CEEC 第 3 級");
@@ -29,7 +29,7 @@ test("以中文座艙介面選擇獨立字彙並開始第九階段貨艙環境",
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-token-count", "30");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-power-up-count", "5");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
-  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-camera-mode", "snake-eye");
+  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-camera-mode", "pinball-player");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-camera-count", "1");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute(
     "data-environment-kind",
@@ -43,7 +43,8 @@ test("以中文座艙介面選擇獨立字彙並開始第九階段貨艙環境",
     "data-obstacle-count",
     "6",
   );
-  await expect(page.getByTestId("cockpit-overlay")).toBeVisible();
+  await expect(page.getByTestId("pinball-table-overlay")).toBeVisible();
+  await expect(page.getByTestId("cockpit-overlay")).toHaveCount(0);
   await expect(page.getByTestId("mini-map")).toBeVisible();
   await expect(page.getByTestId("mini-map")).toHaveAttribute("data-snake-points", "8");
   await expect(page.getByTestId("mini-map")).toHaveAttribute("data-token-count", "30");
@@ -75,13 +76,6 @@ test("以中文座艙介面選擇獨立字彙並開始第九階段貨艙環境",
   await page.keyboard.press("m");
   await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "false");
 
-  await page.evaluate(() => {
-    window.dispatchEvent(new KeyboardEvent("keydown", { code: "ArrowRight" }));
-    window.dispatchEvent(new KeyboardEvent("keydown", { code: "ArrowDown" }));
-  });
-  await expect(page.getByTestId("snake-heading")).toHaveText("東");
-  await page.keyboard.press("ArrowLeft");
-  await expect(page.getByTestId("snake-heading")).toHaveText("東");
   await page.keyboard.press("Space");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
   await expect(page.getByTestId("ammo-count")).toHaveText("0");

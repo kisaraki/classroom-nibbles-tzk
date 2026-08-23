@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## Version 1.1 — 2026-08-23
+
+### Added
+- A `↓` relative backward maneuver that completes a deterministic two-corner U-turn only after the snake has travelled one full segment spacing, preserving direct-reversal and anti-inward-curl protection.
+- A `J`-key visual first-person backflip with synthesized feedback, duplicate-trigger protection and an exact return to the table pose without changing XZ physics or gameplay state.
+- Unit and Chromium coverage for safe backward completion, ordinary reversal rejection, the pinball camera pose, the full backflip/reset cycle and both new keyboard controls.
+
+### Changed
+- Replaced the snake-eye follow camera with one fixed PerspectiveCamera at the player's end of the arena, angled down across the complete pinball table.
+- Replaced the cockpit mask, struts and center reticle with slim table rails and an apron; the snake head is visible again from the new camera.
+- Made batched token quads follow the camera's full orientation so labels remain readable from the angled table view and throughout a backflip.
+- Updated the Traditional Chinese mission header, controls, pause-shield wording, browser description and public version metadata to Version 1.1.
+
+### Removed
+- Removed the former first-person cockpit/snake-eye presentation and its camera-turn smoothing.
+
+### Fixed
+- Refreshed radar position data immediately on state changes so pausing cannot briefly display a stale pre-pause sample.
+
 ## Version 1.0 / Phase 9 — 2026-08-23
 
 ### Added
