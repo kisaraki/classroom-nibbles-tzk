@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 1.4 (Version 1.1 pinball controls and camera)
+Version: 1.5 (Version 1.2 escape maneuver, level themes and speeds)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -32,7 +32,9 @@ The world is true 3D, but gameplay movement is constrained to the XZ plane. Dire
 
 Two rapid 90-degree inputs must not bypass the reversal rule and curl the head into its own trail. If a second corner would reverse the heading from before the previous turn, reject it until the head has travelled at least one segment spacing. During `RECOVERY`, allow one legal stationary turn, but never a direct reversal or a second stationary turn.
 
-Default configuration: initial length 8, min 3, max 40, segment spacing 0.75 world unit, speed approximately 4.5 units/sec. Put gameplay constants in a central config module.
+Default configuration: initial length 8, min 3, max 40, segment spacing 0.75 world unit. Base speed is 3.0 units/sec in Game Level 1 and increases monotonically by level to 6.0 units/sec in Game Level 5. Put gameplay constants in a central config module.
+
+Pressing `J` performs an escape backflip by making the current tail the new head and reversing the existing body trail. The new head points away from the body along the tail tangent, so the maneuver changes the nose direction without folding inward or teleporting individual body segments. It is accepted in `HUNTING`, `MAP_EXPANDED`, and as the one permitted stationary turn in `RECOVERY`; it is rejected in `STUNNED` and all non-gameplay states. Repeated input is locked out for the duration of the camera animation.
 
 ## 4. State machine
 
@@ -65,19 +67,19 @@ Supported gameplay character tokens: `A-Z`, `SPACE`, `PERIOD`, `APOSTROPHE`, `HY
 
 ## 7. Game scenes
 
-- Game Level 1: Cargo Bay, max token length 5, 5 words, 120 seconds.
-- Game Level 2: Ship Pipeline, max token length 8, 5 words, 90 seconds.
-- Game Level 3: Asteroid Belt, max token length 10, 5 words, 90 seconds.
-- Game Level 4: Dense Atmosphere, unlimited token length, 5 words, 90 seconds.
-- Game Level 5: Alien Forest, unlimited token length, 5 words, 60 seconds.
+- Game Level 1: Cargo Bay, max token length 5, 5 words, 120 seconds, snake speed 3.0 units/sec.
+- Game Level 2: Ship Pipeline, max token length 8, 5 words, 90 seconds, snake speed 3.75 units/sec.
+- Game Level 3: Asteroid Belt, max token length 10, 5 words, 90 seconds, snake speed 4.5 units/sec.
+- Game Level 4: Dense Atmosphere, unlimited token length, 5 words, 90 seconds, snake speed 5.25 units/sec.
+- Game Level 5: Alien Forest, unlimited token length, 5 words, 60 seconds, snake speed 6.0 units/sec.
 
-Each scene has a distinct palette, fog range, solid obstacle layout and 3D obstacle treatment. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, appear on both map sizes and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
+Each scene has a distinct world palette, interface accent/line/warning theme, fog range, solid obstacle layout and 3D obstacle treatment. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, appear on both map sizes and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
 
 If a vocabulary filter yields fewer than 5 candidates, relax recent-history filtering first, then increase max token length one token at a time until sufficient.
 
 ## 8. HUD and pinball-table view
 
-Use one PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. Pressing `J` performs one visual first-person backward rotation and returns to the exact table pose; it never changes XZ physics, collision, heading or gameplay state. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
+Use one PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver also performs one visual first-person backward rotation and returns to the exact table pose while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
 
 Mini-map in lower left shows arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. It runs gameplay at 0.25 speed; `Esc` or `M` closes it.
 

@@ -175,7 +175,7 @@ export class PhaseThreePanel {
     const controls = createElement(
       "p",
       "phase-three-panel__controls",
-      "WASD / ↑←→ 轉向 · ↓ 後退迴轉 · J 後空翻 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
+      "WASD / ↑←→ 轉向 · ↓ 後退迴轉 · J 頭尾反轉脫困 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
     );
     this.#element.append(
       heading,

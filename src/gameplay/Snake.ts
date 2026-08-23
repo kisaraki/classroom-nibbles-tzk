@@ -33,6 +33,7 @@ export class Snake {
   #directionBeforeLastTurn: DirectionValue;
   #distanceSinceLastTurn = Number.POSITIVE_INFINITY;
   #length: number;
+  #speed: number;
 
   constructor(config: SnakeConfig, initial: SnakeInitialState = {}) {
     if (
@@ -49,6 +50,7 @@ export class Snake {
     this.#direction = initial.direction ?? Direction.NORTH;
     this.#directionBeforeLastTurn = this.#direction;
     this.#length = clampLength(initial.length ?? config.initialLength, config);
+    this.#speed = config.speed;
     const maximumTrailDistance = config.maximumLength * config.segmentSpacing;
     this.#trail = new Trail(this.#headPosition, this.#direction, maximumTrailDistance);
   }
@@ -62,7 +64,7 @@ export class Snake {
   }
 
   get speed(): number {
-    return this.#config.speed;
+    return this.#speed;
   }
 
   get headPosition(): XZPoint {
@@ -95,7 +97,7 @@ export class Snake {
       throw new Error("Snake deltaSeconds must be a finite non-negative number.");
     }
     const forward = directionVector(this.#direction);
-    const distance = this.#config.speed * deltaSeconds;
+    const distance = this.#speed * deltaSeconds;
     return {
       x: this.#headPosition.x + forward.x * distance,
       z: this.#headPosition.z + forward.z * distance,
@@ -104,8 +106,34 @@ export class Snake {
 
   advance(deltaSeconds: number): void {
     this.#headPosition = this.previewPosition(deltaSeconds);
-    this.#distanceSinceLastTurn += this.#config.speed * deltaSeconds;
+    this.#distanceSinceLastTurn += this.#speed * deltaSeconds;
     this.#trail.record(this.#headPosition);
+  }
+
+  setSpeed(speed: number): void {
+    if (!Number.isFinite(speed) || speed <= 0) {
+      throw new Error("Snake speed must be finite and positive.");
+    }
+    this.#speed = speed;
+  }
+
+  reverseOrientation(): void {
+    const tailDistance = (this.#length - 1) * this.#config.segmentSpacing;
+    const sampleOffset = Math.min(this.#config.segmentSpacing / 100, 0.001);
+    const tail = this.#trail.sample(tailDistance);
+    const towardBody = this.#trail.sample(tailDistance - sampleOffset);
+    const outwardX = tail.x - towardBody.x;
+    const outwardZ = tail.z - towardBody.z;
+    const nextDirection = Math.abs(outwardX) >= Math.abs(outwardZ)
+      ? outwardX >= 0 ? Direction.EAST : Direction.WEST
+      : outwardZ >= 0 ? Direction.SOUTH : Direction.NORTH;
+    const oldDirection = this.#direction;
+
+    this.#trail.reversePrefix(tailDistance, oldDirection);
+    this.#headPosition = tail;
+    this.#direction = nextDirection;
+    this.#directionBeforeLastTurn = nextDirection;
+    this.#distanceSinceLastTurn = Number.POSITIVE_INFINITY;
   }
 
   setLength(length: number): void {

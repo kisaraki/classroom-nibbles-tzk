@@ -130,6 +130,10 @@ export class PhaseThreeScene {
     return this.#cameraRig.triggerBackflip();
   }
 
+  get backflipActive(): boolean {
+    return this.#cameraRig.backflipActive;
+  }
+
   render(
     snake: Snake,
     arena: Arena,

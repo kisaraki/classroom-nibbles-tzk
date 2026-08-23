@@ -122,6 +122,21 @@ export class SnakeSimulation {
     return true;
   }
 
+  requestBackflipEscape(): boolean {
+    const state = this.#stateMachine.state;
+    if (
+      state !== GameState.HUNTING &&
+      state !== GameState.MAP_EXPANDED &&
+      state !== GameState.RECOVERY
+    ) return false;
+    if (state === GameState.RECOVERY && this.#recoveryTurnUsed) return false;
+
+    this.#snake.reverseOrientation();
+    this.#backwardTarget = null;
+    if (state === GameState.RECOVERY) this.#recoveryTurnUsed = true;
+    return true;
+  }
+
   update(deltaSeconds: number): void {
     if (!Number.isFinite(deltaSeconds) || deltaSeconds < 0) {
       throw new Error("Simulation deltaSeconds must be a finite non-negative number.");

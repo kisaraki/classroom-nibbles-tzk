@@ -17,6 +17,7 @@ describe("Phase 7 environments", () => {
   it("defines one distinct functional environment for every Game Level", () => {
     expect(ENVIRONMENT_PROFILES).toHaveLength(5);
     expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.kind)).size).toBe(5);
+    expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.uiTheme.accent)).size).toBe(5);
 
     for (const level of GAME_LEVEL_CONFIGS) {
       const profile = environmentForLevel(level.gameLevel);
@@ -24,6 +25,22 @@ describe("Phase 7 environments", () => {
       expect(profile.featureLabel.length).toBeGreaterThan(0);
       expect(profile.obstacles.length).toBeGreaterThanOrEqual(6);
       expect(profile.palette.fogFar).toBeGreaterThan(profile.palette.fogNear);
+      expect(profile.uiTheme.accent).toMatch(/^#[\da-f]{6}$/iu);
+    }
+  });
+
+  it("starts slowly and increases machine speed in every successive level", () => {
+    expect(GAME_LEVEL_CONFIGS.map((level) => level.snakeSpeed)).toEqual([
+      3,
+      3.75,
+      4.5,
+      5.25,
+      6,
+    ]);
+    for (let index = 1; index < GAME_LEVEL_CONFIGS.length; index += 1) {
+      expect(GAME_LEVEL_CONFIGS[index]!.snakeSpeed).toBeGreaterThan(
+        GAME_LEVEL_CONFIGS[index - 1]!.snakeSpeed,
+      );
     }
   });
 

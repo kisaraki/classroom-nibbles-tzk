@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## Version 1.2 — 2026-08-23
+
+### Added
+- A physical `J`-key escape backflip that swaps the snake's tail into the new head, reverses the preserved trail, and points the new nose outward so it can leave a trap without curling inward.
+- Five distinct interface themes tied to the five existing world palettes.
+- Per-level movement speeds of 3.0, 3.75, 4.5, 5.25 and 6.0 units/sec from Game Level 1 through 5.
+- Unit and Chromium coverage for preserved trail reversal, recovery/stun restrictions, monotonic speeds, unique themes and the visible first-level settings.
+
+### Changed
+- Slowed the default and first-level machine speed from 4.5 to 3.0 units/sec, with each later level faster than the previous one.
+- Coupled the camera backflip to the gameplay escape maneuver and updated the Traditional Chinese control help and public release metadata to Version 1.2.
+
+### Fixed
+- Prevented the escape action from steering a head inward through its own body by deriving the new heading from the old tail's outward tangent.
+
 ## Version 1.1 — 2026-08-23
 
 ### Added

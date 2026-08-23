@@ -2,7 +2,10 @@ import * as THREE from "three";
 import { AudioManager, SoundCue } from "../audio/AudioManager";
 import { Arena } from "../gameplay/Arena";
 import { CollisionSystem } from "../gameplay/CollisionSystem";
-import { EnvironmentController } from "../gameplay/Environment";
+import {
+  EnvironmentController,
+  type EnvironmentProfile,
+} from "../gameplay/Environment";
 import { PowerUpPool } from "../gameplay/PowerUpPool";
 import { PowerUpWeaponSession } from "../gameplay/PowerUpWeaponSession";
 import { Snake } from "../gameplay/Snake";
@@ -46,6 +49,7 @@ import {
   APP_CONFIG,
   GAMEPLAY_CONFIG,
   PRESENTATION_CONFIG,
+  getGameLevelConfig,
   getVocabularyUrl,
 } from "./Config";
 import { FixedStepRunner } from "./FixedStepRunner";
@@ -87,9 +91,12 @@ export class Game {
       this.#snakeSimulation.requestBackward();
     },
     backflip: () => {
-      const state = this.#stateMachine.state;
-      if (state !== GameState.HUNTING && state !== GameState.MAP_EXPANDED) return;
-      if (this.#scene?.triggerBackflip()) this.#audio.play(SoundCue.BACKFLIP);
+      if (!this.#scene || this.#scene.backflipActive) return;
+      if (!this.#snakeSimulation.requestBackflipEscape()) return;
+      this.#scene.triggerBackflip();
+      this.#audio.play(SoundCue.BACKFLIP);
+      this.#updateRadar(this.#gameplay?.status);
+      this.#updatePanel(this.#gameplay?.status);
     },
   });
   readonly #weaponInput = new WeaponInput(() => {
@@ -211,8 +218,10 @@ export class Game {
         this.#recentHistory.load(),
       );
       const initialEnvironment = this.#environment.select(plan.scenes[0]!.gameLevel);
-      this.#scene?.setEnvironment(initialEnvironment);
-      this.#audio.setEnvironment(initialEnvironment.kind);
+      this.#snake.setSpeed(
+        getGameLevelConfig(initialEnvironment.gameLevel).snakeSpeed,
+      );
+      this.#applyEnvironmentPresentation(initialEnvironment);
       void this.#audio.unlock().then(() => {
         this.#audio.play(SoundCue.MENU_ACCEPT);
       });
@@ -280,9 +289,9 @@ export class Game {
       gameplay.subscribeToSceneStarted((scenePlan) => {
         const environment = this.#environment.select(scenePlan.gameLevel);
         this.#snakeSimulation.resetForScene();
+        this.#snake.setSpeed(getGameLevelConfig(scenePlan.gameLevel).snakeSpeed);
         this.#fixedStepRunner.reset();
-        this.#scene?.setEnvironment(environment);
-        this.#audio.setEnvironment(environment.kind);
+        this.#applyEnvironmentPresentation(environment);
         powerUpWeapon.resetEnvironment();
         tokenPool.reset(this.#snake);
       });
@@ -455,6 +464,18 @@ export class Game {
     });
   }
 
+  #applyEnvironmentPresentation(environment: EnvironmentProfile): void {
+    this.#scene?.setEnvironment(environment);
+    this.#audio.setEnvironment(environment.kind);
+    this.#container.dataset.environmentTheme = environment.kind
+      .toLowerCase()
+      .replaceAll("_", "-");
+    this.#container.style.setProperty("--accent", environment.uiTheme.accent);
+    this.#container.style.setProperty("--accent-soft", environment.uiTheme.accentSoft);
+    this.#container.style.setProperty("--line", environment.uiTheme.line);
+    this.#container.style.setProperty("--warning", environment.uiTheme.warning);
+  }
+
   readonly #onVisibilityChange = (): void => {
     this.#updateTypingTest(performance.now());
     if (document.hidden) this.#pauseController.pause(PauseReason.VISIBILITY);
@@ -547,5 +568,10 @@ export class Game {
     this.#failureScreen = null;
     this.#gameplay = null;
     this.#powerUpWeapon = null;
+    delete this.#container.dataset.environmentTheme;
+    this.#container.style.removeProperty("--accent");
+    this.#container.style.removeProperty("--accent-soft");
+    this.#container.style.removeProperty("--line");
+    this.#container.style.removeProperty("--warning");
   }
 }

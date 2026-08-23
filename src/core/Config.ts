@@ -1,6 +1,8 @@
+import type { GameLevel } from "../vocabulary/WordSelector";
+
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  releaseVersion: "1.1.0",
+  releaseVersion: "1.2.0",
   phaseLabel: "第九階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
@@ -48,7 +50,7 @@ export const GAMEPLAY_CONFIG = Object.freeze({
     maximumLength: 40,
     segmentSpacing: 0.75,
     minimumUTurnDistance: 0.75,
-    speed: 4.5,
+    speed: 3,
     headCollisionRadius: 0.32,
     bodyCollisionRadius: 0.28,
     selfCollisionIgnoreSegments: 3,
@@ -96,6 +98,7 @@ export const GAME_LEVEL_CONFIGS = Object.freeze([
     maximumTokenLength: 5 as number | null,
     wordsPerScene: 5,
     durationSeconds: 120,
+    snakeSpeed: 3,
   }),
   Object.freeze({
     gameLevel: 2 as const,
@@ -103,6 +106,7 @@ export const GAME_LEVEL_CONFIGS = Object.freeze([
     maximumTokenLength: 8 as number | null,
     wordsPerScene: 5,
     durationSeconds: 90,
+    snakeSpeed: 3.75,
   }),
   Object.freeze({
     gameLevel: 3 as const,
@@ -110,6 +114,7 @@ export const GAME_LEVEL_CONFIGS = Object.freeze([
     maximumTokenLength: 10 as number | null,
     wordsPerScene: 5,
     durationSeconds: 90,
+    snakeSpeed: 4.5,
   }),
   Object.freeze({
     gameLevel: 4 as const,
@@ -117,6 +122,7 @@ export const GAME_LEVEL_CONFIGS = Object.freeze([
     maximumTokenLength: null,
     wordsPerScene: 5,
     durationSeconds: 90,
+    snakeSpeed: 5.25,
   }),
   Object.freeze({
     gameLevel: 5 as const,
@@ -124,8 +130,17 @@ export const GAME_LEVEL_CONFIGS = Object.freeze([
     maximumTokenLength: null,
     wordsPerScene: 5,
     durationSeconds: 60,
+    snakeSpeed: 6,
   }),
 ]);
+
+export function getGameLevelConfig(gameLevel: GameLevel) {
+  const config = GAME_LEVEL_CONFIGS.find(
+    (candidate) => candidate.gameLevel === gameLevel,
+  );
+  if (!config) throw new Error(`Missing configuration for Game Level ${gameLevel}.`);
+  return config;
+}
 
 export function getVocabularyUrl(baseUrl: string = import.meta.env.BASE_URL): string {
   return `${baseUrl}${APP_CONFIG.vocabularyPath}`;

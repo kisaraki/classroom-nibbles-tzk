@@ -49,7 +49,9 @@ describe("SnakeSimulation", () => {
     simulation.update(0.25);
 
     expect(simulation.status.state).toBe(GameState.MAP_EXPANDED);
-    expect(simulation.snake.headPosition.x).toBeCloseTo(1.125);
+    expect(simulation.snake.headPosition.x).toBeCloseTo(
+      GAMEPLAY_CONFIG.snake.speed * 0.25,
+    );
   });
 
   it("wraps crossing segments individually instead of teleporting the whole snake", () => {
@@ -71,8 +73,8 @@ describe("SnakeSimulation", () => {
       .map((point) => arena.toDisplayPoint(point));
 
     expect(simulation.status.state).toBe(GameState.HUNTING);
-    expect(displayed[0]?.z).toBeCloseTo(4.875);
-    expect(displayed[1]?.z).toBeCloseTo(-4.375);
+    expect(displayed[0]?.z).toBeCloseTo(4.95);
+    expect(displayed[1]?.z).toBeCloseTo(-4.3);
   });
 
   it("treats opposite WRAP edges as adjacent for collision distance", () => {
@@ -211,6 +213,49 @@ describe("SnakeSimulation", () => {
     expect(simulation.snake.headPosition.x).toBeGreaterThanOrEqual(
       GAMEPLAY_CONFIG.snake.segmentSpacing,
     );
+  });
+
+  it("uses a backflip escape to swap head and tail and reverse away from the body", () => {
+    const arena = new Arena({
+      halfWidth: 20,
+      halfDepth: 20,
+      xBoundaryMode: BoundaryMode.SOLID,
+      zBoundaryMode: BoundaryMode.SOLID,
+    });
+    const simulation = createActiveSimulation(arena);
+    const oldHead = simulation.snake.headPosition;
+    const oldTail = simulation.snake.getSegmentPositions().at(-1)!;
+
+    expect(simulation.requestBackflipEscape()).toBe(true);
+    expect(simulation.snake.headPosition).toEqual(oldTail);
+    expect(simulation.snake.direction).toBe(Direction.SOUTH);
+    expect(simulation.snake.headPosition).not.toEqual(oldHead);
+
+    simulation.update(1 / 60);
+    expect(simulation.status.state).toBe(GameState.HUNTING);
+    expect(simulation.snake.headPosition.z).toBeGreaterThan(oldTail.z);
+  });
+
+  it("permits one backflip escape during recovery but never during stun", () => {
+    const arena = new Arena({
+      halfWidth: 5,
+      halfDepth: 5,
+      xBoundaryMode: BoundaryMode.SOLID,
+      zBoundaryMode: BoundaryMode.WRAP,
+    });
+    const simulation = createActiveSimulation(arena, {
+      position: { x: 4.65, z: 0 },
+      direction: Direction.EAST,
+    });
+
+    simulation.update(1 / 60);
+    expect(simulation.status.state).toBe(GameState.STUNNED);
+    expect(simulation.requestBackflipEscape()).toBe(false);
+
+    simulation.update(1);
+    expect(simulation.status.state).toBe(GameState.RECOVERY);
+    expect(simulation.requestBackflipEscape()).toBe(true);
+    expect(simulation.requestBackflipEscape()).toBe(false);
   });
 
   it("detects self collision as the same non-lethal delay penalty", () => {

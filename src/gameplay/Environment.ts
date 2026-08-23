@@ -47,12 +47,20 @@ export interface EnvironmentPalette {
   readonly fogFar: number;
 }
 
+export interface EnvironmentUiTheme {
+  readonly accent: string;
+  readonly accentSoft: string;
+  readonly line: string;
+  readonly warning: string;
+}
+
 export interface EnvironmentProfile {
   readonly gameLevel: GameLevel;
   readonly kind: EnvironmentKind;
   readonly sceneName: string;
   readonly featureLabel: string;
   readonly palette: EnvironmentPalette;
+  readonly uiTheme: EnvironmentUiTheme;
   readonly obstacles: readonly EnvironmentObstacle[];
 }
 
@@ -87,6 +95,12 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
     kind: EnvironmentKind.CARGO_BAY,
     sceneName: "貨艙",
     featureLabel: "貨櫃形成實體掩體",
+    uiTheme: Object.freeze({
+      accent: "#50e3c2",
+      accentSoft: "rgb(80 227 194 / 16%)",
+      line: "rgb(80 227 194 / 28%)",
+      warning: "#ffd166",
+    }),
     palette: Object.freeze({
       backgroundColor: 0x050b16,
       floorColor: 0x091827,
@@ -116,6 +130,12 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
     kind: EnvironmentKind.SHIP_PIPELINE,
     sceneName: "艦艇管線",
     featureLabel: "管柱構成狹長航道",
+    uiTheme: Object.freeze({
+      accent: "#55b8ff",
+      accentSoft: "rgb(85 184 255 / 16%)",
+      line: "rgb(85 184 255 / 30%)",
+      warning: "#a9e6ff",
+    }),
     palette: Object.freeze({
       backgroundColor: 0x041016,
       floorColor: 0x0a2025,
@@ -147,6 +167,12 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
     kind: EnvironmentKind.ASTEROID_BELT,
     sceneName: "小行星帶",
     featureLabel: "不規則小行星阻擋航線",
+    uiTheme: Object.freeze({
+      accent: "#c8a8ff",
+      accentSoft: "rgb(200 168 255 / 17%)",
+      line: "rgb(200 168 255 / 30%)",
+      warning: "#ffca80",
+    }),
     palette: Object.freeze({
       backgroundColor: 0x070711,
       floorColor: 0x151321,
@@ -179,6 +205,12 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
     kind: EnvironmentKind.DENSE_ATMOSPHERE,
     sceneName: "稠密大氣層",
     featureLabel: "濃霧降低遠距能見度",
+    uiTheme: Object.freeze({
+      accent: "#8ed9ed",
+      accentSoft: "rgb(142 217 237 / 17%)",
+      line: "rgb(142 217 237 / 30%)",
+      warning: "#ffe0a3",
+    }),
     palette: Object.freeze({
       backgroundColor: 0x172738,
       floorColor: 0x203747,
@@ -208,6 +240,12 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
     kind: EnvironmentKind.ALIEN_FOREST,
     sceneName: "異星森林",
     featureLabel: "密集樹幹形成曲折路徑",
+    uiTheme: Object.freeze({
+      accent: "#78ef9b",
+      accentSoft: "rgb(120 239 155 / 17%)",
+      line: "rgb(120 239 155 / 30%)",
+      warning: "#d7ff91",
+    }),
     palette: Object.freeze({
       backgroundColor: 0x03110c,
       floorColor: 0x092219,

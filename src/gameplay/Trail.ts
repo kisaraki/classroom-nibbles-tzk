@@ -59,6 +59,49 @@ export class Trail {
     );
   }
 
+  reversePrefix(distanceToNewHead: number, extensionDirection: Direction): void {
+    if (!Number.isFinite(distanceToNewHead) || distanceToNewHead <= 0) {
+      throw new Error("Trail reversal distance must be finite and positive.");
+    }
+    const remainingDistance = Math.min(distanceToNewHead, this.#maximumDistance);
+    const prefix: XZPoint[] = [copyPoint(this.#points[0]!)];
+    let remaining = remainingDistance;
+
+    for (let index = 0; index < this.#points.length - 1; index += 1) {
+      const current = this.#points[index];
+      const previous = this.#points[index + 1];
+      if (!current || !previous) break;
+      const segmentLength = distance(current, previous);
+      if (remaining <= segmentLength) {
+        prefix.push(
+          interpolate(
+            current,
+            previous,
+            segmentLength === 0 ? 0 : remaining / segmentLength,
+          ),
+        );
+        remaining = 0;
+        break;
+      }
+      prefix.push(copyPoint(previous));
+      remaining -= segmentLength;
+    }
+
+    if (remaining > POSITION_EPSILON) {
+      throw new Error("Trail does not contain enough distance for reversal.");
+    }
+
+    prefix.reverse();
+    const oldHead = prefix[prefix.length - 1]!;
+    const forward = directionVector(extensionDirection);
+    prefix.push({
+      x: oldHead.x + forward.x * (this.#maximumDistance - remainingDistance),
+      z: oldHead.z + forward.z * (this.#maximumDistance - remainingDistance),
+    });
+    this.#points.splice(0, this.#points.length, ...prefix);
+    this.#trim();
+  }
+
   record(position: XZPoint): void {
     const current = this.#points[0];
     if (!current || distance(position, current) <= POSITION_EPSILON) return;

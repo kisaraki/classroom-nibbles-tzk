@@ -10,7 +10,7 @@ describe("Snake", () => {
     snake.advance(0.5);
 
     expect(snake.headPosition.x).toBeCloseTo(0);
-    expect(snake.headPosition.z).toBeCloseTo(-2.25);
+    expect(snake.headPosition.z).toBeCloseTo(-1.5);
   });
 
   it("changes cardinal direction immediately but rejects direct reversal", () => {
@@ -67,6 +67,46 @@ describe("Snake", () => {
     expect(snake.length).toBe(3);
     snake.grow(100);
     expect(snake.length).toBe(40);
+  });
+
+  it("switches to a positive finite per-level speed", () => {
+    const snake = new Snake(GAMEPLAY_CONFIG.snake);
+
+    snake.setSpeed(6);
+    snake.advance(0.5);
+
+    expect(snake.speed).toBe(6);
+    expect(snake.headPosition.z).toBeCloseTo(-3);
+    expect(() => snake.setSpeed(0)).toThrow("finite and positive");
+  });
+
+  it("turns the tail into the new head without curling into the preserved body", () => {
+    const snake = new Snake({
+      initialLength: 6,
+      minimumLength: 3,
+      maximumLength: 8,
+      segmentSpacing: 1,
+      minimumUTurnDistance: 1,
+      speed: 1,
+    });
+    snake.advance(2);
+    snake.trySetDirection(Direction.EAST);
+    snake.advance(2);
+    const originalSegments = snake.getSegmentPositions();
+
+    snake.reverseOrientation();
+
+    const reversedSegments = snake.getSegmentPositions();
+    expect(snake.headPosition).toEqual(originalSegments.at(-1));
+    expect(snake.direction).toBe(Direction.SOUTH);
+    reversedSegments.forEach((segment, index) => {
+      const original = originalSegments.at(-(index + 1));
+      expect(segment.x).toBeCloseTo(original!.x);
+      expect(segment.z).toBeCloseTo(original!.z);
+    });
+
+    snake.advance(0.25);
+    expect(snake.headPosition.z).toBeGreaterThan(reversedSegments[0]!.z);
   });
 
   it("resets the scene pose and trail without discarding earned length", () => {
