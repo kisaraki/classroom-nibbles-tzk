@@ -10,7 +10,7 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
   await expect(page.getByTestId("phase-three-data-version")).toContainText("1.0.0-phase0");
-  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.2.0");
+  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.3.0");
   await expect(page.getByTestId("vocabulary-error")).toBeHidden();
   await expect(page.getByTestId("phase-three-canvas")).toBeVisible();
 
@@ -21,7 +21,7 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByTestId("vocabulary-select")).toBeHidden();
   await expect(page.getByTestId("phase-three-panel")).toBeVisible();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.2.0");
+  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.3.0");
   await expect(page.locator("#app")).toHaveAttribute(
     "data-environment-theme",
     "cargo-bay",

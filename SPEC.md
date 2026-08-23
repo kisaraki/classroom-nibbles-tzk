@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 1.5 (Version 1.2 escape maneuver, level themes and speeds)
+Version: 1.6 (Version 1.3 player-view controls and improved resolution)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -28,7 +28,7 @@ Vite must use `base: "./"`. Runtime assets/data must work from a repository subp
 
 ## 3. Spatial and movement model
 
-The world is true 3D, but gameplay movement is constrained to the XZ plane. Directions are NORTH (-Z), SOUTH (+Z), WEST (-X), EAST (+X). Direct 180-degree reversal remains illegal for ordinary direction input. The Down Arrow requests a relative backward maneuver: turn 90 degrees clockwise, travel at least one segment spacing, then turn toward the original rear direction. Snake motion is continuous and the body follows a recorded trail, not grid jumps.
+The world is true 3D, but gameplay movement is constrained to the XZ plane. The fixed player stands at the near/south end of the table, so player-view forward is NORTH (-Z), backward is SOUTH (+Z), left is WEST (-X), and right is EAST (+X). `W`/`↑`, `S`/`↓`, `A`/`←`, and `D`/`→` always request those four absolute player-view directions; their meaning never rotates with the machine nose. Direct 180-degree reversal remains illegal at the snake primitive. When a player-view request is opposite the current heading, the control layer turns 90 degrees clockwise, travels at least one segment spacing, then completes the requested absolute direction. Snake motion is continuous and the body follows a recorded trail, not grid jumps.
 
 Two rapid 90-degree inputs must not bypass the reversal rule and curl the head into its own trail. If a second corner would reverse the heading from before the previous turn, reject it until the head has travelled at least one segment spacing. During `RECOVERY`, allow one legal stationary turn, but never a direct reversal or a second stationary turn.
 
@@ -81,6 +81,8 @@ If a vocabulary filter yields fewer than 5 candidates, relax recent-history filt
 
 Use one PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver also performs one visual first-person backward rotation and returns to the exact table pose while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
 
+The Three.js canvas retains the full CSS viewport and dynamically limits its internal buffer to at most 1152×648 pixels at a 16:9 desktop viewport. This is approximately 2.07 times the former 800×450 pixel count. It must exceed the former budget at 1920×1080 while retaining the 30 FPS minimum release gate.
+
 Mini-map in lower left shows arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. It runs gameplay at 0.25 speed; `Esc` or `M` closes it.
 
 The Version 1.x user interface uses Traditional Chinese for navigation, labels, state feedback, countdown warnings and accessibility text. English vocabulary targets, CEEC names and conventional control abbreviations may remain where they are learning content or proper names.
@@ -128,4 +130,4 @@ Do not start the next phase until the current phase passes typecheck, tests and 
 
 ## 16. Definition of Done for Version 1.x
 
-A player can choose CEEC vocabulary mode, complete all five game scenes from the pinball-table player view, use the safe Down-Arrow backward maneuver and `J` visual backflip, collect target characters in order, experience length rewards/penalties without collision death, use radar/power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. A main-timer failure has a Chinese, keyboard-accessible route back to mission settings. Vocabulary validation, unit tests, 1920×1080 performance/accessibility E2E tests, production build, release-artifact budgets and GitHub Pages deployment all pass.
+A player can choose CEEC vocabulary mode, complete all five game scenes from the pinball-table player view, steer in four fixed player-view directions with safe opposite-direction completion, use the `J` escape backflip, collect target characters in order, experience length rewards/penalties without collision death, use radar/power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. A main-timer failure has a Chinese, keyboard-accessible route back to mission settings. Vocabulary validation, unit tests, improved-resolution 1920×1080 performance/accessibility E2E tests, production build, release-artifact budgets and GitHub Pages deployment all pass.

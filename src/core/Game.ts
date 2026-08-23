@@ -84,12 +84,9 @@ export class Game {
     maximumUpdatesPerFrame: GAMEPLAY_CONFIG.maximumUpdatesPerFrame,
   });
   readonly #input = new DirectionInput((direction) => {
-    this.#snakeSimulation.requestDirection(direction);
+    this.#snakeSimulation.requestPlayerDirection(direction);
   });
   readonly #maneuverInput = new ManeuverInput({
-    backward: () => {
-      this.#snakeSimulation.requestBackward();
-    },
     backflip: () => {
       if (!this.#scene || this.#scene.backflipActive) return;
       if (!this.#snakeSimulation.requestBackflipEscape()) return;

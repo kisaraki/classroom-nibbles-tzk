@@ -5,12 +5,17 @@ export type DirectionInputListener = (direction: DirectionValue) => void;
 const KEY_DIRECTIONS: Readonly<Record<string, DirectionValue>> = Object.freeze({
   ArrowUp: Direction.NORTH,
   KeyW: Direction.NORTH,
+  ArrowDown: Direction.SOUTH,
   KeyS: Direction.SOUTH,
   ArrowLeft: Direction.WEST,
   KeyA: Direction.WEST,
   ArrowRight: Direction.EAST,
   KeyD: Direction.EAST,
 });
+
+export function playerDirectionForCode(code: string): DirectionValue | null {
+  return KEY_DIRECTIONS[code] ?? null;
+}
 
 export class DirectionInput {
   readonly #listener: DirectionInputListener;
@@ -33,7 +38,7 @@ export class DirectionInput {
   }
 
   readonly #onKeyDown = (event: KeyboardEvent): void => {
-    const direction = KEY_DIRECTIONS[event.code];
+    const direction = playerDirectionForCode(event.code);
     if (!direction) return;
     event.preventDefault();
     this.#listener(direction);

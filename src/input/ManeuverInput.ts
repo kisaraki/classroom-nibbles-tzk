@@ -1,5 +1,4 @@
 export interface ManeuverInputListeners {
-  readonly backward: () => void;
   readonly backflip: () => void;
 }
 
@@ -24,10 +23,9 @@ export class ManeuverInput {
   }
 
   readonly #onKeyDown = (event: KeyboardEvent): void => {
-    if (event.code !== "ArrowDown" && event.code !== "KeyJ") return;
+    if (event.code !== "KeyJ") return;
     event.preventDefault();
     if (event.repeat) return;
-    if (event.code === "ArrowDown") this.#listeners.backward();
-    else this.#listeners.backflip();
+    this.#listeners.backflip();
   };
 }

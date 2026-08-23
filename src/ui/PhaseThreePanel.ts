@@ -175,7 +175,7 @@ export class PhaseThreePanel {
     const controls = createElement(
       "p",
       "phase-three-panel__controls",
-      "WASD / ↑←→ 轉向 · ↓ 後退迴轉 · J 頭尾反轉脫困 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
+      "WASD / 方向鍵依玩家視角移動 · J 頭尾反轉脫困 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
     );
     this.#element.append(
       heading,
@@ -197,7 +197,7 @@ export class PhaseThreePanel {
   ): void {
     this.#element.dataset.state = gameplay.state;
     this.#element.dataset.environment = environment.kind;
-    this.#element.dataset.backwardManeuver = String(snake.backwardManeuverActive);
+    this.#element.dataset.safeUTurn = String(snake.safeUTurnActive);
     this.#gameLevel.textContent = `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`;
     this.#vocabularyLevel.textContent = gameplay.vocabularyMode;
     this.#wordNumber.textContent = `${gameplay.wordNumber}/${gameplay.totalWords}`;

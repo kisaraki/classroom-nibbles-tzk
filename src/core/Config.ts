@@ -2,7 +2,7 @@ import type { GameLevel } from "../vocabulary/WordSelector";
 
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  releaseVersion: "1.2.0",
+  releaseVersion: "1.3.0",
   phaseLabel: "第九階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
@@ -15,7 +15,7 @@ export const APP_CONFIG = Object.freeze({
     cameraLookDepthRatio: -0.15,
     cameraBackflipDurationSeconds: 0.8,
     antialias: false,
-    maximumRenderPixelCount: 800 * 450,
+    maximumRenderPixelCount: 1152 * 648,
     maxPixelRatio: 2,
     snakeHeadColor: 0x86ffe1,
     snakeBodyColor: 0x25bda5,

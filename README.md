@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D pinball-table vocabulary game based on
 
 ## Current status
 
-Version 1.2 is complete. It keeps the player-end pinball-table view, turns `J` into a physical head-tail reversal for rapid escape, gives every Game Level its own interface tone, and scales movement from a slower first level to the fastest fifth level while retaining the complete Phase 9 release gates and learning loop.
+Version 1.3 is complete. It raises the pinball-table render budget to 1152×648 and makes every directional control use the fixed player's position instead of the machine nose, while retaining the Version 1.2 escape backflip, level themes, speed progression and complete Phase 9 learning loop.
 
 ## Requirements
 
@@ -19,13 +19,13 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the Version 1.2 vocabulary run.
+Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the Version 1.3 vocabulary run.
 
-## Version 1.2 gameplay and controls
+## Version 1.3 gameplay and controls
 
 - Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
 - A seed creates a reproducible five-scene × five-word run without repeated ids or targets.
-- Steer cardinally with `WASD` or `↑`/`←`/`→`. Press `↓` to perform a safe relative backward U-turn: the snake makes one side turn, travels one segment spacing, then completes the turn toward its original rear.
+- `W`/`↑`, `S`/`↓`, `A`/`←` and `D`/`→` always mean player-view forward (north/away from the player), backward (south/toward the player), left and right. These meanings never rotate with the machine nose. When the requested player-view direction is directly opposite the current heading, the snake completes it through a safe two-corner turn after one segment spacing.
 - Press `J` for an escape backflip: the current tail becomes the new head, the preserved body path reverses, and the new nose points outward along the tail tangent. The camera completes one backward rotation and returns to the exact table pose. The maneuver is available while hunting, on the tactical map, and as the one allowed recovery escape turn, but not while stunned.
 - Rapid double-corner input cannot fold the head back into the snake: a U-shaped second turn is accepted only after moving at least one 0.75-unit segment spacing. Recovery still permits one stationary escape turn.
 - Collect the outlined/pulsing next token shown in the target sequence.
@@ -45,7 +45,7 @@ Vite prints the local development URL. Choose a vocabulary mode and deterministi
 - If a scene's main timer reaches zero, a Chinese mission report returns the player to mission settings. This is a time-limit failure only; collisions remain non-lethal delay penalties.
 - Use the Chinese `音效：開／關` control to persist the sound preference. Audio is synthesized with native Web Audio and gracefully falls back to silent play if audio is unavailable.
 - Scene changes use closed-shield mission cards. Completing all 25 words opens the KOSMOS TOOLKITS 探真拓知酷 credits and a return-to-mission-settings action.
-- The token pool is rendered as one camera-facing texture-atlas mesh, and the internal render resolution scales to an 800×450-pixel budget while retaining the full CSS viewport and pinball-table layout.
+- The token pool is rendered as one camera-facing texture-atlas mesh, and the internal render resolution scales to a 1152×648-pixel budget—about 2.07 times the former pixel count—while retaining the full CSS viewport, pinball-table layout and 30 FPS minimum.
 
 Completing the final token pauses movement and the main timer in `TYPING_TEST` and opens the typing reinforcement modal:
 
@@ -109,7 +109,7 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 - Phase 7 tests cover all five environment profiles, obstacle-safe arena capacity, level switching, safe pose reset, non-lethal obstacle collision and projectile blocking.
 - Phase 8 tests cover synthesized cue/ambient definitions, mute persistence, token/power-up/impact event routing, exact-state pause/resume, hidden-page auto-pause, door transitions and credits/replay presentation.
 - Phase 9 tests cover successful and failed state-machine exits, the Chinese failure dialog and focus, release metadata, unique IDs, accessible names, asset/network errors, draw-call and render-resolution budgets, and the 30 FPS minimum at 1920×1080.
-- Version 1.2 tests cover the segment-spaced backward maneuver, head-tail escape reversal, preserved non-curling body path, progressive level speeds, five unique interface themes, fixed player-end pinball camera, complete backflip/reset cycle and camera-facing token presentation.
+- Version 1.3 tests cover fixed player-view directions, safe opposite-direction completion, the improved 1152×648 render budget, head-tail escape reversal, progressive level speeds, five unique themes, camera reset and camera-facing token presentation.
 - Playwright also checks vocabulary selection, independent Game/Vocabulary labels, the Cargo Bay environment and obstacle markers, the 30-token and five-power-up scene, pinball-table overlay and complete-trail mini-map, steering/firing rules, tactical-map controls, continued quarter-speed movement, typing-modal submission and modal-scoped clipboard blocking.
 - `.github/workflows/ci.yml` runs typecheck, vocabulary validation, unit tests, production build, artifact verification and isolated Chromium E2E jobs on pushes and pull requests.
 - `.github/workflows/deploy-pages.yml` repeats the release gates before deploying `dist/` through official GitHub Pages actions on `main`.
@@ -132,4 +132,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract. Phase 9 remains complete and NIBBLES Version 1.2 is release-ready.
+See `SPEC.md` for the full product contract. Phase 9 remains complete and NIBBLES Version 1.3 is release-ready.

@@ -8,7 +8,7 @@ import {
 } from "./CollisionSystem";
 import {
   clockwiseDirection,
-  oppositeDirection,
+  isOppositeDirection,
   type Direction,
 } from "./Direction";
 import { Snake } from "./Snake";
@@ -31,7 +31,7 @@ export interface SnakeSimulationStatus {
   readonly speed: number;
   readonly headPosition: XZPoint;
   readonly latestCollision: CollisionKind | null;
-  readonly backwardManeuverActive: boolean;
+  readonly safeUTurnActive: boolean;
 }
 
 export type CollisionListener = (event: CollisionEvent) => void;
@@ -49,7 +49,7 @@ export class SnakeSimulation {
   #latestCollision: CollisionKind | null = null;
   #recoveryRequired = false;
   #recoveryTurnUsed = false;
-  #backwardTarget: Direction | null = null;
+  #safeUTurnTarget: Direction | null = null;
 
   constructor(
     snake: Snake,
@@ -86,7 +86,7 @@ export class SnakeSimulation {
       speed: this.#snake.speed,
       headPosition: this.#arena.toDisplayPoint(this.#snake.headPosition),
       latestCollision: this.#latestCollision,
-      backwardManeuverActive: this.#backwardTarget !== null,
+      safeUTurnActive: this.#safeUTurnTarget !== null,
     });
   }
 
@@ -96,7 +96,7 @@ export class SnakeSimulation {
       this.#stateMachine.state === GameState.MAP_EXPANDED
     ) {
       const accepted = this.#snake.trySetDirection(direction);
-      if (accepted) this.#backwardTarget = null;
+      if (accepted) this.#safeUTurnTarget = null;
       return accepted;
     }
     if (this.#stateMachine.state !== GameState.RECOVERY) return false;
@@ -107,19 +107,20 @@ export class SnakeSimulation {
     return accepted;
   }
 
-  requestBackward(): boolean {
+  requestPlayerDirection(direction: Direction): boolean {
     if (
-      this.#backwardTarget !== null ||
-      (this.#stateMachine.state !== GameState.HUNTING &&
-        this.#stateMachine.state !== GameState.MAP_EXPANDED)
-    ) return false;
-    const originalDirection = this.#snake.direction;
-    const accepted = this.#snake.trySetDirection(
-      clockwiseDirection(originalDirection),
-    );
-    if (!accepted) return false;
-    this.#backwardTarget = oppositeDirection(originalDirection);
-    return true;
+      this.#safeUTurnTarget === null &&
+      (this.#stateMachine.state === GameState.HUNTING ||
+        this.#stateMachine.state === GameState.MAP_EXPANDED) &&
+      isOppositeDirection(this.#snake.direction, direction)
+    ) {
+      const accepted = this.#snake.trySetDirection(
+        clockwiseDirection(this.#snake.direction),
+      );
+      if (accepted) this.#safeUTurnTarget = direction;
+      return accepted;
+    }
+    return this.requestDirection(direction);
   }
 
   requestBackflipEscape(): boolean {
@@ -132,7 +133,7 @@ export class SnakeSimulation {
     if (state === GameState.RECOVERY && this.#recoveryTurnUsed) return false;
 
     this.#snake.reverseOrientation();
-    this.#backwardTarget = null;
+    this.#safeUTurnTarget = null;
     if (state === GameState.RECOVERY) this.#recoveryTurnUsed = true;
     return true;
   }
@@ -156,10 +157,10 @@ export class SnakeSimulation {
     ) return;
 
     if (
-      this.#backwardTarget !== null &&
-      this.#snake.trySetDirection(this.#backwardTarget)
+      this.#safeUTurnTarget !== null &&
+      this.#snake.trySetDirection(this.#safeUTurnTarget)
     ) {
-      this.#backwardTarget = null;
+      this.#safeUTurnTarget = null;
     }
 
     const candidate = this.#snake.previewPosition(deltaSeconds);
@@ -196,7 +197,7 @@ export class SnakeSimulation {
     this.#latestCollision = null;
     this.#recoveryRequired = false;
     this.#recoveryTurnUsed = false;
-    this.#backwardTarget = null;
+    this.#safeUTurnTarget = null;
   }
 
   #enterStun(
@@ -205,7 +206,7 @@ export class SnakeSimulation {
     recoveryRequired = true,
   ): void {
     this.#latestCollision = kind;
-    this.#backwardTarget = null;
+    this.#safeUTurnTarget = null;
     this.#recoveryRequired = recoveryRequired;
     this.#delayRemainingSeconds = this.#config.stunDurationSeconds;
     this.#stateMachine.transition(GameState.STUNNED);
