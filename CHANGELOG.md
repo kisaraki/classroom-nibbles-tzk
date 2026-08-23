@@ -8,7 +8,7 @@
 
 ### Changed
 - Distributed mission metrics, vocabulary target, movement telemetry, event feedback and controls directly across the main game view as a transparent, responsive HUD.
-- Kept the HUD backplates lightweight and non-blurred so the 1920×1080 scene retains the 30 FPS release floor.
+- Kept the HUD backplates lightweight and non-blurred, reduced fixed-camera and repeated atlas-update work, and switched gameplay geometry to lower-cost palette materials so the native-resolution 1920×1080 scene retains the 30 FPS release floor.
 - Added main-HUD position diagnostics so pause and backflip behavior remain verifiable without depending on radar data.
 - Updated the Traditional Chinese controls, public specification, release metadata and automated coverage to Version 1.5.
 

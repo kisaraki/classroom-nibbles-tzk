@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import {
-  EnvironmentKind,
   EnvironmentObstacleKind,
   type EnvironmentObstacle,
   type EnvironmentProfile,
@@ -21,20 +20,13 @@ export class EnvironmentView {
   setEnvironment(environment: EnvironmentProfile): void {
     this.#clearResources();
     const material = this.#trackMaterial(
-      new THREE.MeshLambertMaterial({
+      new THREE.MeshBasicMaterial({
         color: environment.palette.obstacleColor,
-        emissive: new THREE.Color(
-          environment.palette.obstacleAccentColor,
-        ).multiplyScalar(0.12),
-        flatShading: environment.kind === EnvironmentKind.ASTEROID_BELT,
       }),
     );
     const accent = this.#trackMaterial(
-      new THREE.MeshLambertMaterial({
+      new THREE.MeshBasicMaterial({
         color: environment.palette.obstacleAccentColor,
-        emissive: new THREE.Color(
-          environment.palette.obstacleAccentColor,
-        ).multiplyScalar(0.32),
       }),
     );
 

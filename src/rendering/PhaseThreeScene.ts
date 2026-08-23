@@ -26,8 +26,6 @@ export class PhaseThreeScene {
   readonly #cameraRig: PinballCameraRig;
   readonly #arenaView: ArenaView;
   readonly #environmentView: EnvironmentView;
-  readonly #hemisphereLight: THREE.HemisphereLight;
-  readonly #keyLight: THREE.DirectionalLight;
   readonly #snakeView: SnakeView;
   readonly #tokenView: TokenView;
   readonly #powerUpView: PowerUpView;
@@ -43,6 +41,7 @@ export class PhaseThreeScene {
     this.#renderer = new THREE.WebGLRenderer({
       antialias: APP_CONFIG.scene.antialias,
       alpha: false,
+      precision: "mediump",
       powerPreference: "high-performance",
       stencil: false,
     });
@@ -76,15 +75,7 @@ export class PhaseThreeScene {
       lookHeight: APP_CONFIG.scene.cameraLookHeight,
       lookDepthRatio: APP_CONFIG.scene.cameraLookDepthRatio,
     });
-
-    this.#hemisphereLight = new THREE.HemisphereLight(
-      environment.palette.hemisphereSkyColor,
-      environment.palette.hemisphereGroundColor,
-      2.5,
-    );
-    this.#keyLight = new THREE.DirectionalLight(environment.palette.keyLightColor, 3.5);
-    this.#keyLight.position.set(5, 12, 7);
-    this.#scene.add(this.#hemisphereLight, this.#keyLight);
+    this.#cameraRig.update(arena);
 
     this.#arenaView = new ArenaView(this.#scene, arena, environment);
     this.#environmentView = new EnvironmentView(this.#scene);
@@ -107,9 +98,6 @@ export class PhaseThreeScene {
       palette.fogNear,
       palette.fogFar,
     );
-    this.#hemisphereLight.color.setHex(palette.hemisphereSkyColor);
-    this.#hemisphereLight.groundColor.setHex(palette.hemisphereGroundColor);
-    this.#keyLight.color.setHex(palette.keyLightColor);
     this.#arenaView.setEnvironment(environment);
     this.#environmentView.setEnvironment(environment);
     this.#renderer.domElement.dataset.environmentKind = environment.kind
@@ -149,7 +137,6 @@ export class PhaseThreeScene {
     this.#setRendererData("tokenCount", String(tokens.length));
     this.#setRendererData("powerUpCount", String(powerUps.length));
     this.#setRendererData("bulletCount", String(bullets.length));
-    this.#cameraRig.update(arena);
     this.#snakeView.update(snake, arena, true, frameDeltaSeconds);
     this.#setRendererData(
       "backflipState",

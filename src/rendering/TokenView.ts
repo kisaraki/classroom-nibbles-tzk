@@ -62,6 +62,7 @@ export class TokenView {
     map: this.#texture,
     transparent: true,
     depthWrite: false,
+    fog: false,
     side: THREE.DoubleSide,
   });
   readonly #geometry = new THREE.BufferGeometry();
@@ -75,6 +76,7 @@ export class TokenView {
   readonly #cameraQuaternion = new THREE.Quaternion();
   readonly #right = new THREE.Vector3();
   readonly #up = new THREE.Vector3();
+  readonly #renderedTokens: CharacterToken[] = [];
 
   constructor(scene: THREE.Scene) {
     const indices = new Uint16Array(CHARACTER_TOKENS.length * INDICES_PER_TOKEN);
@@ -114,19 +116,25 @@ export class TokenView {
     this.#right.set(1, 0, 0).applyQuaternion(this.#cameraQuaternion);
     this.#up.set(0, 1, 0).applyQuaternion(this.#cameraQuaternion);
 
+    let tokenAtlasChanged = entities.length !== this.#renderedTokens.length;
     entities.forEach((entity, index) => {
       const position = arena.toDisplayPoint(entity.position);
       const size = entity.token === nextToken
         ? 1.1 + Math.sin(elapsedSeconds * 5) * 0.12
         : 0.82;
       this.#writePositions(index, position.x, 0.78, position.z, size / 2);
-      this.#writeUvs(index, entity.token);
+      if (this.#renderedTokens[index] !== entity.token) {
+        this.#writeUvs(index, entity.token);
+        this.#renderedTokens[index] = entity.token;
+        tokenAtlasChanged = true;
+      }
     });
+    this.#renderedTokens.length = entities.length;
     this.#geometry.setDrawRange(0, entities.length * INDICES_PER_TOKEN);
     const positionAttribute = this.#geometry.getAttribute("position");
     const uvAttribute = this.#geometry.getAttribute("uv");
     positionAttribute.needsUpdate = true;
-    uvAttribute.needsUpdate = true;
+    if (tokenAtlasChanged) uvAttribute.needsUpdate = true;
   }
 
   dispose(): void {

@@ -58,12 +58,12 @@ body {
   inset: 0;
   z-index: 1;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 62%, transparent 45%, rgb(1 6 13 / 38%) 100%),
-    linear-gradient(180deg, rgb(1 6 13 / 58%) 0 2.5%, transparent 10% 88%, rgb(1 6 13 / 82%) 100%);
-  box-shadow:
-    inset 0 0 3rem rgb(0 0 0 / 48%),
-    inset 0 -3rem 5rem rgb(0 0 0 / 58%);
+  background: linear-gradient(
+    180deg,
+    rgb(1 6 13 / 58%) 0 2.5%,
+    transparent 10% 86%,
+    rgb(1 6 13 / 82%) 100%
+  );
   pointer-events: none;
 }
 
@@ -74,7 +74,6 @@ body {
   bottom: 0;
   width: 1px;
   background: linear-gradient(180deg, transparent 4%, rgb(80 227 194 / 20%) 28%, rgb(80 227 194 / 55%) 82%, transparent 98%);
-  box-shadow: 0 0 1.5rem rgb(80 227 194 / 18%);
   content: "";
 }
 
@@ -99,7 +98,6 @@ body {
   background:
     linear-gradient(90deg, #02070e, #142535 48%, #02070e),
     repeating-linear-gradient(180deg, transparent 0 2rem, rgb(80 227 194 / 18%) 2rem 2.05rem);
-  box-shadow: 0 0 2rem rgb(0 0 0 / 68%), inset 0 0 1rem rgb(80 227 194 / 8%);
 }
 
 .pinball-table-overlay__rail--left {
@@ -120,7 +118,6 @@ body {
   height: 6rem;
   border: 1px solid rgb(80 227 194 / 30%);
   background: linear-gradient(180deg, rgb(16 37 53 / 88%), rgb(2 6 13 / 98%) 72%);
-  box-shadow: 0 -0.75rem 2.5rem rgb(0 0 0 / 62%);
   clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
   transform: translateX(-50%);
 }
@@ -139,6 +136,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: 3;
+  contain: layout paint style;
   overflow: hidden;
   pointer-events: none;
 }
@@ -162,7 +160,6 @@ body {
   display: flex;
   align-items: baseline;
   gap: 0.65rem;
-  filter: drop-shadow(0 0.25rem 0.45rem rgb(0 0 0 / 82%));
 }
 
 .game-hud__environment {
@@ -201,7 +198,6 @@ body {
   margin: 0;
   border: 1px solid var(--line);
   background: var(--line);
-  box-shadow: 0 0.8rem 2.5rem rgb(0 0 0 / 30%);
 }
 
 .game-hud__mission {
@@ -264,7 +260,6 @@ body {
   padding: 0.65rem 0.8rem;
   border: 1px solid var(--line);
   background: linear-gradient(180deg, rgb(4 15 29 / 80%), rgb(4 15 29 / 64%));
-  box-shadow: 0 0.8rem 2.5rem rgb(0 0 0 / 32%);
   text-align: center;
   transform: translateX(-50%);
 }

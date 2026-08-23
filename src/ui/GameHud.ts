@@ -29,6 +29,10 @@ function formatTime(seconds: number): string {
   return `${minutes}:${String(wholeSeconds % 60).padStart(2, "0")}`;
 }
 
+function setText(element: HTMLElement, value: string): void {
+  if (element.textContent !== value) element.textContent = value;
+}
+
 function collisionLabel(collision: SnakeSimulationStatus["latestCollision"]): string {
   if (collision === CollisionKind.SOLID_WALL) return "撞上實體牆";
   if (collision === CollisionKind.SOLID_OBSTACLE) return "撞上環境障礙";
@@ -203,24 +207,26 @@ export class GameHud {
     this.#element.dataset.safeUTurn = String(snake.safeUTurnActive);
     this.#element.dataset.headX = snake.headPosition.x.toFixed(3);
     this.#element.dataset.headZ = snake.headPosition.z.toFixed(3);
-    this.#gameLevel.textContent = `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`;
-    this.#vocabularyLevel.textContent = gameplay.vocabularyMode;
-    this.#wordNumber.textContent = `${gameplay.wordNumber}/${gameplay.totalWords}`;
-    this.#timer.textContent = formatTime(gameplay.timeRemainingSeconds);
-    this.#environmentFeature.textContent = `環境機制：${environment.featureLabel}`;
-    this.#state.textContent = stateLabel(gameplay.state);
-    this.#heading.textContent = directionLabel(snake.direction);
-    this.#speed.textContent = `${snake.speed.toFixed(1)} 單位/秒`;
-    this.#length.textContent = String(snake.length);
-    this.#collision.textContent = collisionLabel(snake.latestCollision);
-    this.#collection.textContent = collectionLabel(gameplay.latestCollection);
-    this.#ammo.textContent = String(powerUpWeapon.ammo);
-    this.#powerUp.textContent = powerUpLabel(powerUpWeapon.latestPowerUp);
-    this.#shot.textContent = bulletImpactLabel(powerUpWeapon.latestBulletImpact);
-    this.#meaning.textContent = gameplay.entry.meaningZh;
-    this.#partOfSpeech.textContent = gameplay.entry.partOfSpeech ?? "";
-    this.#progress.textContent =
-      `${gameplay.progressIndex}/${gameplay.entry.tokenLength} 個字元 · 下一個：${tokenName(gameplay.nextToken)}`;
+    setText(this.#gameLevel, `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`);
+    setText(this.#vocabularyLevel, gameplay.vocabularyMode);
+    setText(this.#wordNumber, `${gameplay.wordNumber}/${gameplay.totalWords}`);
+    setText(this.#timer, formatTime(gameplay.timeRemainingSeconds));
+    setText(this.#environmentFeature, `環境機制：${environment.featureLabel}`);
+    setText(this.#state, stateLabel(gameplay.state));
+    setText(this.#heading, directionLabel(snake.direction));
+    setText(this.#speed, `${snake.speed.toFixed(1)} 單位/秒`);
+    setText(this.#length, String(snake.length));
+    setText(this.#collision, collisionLabel(snake.latestCollision));
+    setText(this.#collection, collectionLabel(gameplay.latestCollection));
+    setText(this.#ammo, String(powerUpWeapon.ammo));
+    setText(this.#powerUp, powerUpLabel(powerUpWeapon.latestPowerUp));
+    setText(this.#shot, bulletImpactLabel(powerUpWeapon.latestBulletImpact));
+    setText(this.#meaning, gameplay.entry.meaningZh);
+    setText(this.#partOfSpeech, gameplay.entry.partOfSpeech ?? "");
+    setText(
+      this.#progress,
+      `${gameplay.progressIndex}/${gameplay.entry.tokenLength} 個字元 · 下一個：${tokenName(gameplay.nextToken)}`,
+    );
 
     if (
       this.#renderedEntryId !== gameplay.entry.id ||
@@ -229,12 +235,16 @@ export class GameHud {
       this.#renderTarget(gameplay);
     }
 
-    this.#phaseMessage.hidden =
+    const phaseMessageHidden =
       gameplay.state !== "TYPING_TEST" &&
       gameplay.state !== "LEVEL_FAILED" &&
       gameplay.state !== "GAME_CLEAR" &&
       !gameplay.typingTimeoutNoticeActive;
-    this.#phaseMessage.textContent =
+    if (this.#phaseMessage.hidden !== phaseMessageHidden) {
+      this.#phaseMessage.hidden = phaseMessageHidden;
+    }
+    setText(
+      this.#phaseMessage,
       gameplay.state === "TYPING_TEST"
         ? "單字已收集完成—正在進行 30 秒打字強化測驗"
         : gameplay.state === "LEVEL_FAILED"
@@ -243,7 +253,8 @@ export class GameHud {
             ? "25 個單字皆已完成打字強化測驗"
             : gameplay.typingTimeoutNoticeActive
               ? `打字測驗逾時：已補回主計時 5 秒，請重新收集最後一個字元（第 ${gameplay.typingTimeoutCount} 次）`
-              : "";
+              : "",
+    );
   }
 
   dispose(): void {

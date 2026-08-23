@@ -98,6 +98,7 @@ export class PowerUpView {
       map: texture,
       transparent: true,
       depthWrite: false,
+      fog: false,
       sizeAttenuation: true,
     });
     this.#textures.set(kind, texture);

@@ -7,20 +7,19 @@ import { MechaBackflipAnimator } from "./MechaBackflipAnimator";
 
 export class SnakeView {
   readonly #headGeometry = new THREE.SphereGeometry(0.36, 18, 12);
-  readonly #headMaterial = new THREE.MeshLambertMaterial({
+  readonly #headMaterial = new THREE.MeshBasicMaterial({
     color: APP_CONFIG.scene.snakeHeadColor,
-    emissive: 0x174a42,
+    fog: false,
   });
   readonly #bodyGeometry = new THREE.SphereGeometry(0.3, 14, 10);
-  readonly #bodyMaterial = new THREE.MeshLambertMaterial({
+  readonly #bodyMaterial = new THREE.MeshBasicMaterial({
     color: APP_CONFIG.scene.snakeBodyColor,
-    emissive: 0x082d2b,
+    fog: false,
   });
   readonly #noseGeometry = new THREE.OctahedronGeometry(0.13);
-  readonly #noseMaterial = new THREE.MeshLambertMaterial({
+  readonly #noseMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
-    emissive: 0x86ffe1,
-    emissiveIntensity: 1.8,
+    fog: false,
   });
   readonly #head = new THREE.Mesh(this.#headGeometry, this.#headMaterial);
   readonly #nose = new THREE.Mesh(this.#noseGeometry, this.#noseMaterial);

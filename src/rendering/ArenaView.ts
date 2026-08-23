@@ -8,14 +8,15 @@ export class ArenaView {
   readonly #grid: THREE.GridHelper;
   readonly #xBoundaryGeometry: THREE.BoxGeometry;
   readonly #zBoundaryGeometry: THREE.BoxGeometry;
-  readonly #solidMaterial: THREE.MeshLambertMaterial;
-  readonly #wrapMaterial: THREE.MeshLambertMaterial;
+  readonly #solidMaterial: THREE.MeshBasicMaterial;
+  readonly #wrapMaterial: THREE.MeshBasicMaterial;
 
   constructor(scene: THREE.Scene, arena: Arena, environment: EnvironmentProfile) {
     const { halfWidth, halfDepth, xBoundaryMode, zBoundaryMode } = arena.config;
     this.#floorGeometry = new THREE.PlaneGeometry(halfWidth * 2, halfDepth * 2);
     this.#floorMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.floorColor,
+      fog: false,
     });
     const floor = new THREE.Mesh(this.#floorGeometry, this.#floorMaterial);
     floor.rotation.x = -Math.PI / 2;
@@ -31,13 +32,11 @@ export class ArenaView {
     this.#grid.position.y = -0.04;
     scene.add(this.#grid);
 
-    this.#solidMaterial = new THREE.MeshLambertMaterial({
+    this.#solidMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.solidWallColor,
-      emissive: 0x351018,
     });
-    this.#wrapMaterial = new THREE.MeshLambertMaterial({
+    this.#wrapMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.wrapGateColor,
-      emissive: 0x182c68,
       transparent: true,
       opacity: 0.8,
     });
@@ -67,9 +66,7 @@ export class ArenaView {
     const { palette } = environment;
     this.#floorMaterial.color.setHex(palette.floorColor);
     this.#solidMaterial.color.setHex(palette.solidWallColor);
-    this.#solidMaterial.emissive.setHex(palette.solidWallColor).multiplyScalar(0.18);
     this.#wrapMaterial.color.setHex(palette.wrapGateColor);
-    this.#wrapMaterial.emissive.setHex(palette.wrapGateColor).multiplyScalar(0.22);
     const gridMaterials = Array.isArray(this.#grid.material)
       ? this.#grid.material
       : [this.#grid.material];
