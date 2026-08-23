@@ -94,6 +94,10 @@ export class WeaponSystem {
     );
   }
 
+  get bulletCount(): number {
+    return this.#bullets.size;
+  }
+
   addAmmo(amount: number): number {
     if (!Number.isInteger(amount) || amount <= 0) {
       throw new Error("Ammo reward must be a positive integer.");

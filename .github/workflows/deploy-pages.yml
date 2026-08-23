@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -37,6 +38,8 @@ jobs:
         run: npm run test
       - name: Build production app
         run: npm run build
+      - name: Verify release artifact
+        run: npm run verify:release
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
@@ -47,6 +50,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
     steps:
       - name: Deploy to GitHub Pages

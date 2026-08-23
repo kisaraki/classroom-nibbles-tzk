@@ -126,7 +126,7 @@ export class PhaseThreePanel {
     this.#element.dataset.testid = "phase-three-panel";
     const heading = createElement("header", "phase-three-panel__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 08"),
+      createElement("p", "phase-three-panel__eyebrow", "座艙任務 / 09"),
       createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
     );
 

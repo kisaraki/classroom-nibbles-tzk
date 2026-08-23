@@ -97,7 +97,7 @@ export class PowerUpWeaponSession {
   get status(): PowerUpWeaponStatus {
     return Object.freeze({
       ammo: this.#weapon.ammo,
-      bulletCount: this.#weapon.bullets.length,
+      bulletCount: this.#weapon.bulletCount,
       latestPowerUp: this.#latestPowerUp,
       latestBulletImpact: this.#latestBulletImpact,
     });

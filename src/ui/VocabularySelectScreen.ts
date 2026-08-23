@@ -43,7 +43,7 @@ export class VocabularySelectScreen {
     this.#element.dataset.testid = "vocabulary-select";
     const panel = createElement("div", "vocabulary-select__panel");
     panel.append(
-      createElement("p", "vocabulary-select__eyebrow", "任務設定 / 08"),
+      createElement("p", "vocabulary-select__eyebrow", "任務設定 / 09"),
       createElement("h1", "vocabulary-select__title", APP_CONFIG.title),
       createElement("p", "vocabulary-select__phase", `${APP_CONFIG.phaseLabel} — 字元獵取`),
       createElement(
@@ -72,7 +72,7 @@ export class VocabularySelectScreen {
     this.#seed = createElement("input", "vocabulary-select__input");
     this.#seed.dataset.testid = "run-seed";
     this.#seed.name = "run-seed";
-    this.#seed.value = "NIBBLES-PHASE-8";
+    this.#seed.value = "NIBBLES-PHASE-9";
     this.#seed.maxLength = 80;
     this.#seed.required = true;
     seedLabel.append(this.#seed);
@@ -89,7 +89,7 @@ export class VocabularySelectScreen {
     const dataset = createElement(
       "p",
       "vocabulary-select__dataset",
-      `資料版本 ${metadata.dataVersion} · ${metadata.eligibleEntries.toLocaleString("zh-TW")} 筆可遊玩字彙`,
+      `NIBBLES ${APP_CONFIG.releaseVersion} · 資料版本 ${metadata.dataVersion} · ${metadata.eligibleEntries.toLocaleString("zh-TW")} 筆可遊玩字彙`,
     );
     dataset.dataset.testid = "phase-three-data-version";
     panel.append(this.#form, dataset);

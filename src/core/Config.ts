@@ -1,6 +1,7 @@
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  phaseLabel: "第八階段",
+  releaseVersion: "1.0.0",
+  phaseLabel: "第九階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     cameraFieldOfView: 60,
@@ -11,6 +12,8 @@ export const APP_CONFIG = Object.freeze({
     cameraLookAhead: 6,
     cameraLookHeight: 0.72,
     cameraTurnSmoothingSeconds: 0.15,
+    antialias: false,
+    maximumRenderPixelCount: 800 * 450,
     maxPixelRatio: 2,
     snakeHeadColor: 0x86ffe1,
     snakeBodyColor: 0x25bda5,
@@ -18,6 +21,7 @@ export const APP_CONFIG = Object.freeze({
 });
 
 export const PRESENTATION_CONFIG = Object.freeze({
+  telemetryUpdateIntervalSeconds: 0.1,
   sceneTransition: Object.freeze({
     closeMilliseconds: 260,
     holdMilliseconds: 520,

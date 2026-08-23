@@ -30,7 +30,7 @@ export class BootScreen {
     this.#element = createElement("section", "boot-screen");
     this.#element.dataset.testid = "boot-screen";
 
-    const eyebrow = createElement("p", "boot-screen__eyebrow", "系統啟動 / 08");
+    const eyebrow = createElement("p", "boot-screen__eyebrow", "系統啟動 / 09");
     const heading = createElement("h1", "boot-screen__title", APP_CONFIG.title);
     const phase = createElement("p", "boot-screen__phase", `${APP_CONFIG.phaseLabel} — 資料連線`);
 

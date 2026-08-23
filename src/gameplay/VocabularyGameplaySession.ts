@@ -98,6 +98,10 @@ export class VocabularyGameplaySession {
     return this.#tokenPool.entities;
   }
 
+  get nextToken(): CharacterToken | null {
+    return this.#currentEntry.tokens[this.#progressIndex] ?? null;
+  }
+
   get status(): VocabularyGameplayStatus {
     const entry = this.#currentEntry;
     return Object.freeze({

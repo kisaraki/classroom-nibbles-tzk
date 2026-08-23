@@ -38,7 +38,12 @@ export class PhaseThreeScene {
     environment: EnvironmentProfile,
   ) {
     this.#container = container;
-    this.#renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.#renderer = new THREE.WebGLRenderer({
+      antialias: APP_CONFIG.scene.antialias,
+      alpha: false,
+      powerPreference: "high-performance",
+      stencil: false,
+    });
     this.#renderer.setPixelRatio(
       Math.min(window.devicePixelRatio, APP_CONFIG.scene.maxPixelRatio),
     );
@@ -47,7 +52,7 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
     this.#renderer.domElement.dataset.cameraMode = "snake-eye";
     this.#renderer.domElement.dataset.cameraCount = "1";
-    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第八階段第一人稱字彙遊戲場");
+    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第九階段第一人稱字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
     this.#scene.background = new THREE.Color(environment.palette.backgroundColor);
@@ -112,7 +117,7 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.obstacleCount = String(environment.obstacles.length);
     this.#renderer.domElement.setAttribute(
       "aria-label",
-      `NIBBLES 第八階段第一人稱字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
+      `NIBBLES 第九階段第一人稱字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
     );
   }
 
@@ -130,15 +135,16 @@ export class PhaseThreeScene {
     elapsedSeconds: number,
     frameDeltaSeconds: number,
   ): void {
-    this.#renderer.domElement.dataset.tokenCount = String(tokens.length);
-    this.#renderer.domElement.dataset.powerUpCount = String(powerUps.length);
-    this.#renderer.domElement.dataset.bulletCount = String(bullets.length);
+    this.#setRendererData("tokenCount", String(tokens.length));
+    this.#setRendererData("powerUpCount", String(powerUps.length));
+    this.#setRendererData("bulletCount", String(bullets.length));
     this.#cameraRig.update(snake.headPosition, snake.direction, arena, frameDeltaSeconds);
     this.#snakeView.update(snake, arena, false);
-    this.#tokenView.update(tokens, arena, nextToken, elapsedSeconds);
+    this.#tokenView.update(tokens, arena, this.#camera, nextToken, elapsedSeconds);
     this.#powerUpView.update(powerUps, arena, elapsedSeconds);
     this.#bulletView.update(bullets, arena);
     this.#renderer.render(this.#scene, this.#camera);
+    this.#setRendererData("drawCallCount", String(this.#renderer.info.render.calls));
   }
 
   dispose(): void {
@@ -156,8 +162,26 @@ export class PhaseThreeScene {
   readonly #resize = (): void => {
     const width = Math.max(this.#container.clientWidth, 1);
     const height = Math.max(this.#container.clientHeight, 1);
+    const maximumDevicePixelRatio = Math.min(
+      window.devicePixelRatio,
+      APP_CONFIG.scene.maxPixelRatio,
+    );
+    const renderPixelRatio = Math.min(
+      maximumDevicePixelRatio,
+      Math.sqrt(APP_CONFIG.scene.maximumRenderPixelCount / (width * height)),
+    );
+    this.#renderer.setPixelRatio(renderPixelRatio);
     this.#camera.aspect = width / height;
     this.#camera.updateProjectionMatrix();
     this.#renderer.setSize(width, height, false);
+    this.#setRendererData("renderPixelRatio", renderPixelRatio.toFixed(3));
+    this.#setRendererData("renderWidth", String(this.#renderer.domElement.width));
+    this.#setRendererData("renderHeight", String(this.#renderer.domElement.height));
   };
+
+  #setRendererData(key: string, value: string): void {
+    if (this.#renderer.domElement.dataset[key] !== value) {
+      this.#renderer.domElement.dataset[key] = value;
+    }
+  }
 }

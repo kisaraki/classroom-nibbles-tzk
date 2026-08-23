@@ -22,12 +22,14 @@ export class CreditsScreen {
     this.#listener = listener;
     this.#element = createElement("section", "credits-screen");
     this.#element.dataset.testid = "credits-screen";
+    this.#element.setAttribute("role", "dialog");
+    this.#element.setAttribute("aria-modal", "true");
     this.#element.setAttribute("aria-labelledby", "credits-title");
 
     const panel = createElement("div", "credits-screen__panel");
     panel.append(
-      createElement("p", "credits-screen__eyebrow", "任務紀錄 / 08"),
-      createElement("p", "credits-screen__status", "MISSION COMPLETE"),
+      createElement("p", "credits-screen__eyebrow", "任務紀錄 / 09"),
+      createElement("p", "credits-screen__status", "任務完成"),
     );
     const title = createElement("h1", "credits-screen__title", APP_CONFIG.title);
     title.id = "credits-title";
@@ -37,6 +39,11 @@ export class CreditsScreen {
         "p",
         "credits-screen__summary",
         "你已穿越五個環境，完成二十五個單字與每次三連續正確的打字強化。",
+      ),
+      createElement(
+        "p",
+        "credits-screen__version",
+        `NIBBLES ${APP_CONFIG.releaseVersion}`,
       ),
     );
 

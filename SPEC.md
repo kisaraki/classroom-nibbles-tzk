@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 1.2 (Phase 0 dataset integrated)  
+Version: 1.3 (Version 1.0 release hardened)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -112,18 +112,18 @@ Use fixed-step gameplay update at 1/60 sec with accumulator. Clamp frame delta t
 ## 15. Development phases
 
 - Phase 0 — vocabulary source extraction, normalization, validator and audit report. **Completed by supplied files.**
-- Phase 1 — project scaffold: Vite/TypeScript/Three.js/Vitest/Playwright/GitHub Pages, and verify Phase 0 data loads.
-- Phase 2 — snake movement/trail/wrap/solid/self collision.
-- Phase 3 — vocabulary gameplay/selection/token spawning/HUD progress.
-- Phase 4 — typing test.
-- Phase 5 — power-ups and weapon.
-- Phase 6 — cockpit HUD, mini-map and tactical map.
-- Phase 7 — five functional environments.
-- Phase 8 — presentation/audio/transitions/credits.
-- Phase 9 — full QA and release hardening.
+- Phase 1 — project scaffold: Vite/TypeScript/Three.js/Vitest/Playwright/GitHub Pages, and verify Phase 0 data loads. **Completed.**
+- Phase 2 — snake movement/trail/wrap/solid/self collision. **Completed.**
+- Phase 3 — vocabulary gameplay/selection/token spawning/HUD progress. **Completed.**
+- Phase 4 — typing test. **Completed.**
+- Phase 5 — power-ups and weapon. **Completed.**
+- Phase 6 — cockpit HUD, mini-map and tactical map. **Completed.**
+- Phase 7 — five functional environments. **Completed.**
+- Phase 8 — presentation/audio/transitions/credits. **Completed.**
+- Phase 9 — full QA and release hardening. **Completed for Version 1.0.**
 
 Do not start the next phase until the current phase passes typecheck, tests and build.
 
 ## 16. Definition of Done for Version 1.x
 
-A player can choose CEEC vocabulary mode, complete all five game scenes, collect target characters in order, experience length rewards/penalties without collision death, use radar/power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. Vocabulary validation, unit tests, E2E tests, production build and GitHub Pages deployment all pass.
+A player can choose CEEC vocabulary mode, complete all five game scenes, collect target characters in order, experience length rewards/penalties without collision death, use radar/power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. A main-timer failure has a Chinese, keyboard-accessible route back to mission settings. Vocabulary validation, unit tests, 1920×1080 performance/accessibility E2E tests, production build, release-artifact budgets and GitHub Pages deployment all pass.

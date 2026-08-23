@@ -29,6 +29,7 @@ import { BootScreen } from "../ui/BootScreen";
 import { AudioControl } from "../ui/AudioControl";
 import { CockpitOverlay } from "../ui/CockpitOverlay";
 import { CreditsScreen } from "../ui/CreditsScreen";
+import { FailureScreen } from "../ui/FailureScreen";
 import { PhaseThreePanel } from "../ui/PhaseThreePanel";
 import { RadarMap } from "../ui/RadarMap";
 import { TypingTestModal } from "../ui/TypingTestModal";
@@ -40,7 +41,12 @@ import {
 import { RecentTargetHistory } from "../vocabulary/RecentTargetHistory";
 import { VocabularyRepository } from "../vocabulary/VocabularyRepository";
 import { WordSelector } from "../vocabulary/WordSelector";
-import { GAMEPLAY_CONFIG, getVocabularyUrl } from "./Config";
+import {
+  APP_CONFIG,
+  GAMEPLAY_CONFIG,
+  PRESENTATION_CONFIG,
+  getVocabularyUrl,
+} from "./Config";
 import { FixedStepRunner } from "./FixedStepRunner";
 import { createGameStateMachine, GameState } from "./GameState";
 import { PauseController, PauseReason } from "./PauseController";
@@ -102,10 +108,14 @@ export class Game {
   #typingTest: TypingTestSession | null = null;
   #typingModal: TypingTestModal | null = null;
   #creditsScreen: CreditsScreen | null = null;
+  #failureScreen: FailureScreen | null = null;
   #timer: THREE.Timer | null = null;
+  #lastTelemetryUpdateSeconds = Number.NEGATIVE_INFINITY;
 
   constructor(container: HTMLElement) {
     this.#container = container;
+    this.#container.dataset.gameState = GameState.BOOT;
+    this.#container.dataset.releaseVersion = APP_CONFIG.releaseVersion;
     this.#bootScreen = new BootScreen(container);
     this.#transitionOverlay = new TransitionOverlay(container);
     this.#pauseController = new PauseController(
@@ -172,11 +182,16 @@ export class Game {
   }
 
   readonly #startRun = (selection: VocabularySelection): void => {
-    if (!this.#repository || !this.#selectionScreen) return;
+    if (
+      !this.#repository ||
+      !this.#selectionScreen ||
+      this.#stateMachine.state !== GameState.VOCABULARY_SELECT
+    ) return;
     try {
       this.#disposeRunPresentation();
       this.#snake.resetPose({ length: GAMEPLAY_CONFIG.snake.initialLength });
       this.#fixedStepRunner.reset();
+      this.#lastTelemetryUpdateSeconds = Number.NEGATIVE_INFINITY;
       const selector = new WordSelector(this.#repository.eligibleEntries);
       const plan = selector.createRun(
         selection.mode,
@@ -299,42 +314,47 @@ export class Game {
       },
     );
 
-    const gameplayStatus = this.#gameplay?.status;
+    const elapsedSeconds = this.#timer.getElapsed();
+    const tokens = this.#gameplay?.tokenEntities ?? [];
+    const powerUps = this.#powerUpWeapon?.powerUpEntities ?? [];
+    const bullets = this.#powerUpWeapon?.bulletEntities ?? [];
     this.#scene.render(
       this.#snake,
       this.#arena,
-      this.#gameplay?.tokenEntities ?? [],
-      this.#powerUpWeapon?.powerUpEntities ?? [],
-      this.#powerUpWeapon?.bulletEntities ?? [],
-      gameplayStatus?.nextToken ?? null,
-      this.#timer.getElapsed(),
+      tokens,
+      powerUps,
+      bullets,
+      this.#gameplay?.nextToken ?? null,
+      elapsedSeconds,
       frameDeltaSeconds,
     );
+    if (
+      elapsedSeconds - this.#lastTelemetryUpdateSeconds <
+      PRESENTATION_CONFIG.telemetryUpdateIntervalSeconds
+    ) return;
+    this.#lastTelemetryUpdateSeconds = elapsedSeconds;
+
+    const gameplayStatus = this.#gameplay?.status;
     if (gameplayStatus && this.#powerUpWeapon) {
       this.#radarMap?.update({
         snakeSegments: this.#snake.getSegmentPositions(),
         snakeDirection: this.#snake.direction,
-        tokens: this.#gameplay?.tokenEntities ?? [],
-        powerUps: this.#powerUpWeapon.powerUpEntities,
-        bullets: this.#powerUpWeapon.bulletEntities,
+        tokens,
+        powerUps,
+        bullets,
         obstacles: this.#environment.obstacles,
         nextToken: gameplayStatus.nextToken,
       });
     }
-    if (gameplayStatus && this.#powerUpWeapon) {
-      this.#panel?.update(
-        gameplayStatus,
-        this.#snakeSimulation.status,
-        this.#powerUpWeapon.status,
-        this.#environment.current,
-      );
-    }
+    this.#updatePanel(gameplayStatus);
   };
 
   readonly #onStateChange = (
     current: ReturnType<typeof createGameStateMachine>["state"],
     previous: ReturnType<typeof createGameStateMachine>["state"],
   ): void => {
+    this.#container.dataset.gameState = current;
+    this.#updatePanel(this.#gameplay?.status);
     this.#radarMap?.setExpanded(
       current === GameState.MAP_EXPANDED,
       current === GameState.MAP_EXPANDED ? this.#tacticalMapController.timeScale : 1,
@@ -359,6 +379,26 @@ export class Game {
       return;
     }
     if (previous === GameState.TYPING_TEST) this.#stopTypingTest();
+    if (current === GameState.LEVEL_FAILED) {
+      this.#input.detach();
+      this.#weaponInput.detach();
+      this.#audio.play(SoundCue.LEVEL_FAILED);
+      const status = this.#gameplay?.status;
+      if (status) {
+        this.#failureScreen?.dispose();
+        this.#failureScreen = new FailureScreen(
+          this.#container,
+          {
+            gameLevel: status.gameLevel,
+            sceneName: status.sceneName,
+            wordNumber: status.wordNumber,
+            totalWords: status.totalWords,
+          },
+          this.#returnToSelection,
+        );
+      }
+      return;
+    }
     if (current === GameState.GAME_CLEAR) {
       this.#input.detach();
       this.#weaponInput.detach();
@@ -380,6 +420,18 @@ export class Game {
       this.#weaponInput.attach();
     }
   };
+
+  #updatePanel(
+    gameplayStatus: VocabularyGameplaySession["status"] | undefined,
+  ): void {
+    if (!gameplayStatus || !this.#powerUpWeapon) return;
+    this.#panel?.update(
+      gameplayStatus,
+      this.#snakeSimulation.status,
+      this.#powerUpWeapon.status,
+      this.#environment.current,
+    );
+  }
 
   readonly #onVisibilityChange = (): void => {
     this.#updateTypingTest(performance.now());
@@ -444,7 +496,10 @@ export class Game {
   }
 
   readonly #returnToSelection = (): void => {
-    if (this.#stateMachine.state !== GameState.CREDITS) return;
+    if (
+      this.#stateMachine.state !== GameState.CREDITS &&
+      this.#stateMachine.state !== GameState.LEVEL_FAILED
+    ) return;
     this.#disposeRunPresentation();
     this.#stateMachine.transition(GameState.MAIN_MENU);
     this.#stateMachine.transition(GameState.VOCABULARY_SELECT);
@@ -460,10 +515,12 @@ export class Game {
     this.#cockpitOverlay?.dispose();
     this.#radarMap?.dispose();
     this.#creditsScreen?.dispose();
+    this.#failureScreen?.dispose();
     this.#panel = null;
     this.#cockpitOverlay = null;
     this.#radarMap = null;
     this.#creditsScreen = null;
+    this.#failureScreen = null;
     this.#gameplay = null;
     this.#powerUpWeapon = null;
   }

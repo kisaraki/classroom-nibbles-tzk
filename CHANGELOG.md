@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## Version 1.0 / Phase 9 — 2026-08-23
+
+### Added
+- A Traditional Chinese `LEVEL_FAILED` mission report with alert-dialog semantics, focused return action, scene/progress context and a non-lethal rules reminder, eliminating the expired-timer dead end.
+- Release-state regression tests covering the full success-to-credits/replay route, the stun/recovery/failure exit and the typing-test pause prohibition.
+- A production artifact verifier for repository-subpath-safe references, required runtime data/assets and JavaScript/CSS size budgets; CI and GitHub Pages now run it after every production build.
+- Chromium release gates for 1920×1080 frame rate, draw calls, internal render budget, browser/network errors, Traditional Chinese accessible names, focus, unique IDs and pause/resume state.
+- Version 1.0 metadata and a repository-safe SVG favicon.
+
+### Changed
+- Batched all 30 token billboards into one dynamic texture-atlas mesh, reduced live telemetry DOM updates to 10 Hz and exposed render diagnostics for repeatable performance checks.
+- Added a dynamic 800×450 internal pixel budget, high-performance WebGL preference and lower-cost live overlays while keeping the cockpit canvas at full viewport size.
+- Added explicit release-version and game-state diagnostics to the application root and replaced the remaining English completion status with Traditional Chinese.
+- Added bounded timeouts to CI and Pages jobs and advanced browser metadata, accessibility text, default seed and visible phase markers to Phase 9.
+
+### Fixed
+- Prevented duplicate start actions outside `VOCABULARY_SELECT` and disposed both success and failure terminal presentation before replay.
+- Refreshed the Chinese simulation-state indicator immediately on pause/resume so visibility-triggered pauses cannot leave stale telemetry when the render timer is suspended.
+- Preserved all core mechanics during release hardening, including non-lethal collision recovery, snake length rewards/penalties, three consecutive typing successes, independent Game/Vocabulary levels, active tactical-map simulation and the complete mini-map trail.
+
 ## Phase 8 — 2026-08-22
 
 ### Added

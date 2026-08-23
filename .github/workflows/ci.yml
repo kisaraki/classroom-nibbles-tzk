@@ -10,6 +10,7 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -28,9 +29,12 @@ jobs:
         run: npm run test
       - name: Build production app
         run: npm run build
+      - name: Verify release artifact
+        run: npm run verify:release
 
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v7

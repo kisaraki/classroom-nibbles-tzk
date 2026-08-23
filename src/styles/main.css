@@ -67,7 +67,6 @@ body {
   background: rgb(5 13 27 / 88%);
   box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 38%);
   pointer-events: none;
-  backdrop-filter: blur(16px);
 }
 
 .cockpit-overlay {
@@ -429,7 +428,6 @@ body {
   font: 0.64rem ui-monospace, "Cascadia Code", monospace;
   letter-spacing: 0.1em;
   cursor: pointer;
-  backdrop-filter: blur(12px);
 }
 
 .audio-control[data-muted="true"] {
@@ -604,6 +602,13 @@ body {
   line-height: 1.7;
 }
 
+.credits-screen__version {
+  margin: 0.65rem 0 0;
+  color: var(--accent);
+  font: 0.62rem ui-monospace, "Cascadia Code", monospace;
+  letter-spacing: 0.14em;
+}
+
 .credits-screen__metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -663,6 +668,94 @@ body {
   outline: none;
   background: var(--accent);
   color: #03100e;
+}
+
+.failure-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  padding: clamp(1rem, 5vw, 5rem);
+  overflow: auto;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 38%, rgb(255 142 142 / 14%), transparent 38%),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgb(255 142 142 / 2%) 3px 4px),
+    rgb(2 8 17 / 94%);
+  backdrop-filter: blur(18px);
+}
+
+.failure-screen__panel {
+  width: min(42rem, 100%);
+  padding: clamp(1.4rem, 5vw, 3.5rem);
+  border: 1px solid rgb(255 142 142 / 38%);
+  background: rgb(12 12 25 / 94%);
+  box-shadow: 0 2rem 8rem rgb(0 0 0 / 65%);
+  text-align: center;
+}
+
+.failure-screen__eyebrow,
+.failure-screen__status,
+.failure-screen__scene,
+.failure-screen__progress,
+.failure-screen__exit {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  letter-spacing: 0.11em;
+}
+
+.failure-screen__eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.62rem;
+}
+
+.failure-screen__status {
+  margin: 0.7rem 0;
+  color: var(--error);
+  font-size: 0.76rem;
+}
+
+.failure-screen__title {
+  margin: 0;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+}
+
+.failure-screen__scene {
+  margin: 0.8rem 0 0;
+  color: var(--error);
+  font-size: 0.72rem;
+}
+
+.failure-screen__description {
+  max-width: 32rem;
+  margin: 1.25rem auto 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.failure-screen__progress {
+  margin: 1rem 0 0;
+  color: #e9fff9;
+  font-size: 0.66rem;
+}
+
+.failure-screen__exit {
+  margin-top: 1.6rem;
+  padding: 0.85rem 1.2rem;
+  border: 1px solid var(--error);
+  background: rgb(255 142 142 / 12%);
+  color: var(--error);
+  cursor: pointer;
+  font-size: 0.68rem;
+}
+
+.failure-screen__exit:hover,
+.failure-screen__exit:focus-visible {
+  outline: none;
+  background: var(--error);
+  color: #160609;
 }
 
 .vocabulary-select {
