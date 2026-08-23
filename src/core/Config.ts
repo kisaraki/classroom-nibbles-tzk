@@ -2,7 +2,7 @@ import type { GameLevel } from "../vocabulary/WordSelector";
 
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  releaseVersion: "1.6.0",
+  releaseVersion: "1.7.0",
   phaseLabel: "第九階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
@@ -66,7 +66,6 @@ export const GAMEPLAY_CONFIG = Object.freeze({
   tableMotion: Object.freeze({
     tiltAngleRadians: Math.PI / 90,
     tiltSlideSpeed: 1.65,
-    shakeDurationSeconds: 2,
     shakeDisplacementSpeed: 7.2,
     shakeAngleRadians: Math.PI / 72,
     shakeLift: 0.24,

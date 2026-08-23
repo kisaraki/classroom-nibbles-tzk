@@ -96,23 +96,21 @@ describe("TableMotionSystem", () => {
     expect(fixture.snake.headPosition.x).toBeLessThan(releasedHeadX);
   });
 
-  it("runs one deterministic two-second shake when both Shift keys are pressed", () => {
+  it("shakes deterministically for as long as both Shift keys remain held", () => {
     const first = createFixture("same-seed");
     const second = createFixture("same-seed");
     const initialHead = first.snake.headPosition;
     const initialToken = first.tokenPool.entities[0]!.position;
 
     for (const fixture of [first, second]) {
-      fixture.system.setControls({ leftLifted: true, rightLifted: false });
       fixture.system.setControls({ leftLifted: true, rightLifted: true });
       expect(fixture.system.status.mode).toBe(TableMotionMode.SHAKE);
-      for (let index = 0; index < 120; index += 1) {
+      for (let index = 0; index < 180; index += 1) {
         fixture.system.update(1 / 60);
       }
+      expect(fixture.system.status.mode).toBe(TableMotionMode.SHAKE);
     }
 
-    expect(first.system.status.shakeRemainingSeconds).toBeCloseTo(0);
-    expect(first.system.status.mode).toBe(TableMotionMode.LEVEL);
     expect(first.snake.headPosition).toEqual(second.snake.headPosition);
     expect(first.tokenPool.entities.map((entity) => entity.position)).toEqual(
       second.tokenPool.entities.map((entity) => entity.position),
@@ -120,11 +118,14 @@ describe("TableMotionSystem", () => {
     expect(first.snake.headPosition).not.toEqual(initialHead);
     expect(first.tokenPool.entities[0]!.position).not.toEqual(initialToken);
 
+    first.system.setControls({ leftLifted: false, rightLifted: false });
+    const releasedHead = first.snake.headPosition;
     first.system.update(1);
     expect(first.system.status.mode).toBe(TableMotionMode.LEVEL);
+    expect(first.snake.headPosition).toEqual(releasedHead);
   });
 
-  it("does not move the world or consume shake time while paused", () => {
+  it("does not move the world while a held shake is paused", () => {
     const fixture = createFixture();
     fixture.system.setControls({ leftLifted: true, rightLifted: true });
     fixture.stateMachine.transition(GameState.PAUSED);
@@ -133,6 +134,6 @@ describe("TableMotionSystem", () => {
     fixture.system.update(1);
 
     expect(fixture.snake.headPosition).toEqual(before);
-    expect(fixture.system.status.shakeRemainingSeconds).toBe(2);
+    expect(fixture.system.status.mode).toBe(TableMotionMode.SHAKE);
   });
 });

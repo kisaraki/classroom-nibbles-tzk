@@ -16,7 +16,6 @@ const ACTIVE_WORLD_STATES = new Set<GameStateValue>([
   GameState.RECOVERY,
 ]);
 const TAU = Math.PI * 2;
-const TIME_EPSILON_SECONDS = 1e-9;
 
 export const TableMotionMode = Object.freeze({
   LEVEL: "LEVEL",
@@ -31,7 +30,6 @@ export type TableMotionMode =
 export interface TableMotionConfig {
   readonly tiltAngleRadians: number;
   readonly tiltSlideSpeed: number;
-  readonly shakeDurationSeconds: number;
   readonly shakeDisplacementSpeed: number;
   readonly shakeAngleRadians: number;
   readonly shakeLift: number;
@@ -40,7 +38,6 @@ export interface TableMotionConfig {
 
 export interface TableMotionStatus extends TableMotionControls {
   readonly mode: TableMotionMode;
-  readonly shakeRemainingSeconds: number;
   readonly tiltRadians: number;
   readonly shakeAngleRadians: number;
   readonly shakeLift: number;
@@ -60,8 +57,6 @@ export class TableMotionSystem {
   readonly #obstacles: TableMotionObstacleProvider;
   #leftLifted = false;
   #rightLifted = false;
-  #bothHeld = false;
-  #shakeRemainingSeconds = 0;
   #cachedStatus: TableMotionStatus | null = null;
 
   constructor(
@@ -78,7 +73,6 @@ export class TableMotionSystem {
     if (
       config.tiltAngleRadians <= 0 ||
       config.tiltSlideSpeed <= 0 ||
-      config.shakeDurationSeconds <= 0 ||
       config.shakeDisplacementSpeed <= 0 ||
       config.shakeAngleRadians <= 0 ||
       config.shakeLift <= 0 ||
@@ -104,7 +98,6 @@ export class TableMotionSystem {
       mode,
       leftLifted: this.#leftLifted,
       rightLifted: this.#rightLifted,
-      shakeRemainingSeconds: this.#shakeRemainingSeconds,
       tiltRadians:
         mode === TableMotionMode.TILT_LEFT
           ? -this.#config.tiltAngleRadians
@@ -118,25 +111,14 @@ export class TableMotionSystem {
   }
 
   setControls(controls: TableMotionControls): void {
-    const bothHeld = controls.leftLifted && controls.rightLifted;
     this.#leftLifted = controls.leftLifted;
     this.#rightLifted = controls.rightLifted;
-    if (
-      bothHeld &&
-      !this.#bothHeld &&
-      ACTIVE_WORLD_STATES.has(this.#stateMachine.state)
-    ) {
-      this.#shakeRemainingSeconds = this.#config.shakeDurationSeconds;
-    }
-    this.#bothHeld = bothHeld;
     this.#cachedStatus = null;
   }
 
   reset(): void {
     this.#leftLifted = false;
     this.#rightLifted = false;
-    this.#bothHeld = false;
-    this.#shakeRemainingSeconds = 0;
     this.#cachedStatus = null;
   }
 
@@ -148,17 +130,8 @@ export class TableMotionSystem {
       return;
     }
 
-    if (this.#shakeRemainingSeconds > 0) {
-      const activeSeconds = Math.min(deltaSeconds, this.#shakeRemainingSeconds);
-      this.#applyShake(activeSeconds);
-      const remaining = Math.max(
-        0,
-        this.#shakeRemainingSeconds - deltaSeconds,
-      );
-      this.#shakeRemainingSeconds = remaining <= TIME_EPSILON_SECONDS
-        ? 0
-        : remaining;
-      this.#cachedStatus = null;
+    if (this.#leftLifted && this.#rightLifted) {
+      this.#applyShake(deltaSeconds);
       return;
     }
 
@@ -171,7 +144,7 @@ export class TableMotionSystem {
   }
 
   get #mode(): TableMotionMode {
-    if (this.#shakeRemainingSeconds > 0) return TableMotionMode.SHAKE;
+    if (this.#leftLifted && this.#rightLifted) return TableMotionMode.SHAKE;
     if (this.#leftLifted && !this.#rightLifted) return TableMotionMode.TILT_LEFT;
     if (this.#rightLifted && !this.#leftLifted) return TableMotionMode.TILT_RIGHT;
     return TableMotionMode.LEVEL;

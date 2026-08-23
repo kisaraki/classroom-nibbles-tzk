@@ -108,7 +108,7 @@ function tableMotionLabel(status: TableMotionStatus): string {
   if (status.mode === TableMotionMode.TILT_LEFT) return "桌面：左側抬高";
   if (status.mode === TableMotionMode.TILT_RIGHT) return "桌面：右側抬高";
   if (status.mode === TableMotionMode.SHAKE) {
-    return `桌面：震動中 ${status.shakeRemainingSeconds.toFixed(1)} 秒`;
+    return "桌面：持續震動中";
   }
   return "桌面：水平";
 }
@@ -202,7 +202,7 @@ export class GameHud {
     const controls = createElement(
       "p",
       "game-hud__controls",
-      "WASD / 方向鍵依玩家視角移動 · 左／右 Shift 傾桌 · 雙 Shift 震桌 2 秒 · J 頭尾反轉脫困 · 空白鍵發射 · P 暫停",
+      "WASD / 方向鍵依玩家視角移動 · 左／右 Shift 傾桌 · 按住雙 Shift 持續震桌 · J 頭尾反轉脫困 · 空白鍵發射 · P 暫停",
     );
     this.#element.append(
       heading,

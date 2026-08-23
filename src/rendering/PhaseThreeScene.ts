@@ -224,7 +224,6 @@ export class PhaseThreeScene {
       }
       this.#setRendererData("tableMotion", mode);
       this.#setRendererData("tableTiltRadians", "0.0000");
-      this.#setRendererData("shakeRemaining", "0.000");
       return;
     }
     const shaking = mode === TableMotionMode.SHAKE;
@@ -272,10 +271,6 @@ export class PhaseThreeScene {
     this.#setRendererData(
       "tableTiltRadians",
       this.#tableGroup.rotation.z.toFixed(4),
-    );
-    this.#setRendererData(
-      "shakeRemaining",
-      (status?.shakeRemainingSeconds ?? 0).toFixed(3),
     );
   }
 

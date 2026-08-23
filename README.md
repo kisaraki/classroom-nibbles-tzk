@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D pinball-table vocabulary game based on
 
 ## Current status
 
-Version 1.6 is complete. It adds physical left/right table tilt and a deterministic two-second table shake while retaining the integrated transparent HUD, fixed pinball-table camera and native device-resolution rendering.
+Version 1.7 is complete. It provides physical left/right table tilt and a deterministic table shake that continues while both Shift keys are held, while retaining the integrated transparent HUD, fixed pinball-table camera and native device-resolution rendering.
 
 ## Requirements
 
@@ -19,15 +19,15 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the Version 1.6 vocabulary run.
+Vite prints the local development URL. Choose a vocabulary mode and deterministic seed, then start the Version 1.7 vocabulary run.
 
-## Version 1.6 gameplay and controls
+## Version 1.7 gameplay and controls
 
 - Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
 - A seed creates a reproducible five-scene × five-word run without repeated ids or targets.
 - `W`/`↑`, `S`/`↓`, `A`/`←` and `D`/`→` always mean player-view forward (north/away from the player), backward (south/toward the player), left and right. These meanings never rotate with the machine nose. When the requested player-view direction is directly opposite the current heading, the snake completes it through a safe two-corner turn after one segment spacing.
 - Hold left `Shift` to raise the left edge of the table by 2 degrees and slide movable tabletop objects toward player-view right; hold right `Shift` to raise the right edge and slide them toward player-view left. Gravity stops when that Shift key is released.
-- Press both physical Shift keys together to shake the table for exactly two seconds. The snake, tokens, power-ups and active bullets receive independent seeded displacements while the full table visibly wobbles and bounces. Releasing Shift does not cancel the two-second shake, and holding both keys does not repeatedly trigger it.
+- Hold both physical Shift keys together to keep shaking the table. The snake, tokens, power-ups and active bullets receive independent seeded displacements while the full table visibly wobbles and bounces. Releasing either Shift immediately stops the shake and resumes the remaining single-side tilt; releasing both returns the table to level.
 - Table displacement respects solid walls, wrap gates and environment obstacles without introducing collision death. It remains active through the normal hunting/stun/recovery world, freezes while paused, and resets outside gameplay.
 - Press `J` for an escape backflip: the current tail becomes the new head, the preserved body path reverses, and the new nose points outward along the tail tangent. Only the snake head and leading body perform the visible rotation; the camera and entire screen remain fixed. The maneuver is available while hunting and as the one allowed recovery escape turn, but not while stunned.
 - Rapid double-corner input cannot fold the head back into the snake: a U-shaped second turn is accepted only after moving at least one 0.75-unit segment spacing. Recovery still permits one stationary escape turn.
@@ -112,7 +112,7 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 - Phase 7 tests cover all five environment profiles, obstacle-safe arena capacity, level switching, safe pose reset, non-lethal obstacle collision and projectile blocking.
 - Phase 8 tests cover synthesized cue/ambient definitions, mute persistence, token/power-up/impact event routing, exact-state pause/resume, hidden-page auto-pause, door transitions and credits/replay presentation.
 - Phase 9 tests cover successful and failed state-machine exits, the Chinese failure dialog and focus, release metadata, unique IDs, accessible names, asset/network errors, draw-call and render-resolution budgets, and the 30 FPS minimum at 1920×1080.
-- Version 1.6 tests cover physical Shift-key distinction, rigid whole-snake translation, directional table gravity, deterministic two-second shaking, pause behavior, tabletop status telemetry and browser-visible entity displacement. Version 1.5 coverage for radar removal, integrated HUD, native device resolution and fixed-camera mecha backflips remains active.
+- Version 1.7 tests cover physical Shift-key distinction, rigid whole-snake translation, directional table gravity, deterministic continuous shaking while both keys remain held, immediate release behavior, pause behavior, tabletop status telemetry and browser-visible entity displacement. Version 1.5 coverage for radar removal, integrated HUD, native device resolution and fixed-camera mecha backflips remains active.
 - Playwright also checks vocabulary selection, independent Game/Vocabulary labels, the Cargo Bay environment and obstacle markers, the 30-token and five-power-up scene, integrated HUD, steering/firing rules, pause behavior, typing-modal submission and modal-scoped clipboard blocking.
 - `.github/workflows/ci.yml` runs typecheck, vocabulary validation, unit tests, production build, artifact verification and isolated Chromium E2E jobs on pushes and pull requests.
 - `.github/workflows/deploy-pages.yml` repeats the release gates before deploying `dist/` through official GitHub Pages actions on `main`.
@@ -135,4 +135,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract. Phase 9 remains complete and NIBBLES Version 1.6 is release-ready.
+See `SPEC.md` for the full product contract. Phase 9 remains complete and NIBBLES Version 1.7 is release-ready.

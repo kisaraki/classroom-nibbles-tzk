@@ -57,7 +57,7 @@ test("左右 Shift 分別抬高單側桌面，放開後停止側向重力", asyn
   await expect(page.getByTestId("table-motion-status")).toHaveText("桌面：水平");
 });
 
-test("左右 Shift 同時按下會讓機體與桌面物品震動位移整整兩秒", async ({ page }) => {
+test("左右 Shift 同時按住會持續震桌，放開任一鍵立即停止", async ({ page }) => {
   await startRun(page);
   const canvas = page.getByTestId("phase-three-canvas");
   const initialTokenChecksum = await canvas.getAttribute(
@@ -68,21 +68,22 @@ test("左右 Shift 同時按下會讓機體與桌面物品震動位移整整兩�
   await shift(page, "keydown", "ShiftRight");
   await expect(canvas).toHaveAttribute("data-table-motion", "SHAKE");
   await expect(page.getByTestId("table-motion-status")).toContainText(
-    "桌面：震動中",
+    "桌面：持續震動中",
   );
-  await shift(page, "keyup", "ShiftLeft");
-  await shift(page, "keyup", "ShiftRight");
 
-  await page.waitForTimeout(450);
+  await page.waitForTimeout(2_250);
+  await expect(canvas).toHaveAttribute("data-table-motion", "SHAKE");
   expect(await canvas.getAttribute("data-token-position-checksum")).not.toBe(
     initialTokenChecksum,
   );
-  await page.waitForTimeout(700);
-  await expect(canvas).toHaveAttribute("data-table-motion", "SHAKE");
 
-  await expect(canvas).toHaveAttribute("data-table-motion", "LEVEL", {
-    timeout: 1_500,
-  });
-  await expect(canvas).toHaveAttribute("data-shake-remaining", "0.000");
+  await shift(page, "keyup", "ShiftRight");
+  await expect(canvas).toHaveAttribute("data-table-motion", "TILT_LEFT");
+  await expect(page.getByTestId("table-motion-status")).toHaveText(
+    "桌面：左側抬高",
+  );
+
+  await shift(page, "keyup", "ShiftLeft");
+  await expect(canvas).toHaveAttribute("data-table-motion", "LEVEL");
   await expect(page.getByTestId("table-motion-status")).toHaveText("桌面：水平");
 });

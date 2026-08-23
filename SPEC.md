@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 1.9 (Version 1.6 physical table tilt and shake controls)
+Version: 2.0 (Version 1.7 hold-to-shake table controls)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -36,7 +36,7 @@ Default configuration: initial length 8, min 3, max 40, segment spacing 0.75 wor
 
 Pressing `J` performs an escape backflip by making the current tail the new head and reversing the existing body trail. The new head points away from the body along the tail tangent, so the maneuver changes the nose direction without folding inward or teleporting individual body segments. It is accepted in `HUNTING` and as the one permitted stationary turn in `RECOVERY`; it is rejected in `STUNNED` and all non-gameplay states. Repeated input is locked out for the duration of the mecha animation.
 
-Physical table controls are independent from the machine heading. Holding physical left `Shift` raises the left edge by 2 degrees and applies gravity toward player-view right (+X) until release. Holding physical right `Shift` raises the right edge by 2 degrees and applies gravity toward player-view left (−X) until release. Pressing both physical Shift keys together triggers one seeded, reproducible two-second table shake; releasing either or both keys does not shorten that shake, and keeping both held does not retrigger it until at least one side is released and both are pressed together again.
+Physical table controls are independent from the machine heading. Holding physical left `Shift` raises the left edge by 2 degrees and applies gravity toward player-view right (+X) until release. Holding physical right `Shift` raises the right edge by 2 degrees and applies gravity toward player-view left (−X) until release. Holding both physical Shift keys together produces a seeded, reproducible table shake for exactly as long as both keys remain held. Releasing either key immediately ends the shake and resumes the remaining single-side tilt, if any; releasing both returns the table to level.
 
 Tilt and shake translate every movable tabletop gameplay entity: the complete snake as one rigid trail, character tokens, power-ups and active bullets. A shake also presents visible tabletop wobble and bounce. Table displacement respects SOLID boundaries and environment obstacles and uses WRAP presentation on wrap axes; it does not create a collision-death path or a new main game state. It operates only while the normal gameplay world is active (`HUNTING`, `STUNNED`, `RECOVERY`), freezes with pause, and resets for transitions, typing and terminal screens. Propulsion, turning and firing retain their existing stun/recovery restrictions; external table gravity may still displace the machine.
 

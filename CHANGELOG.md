@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## Version 1.7 — 2026-08-23
+
+### Changed
+- Changed dual-Shift table shaking from a latched two-second action to a hold action that continues for as long as both physical Shift keys remain pressed.
+- Releasing either Shift now ends the shake immediately and resumes the remaining single-side tilt; releasing both returns the table to level.
+- Removed the obsolete shake countdown from gameplay state, renderer diagnostics and the Traditional Chinese HUD, and updated release metadata and documentation to Version 1.7.
+
+### Added
+- Added deterministic unit and Chromium coverage proving shaking remains active beyond two seconds while held and stops immediately when either Shift is released.
+
 ## Version 1.6 — 2026-08-23
 
 ### Added
