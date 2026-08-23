@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## Version 1.4 — 2026-08-23
+
+### Fixed
+- Made tactical-radar requests during scene entry, stun and recovery queue visibly and open automatically when hunting resumes, eliminating the former silent no-op window.
+- Added resize observation so both radar sizes redraw correctly after layout, viewport and device-resolution changes.
+
+### Changed
+- Moved the `J` escape backflip animation from the full-screen camera to the snake head and leading body while keeping the pinball-table camera fixed.
+- Removed the 960×540 WebGL buffer cap and the radar's 2× cap; both canvases now use the full automatically detected device pixel ratio.
+- Kept native-resolution performance above the 30 FPS release floor by using a lightweight full-screen floor shader while retaining lit mecha, wall and obstacle materials.
+- Added player-view direction labels and the next required token to the expanded radar.
+
+### Added
+- Unit and Chromium coverage for queued radar opening, uncapped device-pixel-ratio detection, the fixed camera, mecha-only animation scope and native render-buffer dimensions.
+
 ## Version 1.3 — 2026-08-23
 
 ### Changed

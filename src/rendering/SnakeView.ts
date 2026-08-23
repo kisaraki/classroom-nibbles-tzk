@@ -3,24 +3,21 @@ import { APP_CONFIG, GAMEPLAY_CONFIG } from "../core/Config";
 import { Arena } from "../gameplay/Arena";
 import { directionVector } from "../gameplay/Direction";
 import { Snake } from "../gameplay/Snake";
+import { MechaBackflipAnimator } from "./MechaBackflipAnimator";
 
 export class SnakeView {
   readonly #headGeometry = new THREE.SphereGeometry(0.36, 18, 12);
-  readonly #headMaterial = new THREE.MeshStandardMaterial({
+  readonly #headMaterial = new THREE.MeshLambertMaterial({
     color: APP_CONFIG.scene.snakeHeadColor,
     emissive: 0x174a42,
-    metalness: 0.65,
-    roughness: 0.22,
   });
   readonly #bodyGeometry = new THREE.SphereGeometry(0.3, 14, 10);
-  readonly #bodyMaterial = new THREE.MeshStandardMaterial({
+  readonly #bodyMaterial = new THREE.MeshLambertMaterial({
     color: APP_CONFIG.scene.snakeBodyColor,
     emissive: 0x082d2b,
-    metalness: 0.5,
-    roughness: 0.32,
   });
   readonly #noseGeometry = new THREE.OctahedronGeometry(0.13);
-  readonly #noseMaterial = new THREE.MeshStandardMaterial({
+  readonly #noseMaterial = new THREE.MeshLambertMaterial({
     color: 0xffffff,
     emissive: 0x86ffe1,
     emissiveIntensity: 1.8,
@@ -33,32 +30,64 @@ export class SnakeView {
     GAMEPLAY_CONFIG.snake.maximumLength - 1,
   );
   readonly #matrix = new THREE.Matrix4();
+  readonly #backflip = new MechaBackflipAnimator(
+    APP_CONFIG.scene.mechaBackflipDurationSeconds,
+  );
+  readonly #backflipAxis = new THREE.Vector3();
 
   constructor(scene: THREE.Scene) {
     this.#body.count = 0;
     scene.add(this.#body, this.#head, this.#nose);
   }
 
-  update(snake: Snake, arena: Arena, showHead = true): void {
+  get backflipActive(): boolean {
+    return this.#backflip.active;
+  }
+
+  get backflipProgress(): number {
+    return this.#backflip.progress;
+  }
+
+  triggerBackflip(): boolean {
+    return this.#backflip.trigger();
+  }
+
+  update(
+    snake: Snake,
+    arena: Arena,
+    showHead = true,
+    deltaSeconds = 0,
+  ): void {
+    this.#backflip.update(deltaSeconds);
+    const pose = this.#backflip.pose;
     const segments = snake.getSegmentPositions();
     const head = arena.toDisplayPoint(segments[0] ?? snake.headPosition);
-    this.#head.position.set(head.x, 0.4, head.z);
+    this.#head.position.set(head.x, 0.4 + pose.lift, head.z);
     this.#head.visible = showHead;
 
     const forward = directionVector(snake.direction);
-    const nosePosition = arena.toDisplayPoint({
-      x: snake.headPosition.x + forward.x * 0.38,
-      z: snake.headPosition.z + forward.z * 0.38,
-    });
-    this.#nose.position.set(nosePosition.x, 0.42, nosePosition.z);
+    const noseForwardOffset = Math.cos(pose.rotationRadians) * 0.38;
+    this.#nose.position.set(
+      head.x + forward.x * noseForwardOffset,
+      0.42 + pose.lift - Math.sin(pose.rotationRadians) * 0.38,
+      head.z + forward.z * noseForwardOffset,
+    );
     this.#nose.visible = showHead;
+    this.#backflipAxis.set(forward.z, 0, -forward.x).normalize();
+    this.#head.quaternion.setFromAxisAngle(this.#backflipAxis, pose.rotationRadians);
+    this.#nose.quaternion.copy(this.#head.quaternion);
 
     this.#body.count = Math.max(segments.length - 1, 0);
     for (let index = 1; index < segments.length; index += 1) {
       const segment = segments[index];
       if (!segment) continue;
       const displayPosition = arena.toDisplayPoint(segment);
-      this.#matrix.makeTranslation(displayPosition.x, 0.34, displayPosition.z);
+      const leadingBodyWeight = Math.max(0, 1 - index / 4);
+      this.#matrix.makeTranslation(
+        displayPosition.x,
+        0.34 + pose.lift * leadingBodyWeight,
+        displayPosition.z,
+      );
       this.#body.setMatrixAt(index - 1, this.#matrix);
     }
     this.#body.instanceMatrix.needsUpdate = true;

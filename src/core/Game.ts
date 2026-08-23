@@ -101,8 +101,8 @@ export class Game {
   });
   readonly #tacticalMapController = new TacticalMapController(this.#stateMachine);
   readonly #tacticalMapInput = new TacticalMapInput({
-    toggle: () => this.#tacticalMapController.toggle(),
-    close: () => this.#tacticalMapController.close(),
+    toggle: () => this.#toggleTacticalMap(),
+    close: () => this.#closeTacticalMap(),
   });
   readonly #recentHistory = new RecentTargetHistory();
   readonly #audio = new AudioManager();
@@ -307,7 +307,7 @@ export class Game {
         this.#container,
         this.#arena,
         () => {
-          this.#tacticalMapController.toggle();
+          this.#toggleTacticalMap();
         },
       );
       this.#tacticalMapInput.attach();
@@ -362,11 +362,21 @@ export class Game {
     previous: ReturnType<typeof createGameStateMachine>["state"],
   ): void => {
     this.#container.dataset.gameState = current;
+    if (
+      current === GameState.LEVEL_FAILED ||
+      current === GameState.GAME_CLEAR ||
+      current === GameState.CREDITS ||
+      current === GameState.MAIN_MENU ||
+      current === GameState.VOCABULARY_SELECT
+    ) {
+      this.#tacticalMapController.cancelPendingOpen();
+    }
     this.#updatePanel(this.#gameplay?.status);
     this.#radarMap?.setExpanded(
       current === GameState.MAP_EXPANDED,
       current === GameState.MAP_EXPANDED ? this.#tacticalMapController.timeScale : 1,
     );
+    this.#radarMap?.setPendingOpen(this.#tacticalMapController.pendingOpen);
     this.#updateRadar(this.#gameplay?.status);
     if (current === GameState.TRANSITION_IN) {
       this.#input.detach();
@@ -431,8 +441,27 @@ export class Game {
       this.#input.attach();
       this.#maneuverInput.attach();
       this.#weaponInput.attach();
+      if (this.#tacticalMapController.pendingOpen) {
+        queueMicrotask(() => {
+          if (this.#tacticalMapController.fulfillPendingOpen()) {
+            this.#radarMap?.setPendingOpen(false);
+          }
+        });
+      }
     }
   };
+
+  #toggleTacticalMap(): boolean {
+    const handled = this.#tacticalMapController.toggle();
+    this.#radarMap?.setPendingOpen(this.#tacticalMapController.pendingOpen);
+    return handled;
+  }
+
+  #closeTacticalMap(): boolean {
+    const handled = this.#tacticalMapController.close();
+    this.#radarMap?.setPendingOpen(this.#tacticalMapController.pendingOpen);
+    return handled;
+  }
 
   #updatePanel(
     gameplayStatus: VocabularyGameplaySession["status"] | undefined,

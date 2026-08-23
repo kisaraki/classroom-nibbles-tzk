@@ -9,7 +9,7 @@ async function startRun(page: import("@playwright/test").Page): Promise<void> {
   await expect(page.getByTestId("transition-overlay")).toBeHidden();
 }
 
-test("J 鍵頭尾反轉脫困並完成鏡頭復位", async ({ page }) => {
+test("J 鍵頭尾反轉脫困且只在機身執行後空翻", async ({ page }) => {
   await startRun(page);
   const heading = page.getByTestId("snake-heading");
   const canvas = page.getByTestId("phase-three-canvas");
@@ -19,6 +19,7 @@ test("J 鍵頭尾反轉脫困並完成鏡頭復位", async ({ page }) => {
 
   await page.keyboard.press("j");
   await expect(canvas).toHaveAttribute("data-backflip-state", "active");
+  await expect(canvas).toHaveAttribute("data-backflip-scope", "mecha");
   await expect(heading).toHaveText("南");
   await expect.poll(async () => Number(await miniMap.getAttribute("data-head-z")))
     .toBeGreaterThan(headBeforeBackflip + 4);

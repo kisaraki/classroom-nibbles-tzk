@@ -58,14 +58,24 @@ test("1920×1080 發行場景維持繪圖呼叫與幀率預算", async ({ page }
       cssHeight: rectangle.height,
       renderWidth: htmlCanvas.width,
       renderHeight: htmlCanvas.height,
+      devicePixelRatio: window.devicePixelRatio,
     };
   });
   expect(viewport.cssWidth).toBe(1920);
   expect(viewport.cssHeight).toBe(1080);
-  expect(viewport.renderWidth).toBeGreaterThan(0);
-  expect(viewport.renderHeight).toBeGreaterThan(0);
-  expect(viewport.renderWidth * viewport.renderHeight).toBeGreaterThan(800 * 450);
-  expect(viewport.renderWidth * viewport.renderHeight).toBeLessThanOrEqual(960 * 540);
+  expect(viewport.renderWidth).toBeCloseTo(
+    viewport.cssWidth * viewport.devicePixelRatio,
+    0,
+  );
+  expect(viewport.renderHeight).toBeCloseTo(
+    viewport.cssHeight * viewport.devicePixelRatio,
+    0,
+  );
+  await expect(canvas).toHaveAttribute("data-resolution-mode", "device-native");
+  await expect(canvas).toHaveAttribute(
+    "data-render-pixel-ratio",
+    viewport.devicePixelRatio.toFixed(3),
+  );
   expect(pageErrors).toEqual([]);
   expect(failedResponses).toEqual([]);
 });

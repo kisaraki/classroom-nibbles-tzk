@@ -21,24 +21,20 @@ export class EnvironmentView {
   setEnvironment(environment: EnvironmentProfile): void {
     this.#clearResources();
     const material = this.#trackMaterial(
-      new THREE.MeshStandardMaterial({
+      new THREE.MeshLambertMaterial({
         color: environment.palette.obstacleColor,
         emissive: new THREE.Color(
           environment.palette.obstacleAccentColor,
         ).multiplyScalar(0.12),
-        metalness: environment.kind === EnvironmentKind.ALIEN_FOREST ? 0.05 : 0.42,
-        roughness: environment.kind === EnvironmentKind.ASTEROID_BELT ? 0.95 : 0.55,
         flatShading: environment.kind === EnvironmentKind.ASTEROID_BELT,
       }),
     );
     const accent = this.#trackMaterial(
-      new THREE.MeshStandardMaterial({
+      new THREE.MeshLambertMaterial({
         color: environment.palette.obstacleAccentColor,
         emissive: new THREE.Color(
           environment.palette.obstacleAccentColor,
         ).multiplyScalar(0.32),
-        metalness: 0.25,
-        roughness: 0.48,
       }),
     );
 

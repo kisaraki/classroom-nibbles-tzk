@@ -10,7 +10,7 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
   await expect(page.getByTestId("phase-three-data-version")).toContainText("1.0.0-phase0");
-  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.3.0");
+  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.4.0");
   await expect(page.getByTestId("vocabulary-error")).toBeHidden();
   await expect(page.getByTestId("phase-three-canvas")).toBeVisible();
 
@@ -21,7 +21,7 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByTestId("vocabulary-select")).toBeHidden();
   await expect(page.getByTestId("phase-three-panel")).toBeVisible();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.3.0");
+  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.4.0");
   await expect(page.locator("#app")).toHaveAttribute(
     "data-environment-theme",
     "cargo-bay",
@@ -90,4 +90,20 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
   await expect(page.getByTestId("ammo-count")).toHaveText("0");
   expect(pageErrors).toEqual([]);
+});
+
+test("進場期間提出的戰術雷達要求會在可操控時自動展開", async ({ page }) => {
+  await page.goto("./");
+  await page.getByTestId("vocabulary-select").waitFor();
+  await page.getByTestId("run-seed").fill("radar-queued-open");
+  await page.getByTestId("start-run").click();
+  await expect(page.locator("#app")).toHaveAttribute("data-game-state", "TRANSITION_IN");
+
+  await page.keyboard.press("m");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-pending", "true");
+  await expect(page.getByTestId("tactical-map-status")).toContainText("自動展開");
+
+  await expect(page.locator("#app")).toHaveAttribute("data-game-state", "MAP_EXPANDED");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "true");
+  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-pending", "false");
 });

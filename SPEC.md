@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 1.6 (Version 1.3 player-view controls and improved resolution)
+Version: 1.7 (Version 1.4 native resolution, reliable radar and mecha backflip)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -34,7 +34,7 @@ Two rapid 90-degree inputs must not bypass the reversal rule and curl the head i
 
 Default configuration: initial length 8, min 3, max 40, segment spacing 0.75 world unit. Base speed is 3.0 units/sec in Game Level 1 and increases monotonically by level to 6.0 units/sec in Game Level 5. Put gameplay constants in a central config module.
 
-Pressing `J` performs an escape backflip by making the current tail the new head and reversing the existing body trail. The new head points away from the body along the tail tangent, so the maneuver changes the nose direction without folding inward or teleporting individual body segments. It is accepted in `HUNTING`, `MAP_EXPANDED`, and as the one permitted stationary turn in `RECOVERY`; it is rejected in `STUNNED` and all non-gameplay states. Repeated input is locked out for the duration of the camera animation.
+Pressing `J` performs an escape backflip by making the current tail the new head and reversing the existing body trail. The new head points away from the body along the tail tangent, so the maneuver changes the nose direction without folding inward or teleporting individual body segments. It is accepted in `HUNTING`, `MAP_EXPANDED`, and as the one permitted stationary turn in `RECOVERY`; it is rejected in `STUNNED` and all non-gameplay states. Repeated input is locked out for the duration of the mecha animation.
 
 ## 4. State machine
 
@@ -79,11 +79,11 @@ If a vocabulary filter yields fewer than 5 candidates, relax recent-history filt
 
 ## 8. HUD and pinball-table view
 
-Use one PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver also performs one visual first-person backward rotation and returns to the exact table pose while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
+Use one fixed PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver animates one backward rotation on the snake head and leading body only; the camera and full-screen view remain fixed while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
 
-The Three.js canvas retains the full CSS viewport and dynamically limits its internal buffer to at most 960×540 pixels at a 16:9 desktop viewport. This is 44% more pixels than the former 800×450 budget. It must exceed the former budget at 1920×1080 while retaining the 30 FPS minimum release gate in both local and CI WebGL environments.
+The Three.js canvas retains the full CSS viewport and automatically uses the browser's complete detected `devicePixelRatio`, with no application resolution cap. It re-detects changes while running and resizes the internal buffer to CSS size × device pixel ratio. The tactical-map canvas follows the same native-resolution rule.
 
-Mini-map in lower left shows arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. It runs gameplay at 0.25 speed; `Esc` or `M` closes it.
+Mini-map in lower left shows player-view directions, arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. A request during scene entry, stun or recovery is queued and automatically fulfilled as soon as hunting resumes instead of being silently ignored. The enlarged map runs gameplay at 0.25 speed; `Esc` or `M` closes it.
 
 The Version 1.x user interface uses Traditional Chinese for navigation, labels, state feedback, countdown warnings and accessibility text. English vocabulary targets, CEEC names and conventional control abbreviations may remain where they are learning content or proper names.
 

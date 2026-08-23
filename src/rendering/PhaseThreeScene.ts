@@ -14,6 +14,7 @@ import { EnvironmentView } from "./EnvironmentView";
 import { PowerUpView } from "./PowerUpView";
 import { SnakeView } from "./SnakeView";
 import { TokenView } from "./TokenView";
+import { detectDevicePixelRatio } from "./DeviceResolution";
 
 export type AnimationFrameHandler = () => void;
 
@@ -31,6 +32,7 @@ export class PhaseThreeScene {
   readonly #tokenView: TokenView;
   readonly #powerUpView: PowerUpView;
   readonly #bulletView: BulletView;
+  #activePixelRatio = 0;
 
   constructor(
     container: HTMLElement,
@@ -44,15 +46,15 @@ export class PhaseThreeScene {
       powerPreference: "high-performance",
       stencil: false,
     });
-    this.#renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, APP_CONFIG.scene.maxPixelRatio),
-    );
+    this.#renderer.setPixelRatio(detectDevicePixelRatio());
     this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.#renderer.domElement.className = "phase-three-scene";
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
     this.#renderer.domElement.dataset.cameraMode = "pinball-player";
     this.#renderer.domElement.dataset.cameraCount = "1";
     this.#renderer.domElement.dataset.backflipState = "idle";
+    this.#renderer.domElement.dataset.backflipScope = "mecha";
+    this.#renderer.domElement.dataset.resolutionMode = "device-native";
     this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第九階段第一人稱彈珠台字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
@@ -73,7 +75,6 @@ export class PhaseThreeScene {
       playerDistance: APP_CONFIG.scene.cameraPlayerDistance,
       lookHeight: APP_CONFIG.scene.cameraLookHeight,
       lookDepthRatio: APP_CONFIG.scene.cameraLookDepthRatio,
-      backflipDurationSeconds: APP_CONFIG.scene.cameraBackflipDurationSeconds,
     });
 
     this.#hemisphereLight = new THREE.HemisphereLight(
@@ -127,11 +128,11 @@ export class PhaseThreeScene {
   }
 
   triggerBackflip(): boolean {
-    return this.#cameraRig.triggerBackflip();
+    return this.#snakeView.triggerBackflip();
   }
 
   get backflipActive(): boolean {
-    return this.#cameraRig.backflipActive;
+    return this.#snakeView.backflipActive;
   }
 
   render(
@@ -144,19 +145,20 @@ export class PhaseThreeScene {
     elapsedSeconds: number,
     frameDeltaSeconds: number,
   ): void {
+    if (detectDevicePixelRatio() !== this.#activePixelRatio) this.#resize();
     this.#setRendererData("tokenCount", String(tokens.length));
     this.#setRendererData("powerUpCount", String(powerUps.length));
     this.#setRendererData("bulletCount", String(bullets.length));
-    this.#cameraRig.update(arena, frameDeltaSeconds);
+    this.#cameraRig.update(arena);
+    this.#snakeView.update(snake, arena, true, frameDeltaSeconds);
     this.#setRendererData(
       "backflipState",
-      this.#cameraRig.backflipActive ? "active" : "idle",
+      this.#snakeView.backflipActive ? "active" : "idle",
     );
     this.#setRendererData(
       "backflipProgress",
-      this.#cameraRig.backflipProgress.toFixed(3),
+      this.#snakeView.backflipProgress.toFixed(3),
     );
-    this.#snakeView.update(snake, arena, true);
     this.#tokenView.update(tokens, arena, this.#camera, nextToken, elapsedSeconds);
     this.#powerUpView.update(powerUps, arena, elapsedSeconds);
     this.#bulletView.update(bullets, arena);
@@ -179,14 +181,8 @@ export class PhaseThreeScene {
   readonly #resize = (): void => {
     const width = Math.max(this.#container.clientWidth, 1);
     const height = Math.max(this.#container.clientHeight, 1);
-    const maximumDevicePixelRatio = Math.min(
-      window.devicePixelRatio,
-      APP_CONFIG.scene.maxPixelRatio,
-    );
-    const renderPixelRatio = Math.min(
-      maximumDevicePixelRatio,
-      Math.sqrt(APP_CONFIG.scene.maximumRenderPixelCount / (width * height)),
-    );
+    const renderPixelRatio = detectDevicePixelRatio();
+    this.#activePixelRatio = renderPixelRatio;
     this.#renderer.setPixelRatio(renderPixelRatio);
     this.#camera.aspect = width / height;
     this.#camera.updateProjectionMatrix();

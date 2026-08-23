@@ -5,7 +5,8 @@ import {
   powerUpDisplayLabel,
   type PowerUpEntity,
 } from "../gameplay/PowerUpPool";
-import type { TokenEntity } from "../gameplay/TokenPool";
+import { tokenDisplayLabel, type TokenEntity } from "../gameplay/TokenPool";
+import { detectDevicePixelRatio } from "../rendering/DeviceResolution";
 import type { XZPoint } from "../gameplay/Trail";
 import type { BulletEntity } from "../gameplay/WeaponSystem";
 import type { CharacterToken } from "../vocabulary/types";
@@ -53,7 +54,10 @@ export class RadarMap {
   readonly #context: CanvasRenderingContext2D;
   readonly #status: HTMLElement;
   readonly #listener: RadarToggleListener;
+  readonly #resizeObserver: ResizeObserver | null;
   #expanded = false;
+  #pendingOpen = false;
+  #timeScale = 1;
   #snapshot: RadarMapSnapshot | null = null;
 
   constructor(container: HTMLElement, arena: Arena, listener: RadarToggleListener) {
@@ -63,6 +67,7 @@ export class RadarMap {
     this.#element.className = "radar-map";
     this.#element.dataset.testid = "mini-map";
     this.#element.dataset.expanded = "false";
+    this.#element.dataset.pending = "false";
     this.#element.dataset.timeScale = "1";
 
     this.#button = document.createElement("button");
@@ -93,17 +98,29 @@ export class RadarMap {
     this.#button.append(heading, this.#status, this.#canvas, legend);
     this.#element.append(this.#button);
     container.append(this.#element);
+    this.#resizeObserver = typeof ResizeObserver === "undefined"
+      ? null
+      : new ResizeObserver(this.#onResize);
+    this.#resizeObserver?.observe(this.#canvas);
+    window.addEventListener("resize", this.#onResize);
   }
 
   setExpanded(expanded: boolean, timeScale: number): void {
     this.#expanded = expanded;
+    this.#timeScale = timeScale;
+    if (expanded) this.#pendingOpen = false;
     this.#element.dataset.expanded = String(expanded);
+    this.#element.dataset.pending = String(this.#pendingOpen);
     this.#element.dataset.timeScale = String(timeScale);
     this.#button.setAttribute("aria-expanded", String(expanded));
-    this.#status.textContent = expanded
-      ? `戰術地圖啟用 · ${timeScale.toFixed(2)}× · Esc 關閉`
-      : "點擊或按 M 展開";
+    this.#syncStatus();
     this.#draw();
+  }
+
+  setPendingOpen(pendingOpen: boolean): void {
+    this.#pendingOpen = pendingOpen;
+    this.#element.dataset.pending = String(pendingOpen);
+    this.#syncStatus();
   }
 
   update(snapshot: RadarMapSnapshot): void {
@@ -128,6 +145,8 @@ export class RadarMap {
 
   dispose(): void {
     this.#button.removeEventListener("click", this.#onClick);
+    this.#resizeObserver?.disconnect();
+    window.removeEventListener("resize", this.#onResize);
     this.#element.remove();
   }
 
@@ -135,17 +154,32 @@ export class RadarMap {
     this.#listener();
   };
 
+  readonly #onResize = (): void => {
+    this.#draw();
+  };
+
+  #syncStatus(): void {
+    this.#status.textContent = this.#expanded
+      ? `戰術地圖啟用 · ${this.#timeScale.toFixed(2)}× · Esc 關閉`
+      : this.#pendingOpen
+        ? "雷達已排程 · 進入操控後自動展開"
+        : "點擊或按 M 展開";
+  }
+
   #draw(): void {
     if (!this.#snapshot) return;
     const cssWidth = Math.max(this.#canvas.clientWidth, this.#expanded ? 640 : 230);
     const cssHeight = Math.max(this.#canvas.clientHeight, this.#expanded ? 520 : 170);
-    const pixelRatio = Math.min(window.devicePixelRatio, 2);
+    const pixelRatio = detectDevicePixelRatio();
     const width = Math.round(cssWidth * pixelRatio);
     const height = Math.round(cssHeight * pixelRatio);
     if (this.#canvas.width !== width || this.#canvas.height !== height) {
       this.#canvas.width = width;
       this.#canvas.height = height;
     }
+    this.#element.dataset.renderPixelRatio = pixelRatio.toFixed(3);
+    this.#element.dataset.renderWidth = String(width);
+    this.#element.dataset.renderHeight = String(height);
     this.#context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     this.#context.clearRect(0, 0, cssWidth, cssHeight);
     this.#context.fillStyle = "rgba(2, 11, 21, 0.96)";
@@ -159,6 +193,8 @@ export class RadarMap {
     this.#drawObstacles(cssWidth, cssHeight, padding);
     this.#drawBullets(cssWidth, cssHeight, padding);
     this.#drawSnake(cssWidth, cssHeight, padding);
+    this.#drawOrientationLabels(cssWidth, cssHeight, padding);
+    this.#drawObjective(cssWidth, padding);
   }
 
   #project(
@@ -303,6 +339,37 @@ export class RadarMap {
     this.#context.lineTo(-size * 0.65, -size * 0.65);
     this.#context.closePath();
     this.#context.fill();
+    this.#context.restore();
+  }
+
+  #drawOrientationLabels(width: number, height: number, padding: number): void {
+    this.#context.save();
+    this.#context.fillStyle = this.#expanded ? "#b9fff0" : "rgba(185, 255, 240, 0.8)";
+    this.#context.font = this.#expanded
+      ? "700 13px system-ui, sans-serif"
+      : "700 9px system-ui, sans-serif";
+    this.#context.textAlign = "center";
+    this.#context.textBaseline = "middle";
+    this.#context.fillText("前", width / 2, padding / 2);
+    this.#context.fillText("後", width / 2, height - padding / 2);
+    this.#context.fillText("左", padding / 2, height / 2);
+    this.#context.fillText("右", width - padding / 2, height / 2);
+    this.#context.restore();
+  }
+
+  #drawObjective(width: number, padding: number): void {
+    if (!this.#expanded || !this.#snapshot?.nextToken) return;
+    this.#context.save();
+    this.#context.fillStyle = "#ffffff";
+    this.#context.font = "700 14px ui-monospace, monospace";
+    this.#context.textAlign = "left";
+    this.#context.textBaseline = "top";
+    this.#context.fillText(
+      `下一個：${tokenDisplayLabel(this.#snapshot.nextToken)}`,
+      padding + 8,
+      padding + 8,
+      Math.max(width - padding * 2 - 16, 1),
+    );
     this.#context.restore();
   }
 

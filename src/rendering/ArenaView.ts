@@ -4,20 +4,18 @@ import type { EnvironmentProfile } from "../gameplay/Environment";
 
 export class ArenaView {
   readonly #floorGeometry: THREE.PlaneGeometry;
-  readonly #floorMaterial: THREE.MeshStandardMaterial;
+  readonly #floorMaterial: THREE.MeshBasicMaterial;
   readonly #grid: THREE.GridHelper;
   readonly #xBoundaryGeometry: THREE.BoxGeometry;
   readonly #zBoundaryGeometry: THREE.BoxGeometry;
-  readonly #solidMaterial: THREE.MeshStandardMaterial;
-  readonly #wrapMaterial: THREE.MeshStandardMaterial;
+  readonly #solidMaterial: THREE.MeshLambertMaterial;
+  readonly #wrapMaterial: THREE.MeshLambertMaterial;
 
   constructor(scene: THREE.Scene, arena: Arena, environment: EnvironmentProfile) {
     const { halfWidth, halfDepth, xBoundaryMode, zBoundaryMode } = arena.config;
     this.#floorGeometry = new THREE.PlaneGeometry(halfWidth * 2, halfDepth * 2);
-    this.#floorMaterial = new THREE.MeshStandardMaterial({
+    this.#floorMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.floorColor,
-      metalness: 0.35,
-      roughness: 0.82,
     });
     const floor = new THREE.Mesh(this.#floorGeometry, this.#floorMaterial);
     floor.rotation.x = -Math.PI / 2;
@@ -33,19 +31,15 @@ export class ArenaView {
     this.#grid.position.y = -0.04;
     scene.add(this.#grid);
 
-    this.#solidMaterial = new THREE.MeshStandardMaterial({
+    this.#solidMaterial = new THREE.MeshLambertMaterial({
       color: environment.palette.solidWallColor,
       emissive: 0x351018,
-      metalness: 0.5,
-      roughness: 0.35,
     });
-    this.#wrapMaterial = new THREE.MeshStandardMaterial({
+    this.#wrapMaterial = new THREE.MeshLambertMaterial({
       color: environment.palette.wrapGateColor,
       emissive: 0x182c68,
       transparent: true,
       opacity: 0.8,
-      metalness: 0.3,
-      roughness: 0.25,
     });
     this.#xBoundaryGeometry = new THREE.BoxGeometry(0.22, 0.8, halfDepth * 2);
     this.#zBoundaryGeometry = new THREE.BoxGeometry(halfWidth * 2, 0.8, 0.22);
