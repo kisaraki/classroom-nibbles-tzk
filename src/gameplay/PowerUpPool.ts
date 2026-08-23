@@ -93,6 +93,20 @@ export class PowerUpPool {
     return this.#entities.get(id) ?? null;
   }
 
+  move(id: string, position: XZPoint): PowerUpEntity | null {
+    if (!Number.isFinite(position.x) || !Number.isFinite(position.z)) {
+      throw new Error("Power-up position must contain finite coordinates.");
+    }
+    const entity = this.#entities.get(id);
+    if (!entity) return null;
+    const moved = Object.freeze({
+      ...entity,
+      position: Object.freeze({ ...position }),
+    });
+    this.#entities.set(id, moved);
+    return moved;
+  }
+
   reposition(id: string, snake: Snake): PowerUpEntity | null {
     const entity = this.#entities.get(id);
     if (!entity) return null;

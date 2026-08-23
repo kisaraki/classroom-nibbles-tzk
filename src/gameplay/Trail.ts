@@ -115,6 +115,20 @@ export class Trail {
     this.#trim();
   }
 
+  translate(displacement: XZPoint): void {
+    if (!Number.isFinite(displacement.x) || !Number.isFinite(displacement.z)) {
+      throw new Error("Trail displacement must contain finite coordinates.");
+    }
+    for (let index = 0; index < this.#points.length; index += 1) {
+      const point = this.#points[index];
+      if (!point) continue;
+      this.#points[index] = {
+        x: point.x + displacement.x,
+        z: point.z + displacement.z,
+      };
+    }
+  }
+
   sample(distanceBehindHead: number): XZPoint {
     if (!Number.isFinite(distanceBehindHead) || distanceBehindHead < 0) {
       throw new Error("Trail sample distance must be a finite non-negative number.");

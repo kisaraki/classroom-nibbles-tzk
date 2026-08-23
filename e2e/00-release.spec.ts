@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 
+// Run native-resolution performance checks before prior WebGL contexts can
+// temporarily contend for the shared Chromium GPU process.
+
 test.use({ viewport: { width: 1920, height: 1080 } });
 
 async function startReleaseRun(page: import("@playwright/test").Page): Promise<void> {

@@ -5,6 +5,10 @@ import { PowerUpKind } from "../gameplay/PowerUpPool";
 import type { PowerUpWeaponStatus } from "../gameplay/PowerUpWeaponSession";
 import type { SnakeSimulationStatus } from "../gameplay/SnakeSimulation";
 import {
+  TableMotionMode,
+  type TableMotionStatus,
+} from "../gameplay/TableMotionSystem";
+import {
   TokenCollectionKind,
   type VocabularyGameplayStatus,
 } from "../gameplay/VocabularyGameplaySession";
@@ -100,6 +104,15 @@ function bulletImpactLabel(impact: PowerUpWeaponStatus["latestBulletImpact"]): s
   return "無";
 }
 
+function tableMotionLabel(status: TableMotionStatus): string {
+  if (status.mode === TableMotionMode.TILT_LEFT) return "桌面：左側抬高";
+  if (status.mode === TableMotionMode.TILT_RIGHT) return "桌面：右側抬高";
+  if (status.mode === TableMotionMode.SHAKE) {
+    return `桌面：震動中 ${status.shakeRemainingSeconds.toFixed(1)} 秒`;
+  }
+  return "桌面：水平";
+}
+
 export class GameHud {
   readonly #element: HTMLElement;
   readonly #gameLevel: HTMLElement;
@@ -107,6 +120,7 @@ export class GameHud {
   readonly #wordNumber: HTMLElement;
   readonly #timer: HTMLElement;
   readonly #environmentFeature: HTMLElement;
+  readonly #tableMotion: HTMLElement;
   readonly #state: HTMLElement;
   readonly #heading: HTMLElement;
   readonly #speed: HTMLElement;
@@ -150,6 +164,13 @@ export class GameHud {
       "環境機制：—",
     );
     this.#environmentFeature.dataset.testid = "environment-feature";
+    this.#tableMotion = createElement(
+      "p",
+      "game-hud__table-motion",
+      "桌面：水平",
+    );
+    this.#tableMotion.dataset.testid = "table-motion-status";
+    this.#tableMotion.setAttribute("aria-live", "polite");
 
     const targetBlock = createElement("article", "game-hud__target-block");
     targetBlock.append(createElement("p", "game-hud__label", "目標單字"));
@@ -181,12 +202,13 @@ export class GameHud {
     const controls = createElement(
       "p",
       "game-hud__controls",
-      "WASD / 方向鍵依玩家視角移動 · J 頭尾反轉脫困 · 空白鍵發射 · P 暫停",
+      "WASD / 方向鍵依玩家視角移動 · 左／右 Shift 傾桌 · 雙 Shift 震桌 2 秒 · J 頭尾反轉脫困 · 空白鍵發射 · P 暫停",
     );
     this.#element.append(
       heading,
       mission,
       this.#environmentFeature,
+      this.#tableMotion,
       targetBlock,
       telemetry,
       events,
@@ -201,17 +223,20 @@ export class GameHud {
     snake: SnakeSimulationStatus,
     powerUpWeapon: PowerUpWeaponStatus,
     environment: EnvironmentProfile,
+    tableMotion: TableMotionStatus,
   ): void {
     this.#element.dataset.state = gameplay.state;
     this.#element.dataset.environment = environment.kind;
     this.#element.dataset.safeUTurn = String(snake.safeUTurnActive);
     this.#element.dataset.headX = snake.headPosition.x.toFixed(3);
     this.#element.dataset.headZ = snake.headPosition.z.toFixed(3);
+    this.#element.dataset.tableMotion = tableMotion.mode;
     setText(this.#gameLevel, `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`);
     setText(this.#vocabularyLevel, gameplay.vocabularyMode);
     setText(this.#wordNumber, `${gameplay.wordNumber}/${gameplay.totalWords}`);
     setText(this.#timer, formatTime(gameplay.timeRemainingSeconds));
     setText(this.#environmentFeature, `環境機制：${environment.featureLabel}`);
+    setText(this.#tableMotion, tableMotionLabel(tableMotion));
     setText(this.#state, stateLabel(gameplay.state));
     setText(this.#heading, directionLabel(snake.direction));
     setText(this.#speed, `${snake.speed.toFixed(1)} 單位/秒`);

@@ -143,6 +143,7 @@ body {
 
 .game-hud__eyebrow,
 .game-hud__environment,
+.game-hud__table-motion,
 .game-hud__metric-label,
 .game-hud__label,
 .game-hud__progress,
@@ -174,6 +175,24 @@ body {
   color: var(--accent);
   font-size: 0.58rem;
   line-height: 1.45;
+}
+
+.game-hud__table-motion {
+  position: absolute;
+  top: 6.8rem;
+  left: 0.9rem;
+  max-width: min(20rem, 25vw);
+  margin: 0;
+  padding: 0.38rem 0.65rem;
+  border-left: 2px solid var(--accent);
+  background: rgb(4 15 29 / 72%);
+  color: var(--accent);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+}
+
+.game-hud[data-table-motion="SHAKE"] .game-hud__table-motion {
+  color: #ffd166;
 }
 
 .game-hud__eyebrow {
@@ -1194,6 +1213,7 @@ body {
 
   .game-hud__heading,
   .game-hud__environment,
+  .game-hud__table-motion,
   .game-hud__events,
   .game-hud__controls {
     display: none;

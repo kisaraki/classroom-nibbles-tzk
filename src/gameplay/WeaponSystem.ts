@@ -110,6 +110,21 @@ export class WeaponSystem {
     this.#bullets.clear();
   }
 
+  moveBullet(id: string, position: XZPoint): BulletEntity | null {
+    if (!Number.isFinite(position.x) || !Number.isFinite(position.z)) {
+      throw new Error("Bullet position must contain finite coordinates.");
+    }
+    const bullet = this.#bullets.get(id);
+    if (!bullet) return null;
+    bullet.position = { ...position };
+    return Object.freeze({
+      id: bullet.id,
+      position: Object.freeze({ ...bullet.position }),
+      direction: bullet.direction,
+      radius: bullet.radius,
+    });
+  }
+
   fire(origin: XZPoint, direction: Direction): BulletEntity | null {
     if (this.#ammo <= 0) return null;
     const forward = directionVector(direction);

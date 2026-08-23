@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## Version 1.6 — 2026-08-23
+
+### Added
+- Added physical left/right Shift detection: holding left Shift raises the left table edge and applies gravity toward player-view right, while holding right Shift raises the right edge and applies gravity toward player-view left until release.
+- Added a single seeded two-second shake when both Shift keys are pressed together. The complete snake trail, tokens, power-ups and active bullets receive independent displacement while the table visibly wobbles and bounces.
+- Added Traditional Chinese table-motion HUD status, concise control help, renderer diagnostics, deterministic unit coverage and Chromium interaction coverage.
+
+### Changed
+- Grouped the arena, environment and dynamic gameplay views under one Three.js table transform so physical tilt and shake remain local to the pinball table and keep the camera fixed.
+- Added obstacle, SOLID-boundary and WRAP-aware table displacement without introducing collision death or changing the existing propulsion, typing, reward/penalty or state-machine rules.
+- Updated the public specification, README and release metadata to Version 1.6.
+
 ## Version 1.5 — 2026-08-23
 
 ### Removed

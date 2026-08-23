@@ -6,15 +6,16 @@ import {
 } from "../gameplay/Environment";
 
 export class EnvironmentView {
-  readonly #scene: THREE.Scene;
+  readonly #parent: THREE.Object3D;
   readonly #group = new THREE.Group();
   readonly #geometries: THREE.BufferGeometry[] = [];
   readonly #materials: THREE.Material[] = [];
 
-  constructor(scene: THREE.Scene) {
-    this.#scene = scene;
+  constructor(parent: THREE.Object3D) {
+    this.#parent = parent;
     this.#group.name = "phase-seven-environment";
-    this.#scene.add(this.#group);
+    this.#group.matrixAutoUpdate = false;
+    this.#parent.add(this.#group);
   }
 
   setEnvironment(environment: EnvironmentProfile): void {
@@ -46,7 +47,7 @@ export class EnvironmentView {
 
   dispose(): void {
     this.#clearResources();
-    this.#scene.remove(this.#group);
+    this.#parent.remove(this.#group);
   }
 
   #addCargo(
@@ -183,6 +184,7 @@ export class EnvironmentView {
     },
   ): THREE.InstancedMesh {
     const mesh = new THREE.InstancedMesh(geometry, material, obstacles.length);
+    mesh.matrixAutoUpdate = false;
     const matrix = new THREE.Matrix4();
     const quaternion = new THREE.Quaternion();
     const position = new THREE.Vector3();

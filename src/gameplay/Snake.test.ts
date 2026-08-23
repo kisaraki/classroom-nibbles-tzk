@@ -80,6 +80,20 @@ describe("Snake", () => {
     expect(() => snake.setSpeed(0)).toThrow("finite and positive");
   });
 
+  it("translates the head and complete trail as one rigid body", () => {
+    const snake = new Snake(GAMEPLAY_CONFIG.snake);
+    snake.advance(0.5);
+    const before = snake.getSegmentPositions();
+
+    snake.translate({ x: 1.25, z: -0.75 });
+
+    snake.getSegmentPositions().forEach((segment, index) => {
+      expect(segment.x).toBeCloseTo(before[index]!.x + 1.25);
+      expect(segment.z).toBeCloseTo(before[index]!.z - 0.75);
+    });
+    expect(snake.direction).toBe(Direction.NORTH);
+  });
+
   it("turns the tail into the new head without curling into the preserved body", () => {
     const snake = new Snake({
       initialLength: 6,

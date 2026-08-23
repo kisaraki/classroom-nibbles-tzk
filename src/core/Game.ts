@@ -11,6 +11,7 @@ import { PowerUpWeaponSession } from "../gameplay/PowerUpWeaponSession";
 import { Snake } from "../gameplay/Snake";
 import { SnakeSimulation } from "../gameplay/SnakeSimulation";
 import { SpawnManager } from "../gameplay/SpawnManager";
+import { TableMotionSystem } from "../gameplay/TableMotionSystem";
 import { TokenCollisionSystem } from "../gameplay/TokenCollisionSystem";
 import { TokenPool } from "../gameplay/TokenPool";
 import { WeaponSystem } from "../gameplay/WeaponSystem";
@@ -26,6 +27,7 @@ import {
 import { DirectionInput } from "../input/DirectionInput";
 import { ManeuverInput } from "../input/ManeuverInput";
 import { PauseInput } from "../input/PauseInput";
+import { TableMotionInput } from "../input/TableMotionInput";
 import { WeaponInput } from "../input/WeaponInput";
 import { PhaseThreeScene } from "../rendering/PhaseThreeScene";
 import { BootScreen } from "../ui/BootScreen";
@@ -95,6 +97,9 @@ export class Game {
   readonly #weaponInput = new WeaponInput(() => {
     if (this.#powerUpWeapon?.fire()) this.#audio.play(SoundCue.SHOT);
   });
+  readonly #tableMotionInput = new TableMotionInput((controls) => {
+    this.#tableMotion?.setControls(controls);
+  });
   readonly #recentHistory = new RecentTargetHistory();
   readonly #audio = new AudioManager();
   readonly #transitionOverlay: TransitionOverlay;
@@ -110,6 +115,7 @@ export class Game {
   #repository: VocabularyRepository | null = null;
   #gameplay: VocabularyGameplaySession | null = null;
   #powerUpWeapon: PowerUpWeaponSession | null = null;
+  #tableMotion: TableMotionSystem | null = null;
   #typingTest: TypingTestSession | null = null;
   #typingModal: TypingTestModal | null = null;
   #creditsScreen: CreditsScreen | null = null;
@@ -172,6 +178,7 @@ export class Game {
     this.#input.detach();
     this.#maneuverInput.detach();
     this.#weaponInput.detach();
+    this.#tableMotionInput.detach();
     this.#pauseInput.detach();
     this.#stopTypingTest();
     this.#disposeRunPresentation();
@@ -247,22 +254,34 @@ export class Game {
         tokenPool,
         tokenCollisions,
       );
+      const weaponSystem = new WeaponSystem(
+        this.#arena,
+        GAMEPLAY_CONFIG.weapon,
+        () => this.#environment.obstacles,
+      );
       const powerUpWeapon = new PowerUpWeaponSession(
         this.#stateMachine,
         this.#snake,
         this.#arena,
         tokenPool,
         powerUpPool,
-        new WeaponSystem(
-          this.#arena,
-          GAMEPLAY_CONFIG.weapon,
-          () => this.#environment.obstacles,
-        ),
+        weaponSystem,
         GAMEPLAY_CONFIG.snake.headCollisionRadius,
         GAMEPLAY_CONFIG.powerUp.attackAmmoReward,
         (deltaSeconds) => {
           gameplay.adjustMainTime(deltaSeconds);
         },
+      );
+      const tableMotion = new TableMotionSystem(
+        this.#stateMachine,
+        this.#arena,
+        this.#snake,
+        tokenPool,
+        powerUpPool,
+        weaponSystem,
+        new SeededRandom(`${selection.seed}:table-motion`),
+        GAMEPLAY_CONFIG.tableMotion,
+        () => this.#environment.obstacles,
       );
       gameplay.subscribeToWordStarted((entry) => this.#recentHistory.remember(entry.target));
       gameplay.subscribeToTokenCollections((result) => {
@@ -280,6 +299,7 @@ export class Game {
         this.#applyEnvironmentPresentation(environment);
         powerUpWeapon.resetEnvironment();
         tokenPool.reset(this.#snake);
+        tableMotion.reset();
       });
       powerUpWeapon.subscribeToPowerUpCollections(() => {
         this.#audio.play(SoundCue.POWER_UP);
@@ -290,6 +310,7 @@ export class Game {
 
       this.#gameplay = gameplay;
       this.#powerUpWeapon = powerUpWeapon;
+      this.#tableMotion = tableMotion;
       this.#hud = new GameHud(this.#container);
       this.#pinballTableOverlay = new PinballTableOverlay(this.#container);
       this.#selectionScreen.hide();
@@ -306,6 +327,7 @@ export class Game {
     this.#updateTypingTest(performance.now());
     const frameDeltaSeconds = this.#timer.getDelta();
     this.#fixedStepRunner.advance(frameDeltaSeconds, (stepSeconds) => {
+      this.#tableMotion?.update(stepSeconds);
       this.#gameplay?.update(stepSeconds);
       this.#powerUpWeapon?.update(stepSeconds);
     });
@@ -321,6 +343,7 @@ export class Game {
       powerUps,
       bullets,
       this.#gameplay?.nextToken ?? null,
+      this.#tableMotion?.status ?? null,
       elapsedSeconds,
       frameDeltaSeconds,
     );
@@ -344,6 +367,8 @@ export class Game {
       this.#input.detach();
       this.#maneuverInput.detach();
       this.#weaponInput.detach();
+      this.#tableMotionInput.detach();
+      this.#tableMotion?.reset();
       this.#transitionOverlay.playSceneTransition(this.#environment.current, () => {
         if (this.#stateMachine.state !== GameState.TRANSITION_IN) return;
         this.#audio.play(SoundCue.SCENE_ENTER);
@@ -352,6 +377,7 @@ export class Game {
       return;
     }
     if (current === GameState.PAUSED) {
+      this.#tableMotionInput.detach();
       this.#audio.play(SoundCue.PAUSE);
       return;
     }
@@ -365,6 +391,8 @@ export class Game {
       this.#input.detach();
       this.#maneuverInput.detach();
       this.#weaponInput.detach();
+      this.#tableMotionInput.detach();
+      this.#tableMotion?.reset();
       this.#audio.play(SoundCue.LEVEL_FAILED);
       const status = this.#gameplay?.status;
       if (status) {
@@ -386,6 +414,8 @@ export class Game {
       this.#input.detach();
       this.#maneuverInput.detach();
       this.#weaponInput.detach();
+      this.#tableMotionInput.detach();
+      this.#tableMotion?.reset();
       this.#audio.play(SoundCue.GAME_CLEAR);
       this.#transitionOverlay.playMissionComplete(() => {
         if (this.#stateMachine.state === GameState.GAME_CLEAR) {
@@ -399,6 +429,13 @@ export class Game {
       this.#creditsScreen = new CreditsScreen(this.#container, this.#returnToSelection);
       return;
     }
+    if (
+      current === GameState.HUNTING ||
+      current === GameState.STUNNED ||
+      current === GameState.RECOVERY
+    ) {
+      this.#tableMotionInput.attach();
+    }
     if (current === GameState.HUNTING) {
       this.#input.attach();
       this.#maneuverInput.attach();
@@ -409,12 +446,13 @@ export class Game {
   #updatePanel(
     gameplayStatus: VocabularyGameplaySession["status"] | undefined,
   ): void {
-    if (!gameplayStatus || !this.#powerUpWeapon) return;
+    if (!gameplayStatus || !this.#powerUpWeapon || !this.#tableMotion) return;
     this.#hud?.update(
       gameplayStatus,
       this.#snakeSimulation.status,
       this.#powerUpWeapon.status,
       this.#environment.current,
+      this.#tableMotion.status,
     );
   }
 
@@ -440,6 +478,8 @@ export class Game {
     this.#input.detach();
     this.#maneuverInput.detach();
     this.#weaponInput.detach();
+    this.#tableMotionInput.detach();
+    this.#tableMotion?.reset();
     this.#stopTypingTest();
     const config = GAMEPLAY_CONFIG.typingTest;
     const typingTest = new TypingTestSession(
@@ -508,6 +548,8 @@ export class Game {
     this.#input.detach();
     this.#maneuverInput.detach();
     this.#weaponInput.detach();
+    this.#tableMotionInput.detach();
+    this.#tableMotion?.reset();
     this.#stopTypingTest();
     this.#hud?.dispose();
     this.#pinballTableOverlay?.dispose();
@@ -519,6 +561,8 @@ export class Game {
     this.#failureScreen = null;
     this.#gameplay = null;
     this.#powerUpWeapon = null;
+    this.#tableMotion = null;
+    delete this.#container.dataset.tableMotion;
     delete this.#container.dataset.environmentTheme;
     this.#container.style.removeProperty("--accent");
     this.#container.style.removeProperty("--accent-soft");

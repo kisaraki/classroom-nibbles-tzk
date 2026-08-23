@@ -77,8 +77,9 @@ export class TokenView {
   readonly #right = new THREE.Vector3();
   readonly #up = new THREE.Vector3();
   readonly #renderedTokens: CharacterToken[] = [];
+  #cameraBasisReady = false;
 
-  constructor(scene: THREE.Scene) {
+  constructor(parent: THREE.Object3D) {
     const indices = new Uint16Array(CHARACTER_TOKENS.length * INDICES_PER_TOKEN);
     for (let index = 0; index < CHARACTER_TOKENS.length; index += 1) {
       const vertex = index * VERTICES_PER_TOKEN;
@@ -102,7 +103,8 @@ export class TokenView {
     this.#mesh = new THREE.Mesh(this.#geometry, this.#material);
     this.#mesh.frustumCulled = false;
     this.#mesh.renderOrder = 2;
-    scene.add(this.#mesh);
+    this.#mesh.matrixAutoUpdate = false;
+    parent.add(this.#mesh);
   }
 
   update(
@@ -112,9 +114,12 @@ export class TokenView {
     nextToken: CharacterToken | null,
     elapsedSeconds: number,
   ): void {
-    camera.getWorldQuaternion(this.#cameraQuaternion);
-    this.#right.set(1, 0, 0).applyQuaternion(this.#cameraQuaternion);
-    this.#up.set(0, 1, 0).applyQuaternion(this.#cameraQuaternion);
+    if (!this.#cameraBasisReady) {
+      camera.getWorldQuaternion(this.#cameraQuaternion);
+      this.#right.set(1, 0, 0).applyQuaternion(this.#cameraQuaternion);
+      this.#up.set(0, 1, 0).applyQuaternion(this.#cameraQuaternion);
+      this.#cameraBasisReady = true;
+    }
 
     let tokenAtlasChanged = entities.length !== this.#renderedTokens.length;
     entities.forEach((entity, index) => {

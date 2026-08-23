@@ -110,6 +110,17 @@ export class Snake {
     this.#trail.record(this.#headPosition);
   }
 
+  translate(displacement: XZPoint): void {
+    if (!Number.isFinite(displacement.x) || !Number.isFinite(displacement.z)) {
+      throw new Error("Snake displacement must contain finite coordinates.");
+    }
+    this.#headPosition = {
+      x: this.#headPosition.x + displacement.x,
+      z: this.#headPosition.z + displacement.z,
+    };
+    this.#trail.translate(displacement);
+  }
+
   setSpeed(speed: number): void {
     if (!Number.isFinite(speed) || speed <= 0) {
       throw new Error("Snake speed must be finite and positive.");

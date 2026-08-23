@@ -11,7 +11,7 @@ export class ArenaView {
   readonly #solidMaterial: THREE.MeshBasicMaterial;
   readonly #wrapMaterial: THREE.MeshBasicMaterial;
 
-  constructor(scene: THREE.Scene, arena: Arena, environment: EnvironmentProfile) {
+  constructor(parent: THREE.Object3D, arena: Arena, environment: EnvironmentProfile) {
     const { halfWidth, halfDepth, xBoundaryMode, zBoundaryMode } = arena.config;
     this.#floorGeometry = new THREE.PlaneGeometry(halfWidth * 2, halfDepth * 2);
     this.#floorMaterial = new THREE.MeshBasicMaterial({
@@ -21,7 +21,9 @@ export class ArenaView {
     const floor = new THREE.Mesh(this.#floorGeometry, this.#floorMaterial);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -0.08;
-    scene.add(floor);
+    floor.updateMatrix();
+    floor.matrixAutoUpdate = false;
+    parent.add(floor);
 
     this.#grid = new THREE.GridHelper(
       Math.max(halfWidth, halfDepth) * 2,
@@ -30,7 +32,9 @@ export class ArenaView {
       environment.palette.gridLineColor,
     );
     this.#grid.position.y = -0.04;
-    scene.add(this.#grid);
+    this.#grid.updateMatrix();
+    this.#grid.matrixAutoUpdate = false;
+    parent.add(this.#grid);
 
     this.#solidMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.solidWallColor,
@@ -59,7 +63,7 @@ export class ArenaView {
         { x: 0, z: halfDepth },
       ],
     );
-    scene.add(xBoundaries, zBoundaries);
+    parent.add(xBoundaries, zBoundaries);
   }
 
   setEnvironment(environment: EnvironmentProfile): void {
@@ -98,6 +102,7 @@ export class ArenaView {
     positions: readonly { readonly x: number; readonly z: number }[],
   ): THREE.InstancedMesh {
     const instances = new THREE.InstancedMesh(geometry, material, positions.length);
+    instances.matrixAutoUpdate = false;
     const matrix = new THREE.Matrix4();
     positions.forEach((position, index) => {
       matrix.makeTranslation(position.x, 0.35, position.z);

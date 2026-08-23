@@ -34,9 +34,9 @@ export class SnakeView {
   );
   readonly #backflipAxis = new THREE.Vector3();
 
-  constructor(scene: THREE.Scene) {
+  constructor(parent: THREE.Object3D) {
     this.#body.count = 0;
-    scene.add(this.#body, this.#head, this.#nose);
+    parent.add(this.#body, this.#head, this.#nose);
   }
 
   get backflipActive(): boolean {

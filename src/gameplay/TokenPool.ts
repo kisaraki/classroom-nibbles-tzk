@@ -83,6 +83,20 @@ export class TokenPool {
     return entity;
   }
 
+  move(id: string, position: XZPoint): TokenEntity | null {
+    if (!Number.isFinite(position.x) || !Number.isFinite(position.z)) {
+      throw new Error("Token position must contain finite coordinates.");
+    }
+    const entity = this.#entities.get(id);
+    if (!entity) return null;
+    const moved = Object.freeze({
+      ...entity,
+      position: Object.freeze({ ...position }),
+    });
+    this.#entities.set(id, moved);
+    return moved;
+  }
+
   reposition(id: string, snake: Snake): TokenEntity | null {
     const entity = this.remove(id);
     return entity ? this.spawn(entity.token, snake) : null;
