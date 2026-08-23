@@ -24,9 +24,9 @@ test("P 鍵以彈珠台護板轉場暫停並在開啟後精確恢復", async ({ 
   await expect(page.getByTestId("transition-title")).toHaveText("遊戲暫停");
   await expect(overlay).toHaveAttribute("data-door", "closed");
 
-  const pausedHeadZ = await page.getByTestId("mini-map").getAttribute("data-head-z");
+  const pausedHeadZ = await page.getByTestId("game-hud").getAttribute("data-head-z");
   await page.waitForTimeout(350);
-  await expect(page.getByTestId("mini-map")).toHaveAttribute(
+  await expect(page.getByTestId("game-hud")).toHaveAttribute(
     "data-head-z",
     pausedHeadZ!,
   );
@@ -85,7 +85,7 @@ test("完成畫面顯示 KOSMOS TOOLKITS 製作名單並提供重玩入口", asy
   await expect(credits.getByText("KOSMOS TOOLKITS")).toBeVisible();
   await expect(credits.getByText("探真拓知酷")).toBeVisible();
   await expect(credits.getByText("任務完成", { exact: true })).toBeVisible();
-  await expect(credits.getByText("NIBBLES 1.4.0")).toBeVisible();
+  await expect(credits.getByText("NIBBLES 1.5.0")).toBeVisible();
   await expect(credits.getByText("25/25")).toBeVisible();
   await page.getByTestId("replay-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-replay-requested", "true");

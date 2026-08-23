@@ -46,7 +46,6 @@ function stateLabel(state: VocabularyGameplayStatus["state"]): string {
     HUNTING: "進行中",
     STUNNED: "暈眩",
     RECOVERY: "復原中",
-    MAP_EXPANDED: "戰術地圖",
     TYPING_TEST: "打字測驗",
     PAUSED: "暫停",
     LEVEL_CLEAR: "關卡完成",
@@ -97,7 +96,7 @@ function bulletImpactLabel(impact: PowerUpWeaponStatus["latestBulletImpact"]): s
   return "無";
 }
 
-export class PhaseThreePanel {
+export class GameHud {
   readonly #element: HTMLElement;
   readonly #gameLevel: HTMLElement;
   readonly #vocabularyLevel: HTMLElement;
@@ -122,15 +121,16 @@ export class PhaseThreePanel {
   #renderedProgress = -1;
 
   constructor(container: HTMLElement) {
-    this.#element = createElement("section", "phase-three-panel");
-    this.#element.dataset.testid = "phase-three-panel";
-    const heading = createElement("header", "phase-three-panel__heading");
+    this.#element = createElement("section", "game-hud");
+    this.#element.dataset.testid = "game-hud";
+    this.#element.setAttribute("aria-label", "遊戲主畫面資訊");
+    const heading = createElement("header", "game-hud__heading");
     heading.append(
-      createElement("p", "phase-three-panel__eyebrow", "彈珠台任務 / 09"),
-      createElement("h1", "phase-three-panel__title", APP_CONFIG.title),
+      createElement("p", "game-hud__eyebrow", "彈珠台任務 / 09"),
+      createElement("h1", "game-hud__title", APP_CONFIG.title),
     );
 
-    const mission = createElement("dl", "phase-three-panel__mission");
+    const mission = createElement("dl", "game-hud__mission");
     this.#gameLevel = this.#appendMetric(mission, "關卡", "—", "game-level");
     this.#vocabularyLevel = this.#appendMetric(
       mission,
@@ -142,40 +142,42 @@ export class PhaseThreePanel {
     this.#timer = this.#appendMetric(mission, "主計時", "—", "main-timer");
     this.#environmentFeature = createElement(
       "p",
-      "phase-three-panel__environment",
+      "game-hud__environment",
       "環境機制：—",
     );
     this.#environmentFeature.dataset.testid = "environment-feature";
 
-    const targetBlock = createElement("article", "phase-three-panel__target-block");
-    targetBlock.append(createElement("p", "phase-three-panel__label", "目標單字"));
-    this.#target = createElement("div", "phase-three-panel__target");
+    const targetBlock = createElement("article", "game-hud__target-block");
+    targetBlock.append(createElement("p", "game-hud__label", "目標單字"));
+    this.#target = createElement("div", "game-hud__target");
     this.#target.dataset.testid = "target-tokens";
-    this.#meaning = createElement("p", "phase-three-panel__meaning");
+    this.#meaning = createElement("p", "game-hud__meaning");
     this.#meaning.dataset.testid = "target-meaning";
-    this.#partOfSpeech = createElement("p", "phase-three-panel__part-of-speech");
-    this.#progress = createElement("p", "phase-three-panel__progress");
+    this.#partOfSpeech = createElement("p", "game-hud__part-of-speech");
+    this.#progress = createElement("p", "game-hud__progress");
     this.#progress.dataset.testid = "token-progress";
     targetBlock.append(this.#target, this.#meaning, this.#partOfSpeech, this.#progress);
 
-    const telemetry = createElement("dl", "phase-three-panel__telemetry");
+    const telemetry = createElement("dl", "game-hud__telemetry");
     this.#state = this.#appendMetric(telemetry, "狀態", "—", "simulation-state");
     this.#heading = this.#appendMetric(telemetry, "方向", "—", "snake-heading");
     this.#speed = this.#appendMetric(telemetry, "速度", "—", "snake-speed");
     this.#length = this.#appendMetric(telemetry, "長度", "—", "snake-length");
-    this.#collision = this.#appendMetric(telemetry, "碰撞", "無", "latest-collision");
-    this.#collection = this.#appendMetric(telemetry, "字元", "無", "latest-collection");
     this.#ammo = this.#appendMetric(telemetry, "彈藥", "0", "ammo-count");
-    this.#powerUp = this.#appendMetric(telemetry, "道具", "無", "latest-power-up");
-    this.#shot = this.#appendMetric(telemetry, "射擊", "無", "latest-shot");
 
-    this.#phaseMessage = createElement("p", "phase-three-panel__message");
+    const events = createElement("dl", "game-hud__events");
+    this.#collision = this.#appendMetric(events, "碰撞", "無", "latest-collision");
+    this.#collection = this.#appendMetric(events, "字元", "無", "latest-collection");
+    this.#powerUp = this.#appendMetric(events, "道具", "無", "latest-power-up");
+    this.#shot = this.#appendMetric(events, "射擊", "無", "latest-shot");
+
+    this.#phaseMessage = createElement("p", "game-hud__message");
     this.#phaseMessage.dataset.testid = "phase-message";
     this.#phaseMessage.hidden = true;
     const controls = createElement(
       "p",
-      "phase-three-panel__controls",
-      "WASD / 方向鍵依玩家視角移動 · J 頭尾反轉脫困 · 空白鍵發射 · M 戰術地圖 · P 暫停 · Esc 關閉",
+      "game-hud__controls",
+      "WASD / 方向鍵依玩家視角移動 · J 頭尾反轉脫困 · 空白鍵發射 · P 暫停",
     );
     this.#element.append(
       heading,
@@ -183,6 +185,7 @@ export class PhaseThreePanel {
       this.#environmentFeature,
       targetBlock,
       telemetry,
+      events,
       this.#phaseMessage,
       controls,
     );
@@ -198,6 +201,8 @@ export class PhaseThreePanel {
     this.#element.dataset.state = gameplay.state;
     this.#element.dataset.environment = environment.kind;
     this.#element.dataset.safeUTurn = String(snake.safeUTurnActive);
+    this.#element.dataset.headX = snake.headPosition.x.toFixed(3);
+    this.#element.dataset.headZ = snake.headPosition.z.toFixed(3);
     this.#gameLevel.textContent = `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`;
     this.#vocabularyLevel.textContent = gameplay.vocabularyMode;
     this.#wordNumber.textContent = `${gameplay.wordNumber}/${gameplay.totalWords}`;
@@ -250,7 +255,7 @@ export class PhaseThreePanel {
     gameplay.entry.tokens.forEach((token, index) => {
       const tokenElement = createElement(
         "span",
-        "phase-three-panel__target-token",
+        "game-hud__target-token",
         tokenDisplayLabel(token),
       );
       if (index < gameplay.progressIndex) tokenElement.dataset.status = "collected";
@@ -270,9 +275,9 @@ export class PhaseThreePanel {
     initialValue: string,
     testId: string,
   ): HTMLElement {
-    const metric = createElement("div", "phase-three-panel__metric");
-    metric.append(createElement("dt", "phase-three-panel__metric-label", label));
-    const value = createElement("dd", "phase-three-panel__metric-value", initialValue);
+    const metric = createElement("div", "game-hud__metric");
+    metric.append(createElement("dt", "game-hud__metric-label", label));
+    const value = createElement("dd", "game-hud__metric-value", initialValue);
     value.dataset.testid = testId;
     metric.append(value);
     list.append(metric);

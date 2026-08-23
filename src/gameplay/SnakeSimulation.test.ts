@@ -11,14 +11,12 @@ function createActiveSimulation(
   arena: Arena,
   initial: SnakeInitialState = {},
   length: number = GAMEPLAY_CONFIG.snake.initialLength,
-  expandedMap = false,
   obstacles: readonly { readonly position: { readonly x: number; readonly z: number }; readonly radius: number }[] = [],
 ): SnakeSimulation {
   const stateMachine = createGameStateMachine();
   stateMachine.transition(GameState.MAIN_MENU);
   stateMachine.transition(GameState.TRANSITION_IN);
   stateMachine.transition(GameState.HUNTING);
-  if (expandedMap) stateMachine.transition(GameState.MAP_EXPANDED);
   const snake = new Snake(GAMEPLAY_CONFIG.snake, { ...initial, length });
   const collisions = new CollisionSystem({
     headRadius: GAMEPLAY_CONFIG.snake.headCollisionRadius,
@@ -36,19 +34,19 @@ function createActiveSimulation(
 }
 
 describe("SnakeSimulation", () => {
-  it("continues movement and steering while the tactical map is expanded", () => {
+  it("continues movement and steering while hunting", () => {
     const arena = new Arena({
       halfWidth: 20,
       halfDepth: 20,
       xBoundaryMode: BoundaryMode.SOLID,
       zBoundaryMode: BoundaryMode.SOLID,
     });
-    const simulation = createActiveSimulation(arena, {}, 8, true);
+    const simulation = createActiveSimulation(arena);
 
     expect(simulation.requestDirection(Direction.EAST)).toBe(true);
     simulation.update(0.25);
 
-    expect(simulation.status.state).toBe(GameState.MAP_EXPANDED);
+    expect(simulation.status.state).toBe(GameState.HUNTING);
     expect(simulation.snake.headPosition.x).toBeCloseTo(
       GAMEPLAY_CONFIG.snake.speed * 0.25,
     );
@@ -131,7 +129,6 @@ describe("SnakeSimulation", () => {
       arena,
       { position: { x: 0, z: 0 }, direction: Direction.NORTH },
       8,
-      false,
       [{ position: { x: 0, z: -1 }, radius: 0.6 }],
     );
     const startLength = simulation.snake.length;

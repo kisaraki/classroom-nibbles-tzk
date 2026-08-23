@@ -91,10 +91,7 @@ export class SnakeSimulation {
   }
 
   requestDirection(direction: Direction): boolean {
-    if (
-      this.#stateMachine.state === GameState.HUNTING ||
-      this.#stateMachine.state === GameState.MAP_EXPANDED
-    ) {
+    if (this.#stateMachine.state === GameState.HUNTING) {
       const accepted = this.#snake.trySetDirection(direction);
       if (accepted) this.#safeUTurnTarget = null;
       return accepted;
@@ -110,8 +107,7 @@ export class SnakeSimulation {
   requestPlayerDirection(direction: Direction): boolean {
     if (
       this.#safeUTurnTarget === null &&
-      (this.#stateMachine.state === GameState.HUNTING ||
-        this.#stateMachine.state === GameState.MAP_EXPANDED) &&
+      this.#stateMachine.state === GameState.HUNTING &&
       isOppositeDirection(this.#snake.direction, direction)
     ) {
       const accepted = this.#snake.trySetDirection(
@@ -127,7 +123,6 @@ export class SnakeSimulation {
     const state = this.#stateMachine.state;
     if (
       state !== GameState.HUNTING &&
-      state !== GameState.MAP_EXPANDED &&
       state !== GameState.RECOVERY
     ) return false;
     if (state === GameState.RECOVERY && this.#recoveryTurnUsed) return false;
@@ -151,10 +146,7 @@ export class SnakeSimulation {
       this.#advanceRecovery(deltaSeconds);
       return;
     }
-    if (
-      this.#stateMachine.state !== GameState.HUNTING &&
-      this.#stateMachine.state !== GameState.MAP_EXPANDED
-    ) return;
+    if (this.#stateMachine.state !== GameState.HUNTING) return;
 
     if (
       this.#safeUTurnTarget !== null &&
@@ -178,10 +170,7 @@ export class SnakeSimulation {
   }
 
   applyWrongTokenCollision(position: XZPoint): boolean {
-    if (
-      this.#stateMachine.state !== GameState.HUNTING &&
-      this.#stateMachine.state !== GameState.MAP_EXPANDED
-    ) return false;
+    if (this.#stateMachine.state !== GameState.HUNTING) return false;
     this.#enterStun(CollisionKind.WRONG_TOKEN, position, false);
     return true;
   }

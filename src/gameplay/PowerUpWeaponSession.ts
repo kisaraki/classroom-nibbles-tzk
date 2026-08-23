@@ -21,12 +21,10 @@ const ACTIVE_WORLD_STATES = new Set<GameStateValue>([
   GameState.HUNTING,
   GameState.STUNNED,
   GameState.RECOVERY,
-  GameState.MAP_EXPANDED,
 ]);
 
 const INTERACTION_STATES = new Set<GameStateValue>([
   GameState.HUNTING,
-  GameState.MAP_EXPANDED,
 ]);
 
 export interface PowerUpCollectionResult {

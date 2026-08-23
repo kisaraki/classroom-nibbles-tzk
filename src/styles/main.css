@@ -53,22 +53,6 @@ body {
   display: none;
 }
 
-.phase-three-panel {
-  position: absolute;
-  top: clamp(0.8rem, 2.5vw, 2rem);
-  right: clamp(0.8rem, 2.5vw, 2rem);
-  z-index: 3;
-  width: min(31rem, calc(100% - 1.6rem));
-  max-height: calc(100% - clamp(1.6rem, 5vw, 4rem));
-  padding: clamp(1rem, 2.5vw, 1.6rem);
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 0.25rem;
-  background: rgb(5 13 27 / 88%);
-  box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 38%);
-  pointer-events: none;
-}
-
 .pinball-table-overlay {
   position: absolute;
   inset: 0;
@@ -151,223 +135,179 @@ body {
   transform: translateX(-50%);
 }
 
-.radar-map {
+.game-hud {
   position: absolute;
-  bottom: clamp(0.8rem, 2.5vw, 2rem);
-  left: clamp(0.8rem, 2.5vw, 2rem);
-  z-index: 4;
-  width: min(17rem, 42vw);
-  border: 1px solid rgb(80 227 194 / 42%);
-  background: rgb(2 11 21 / 92%);
-  box-shadow: 0 1rem 4rem rgb(0 0 0 / 52%);
-  transition: inset 180ms ease, width 180ms ease;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-.radar-map__button {
-  display: grid;
-  width: 100%;
-  padding: 0.65rem;
-  border: 0;
-  outline: none;
-  background: transparent;
-  color: #e9fff9;
-  cursor: pointer;
-  text-align: left;
-}
-
-.radar-map__button:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--accent);
-}
-
-.radar-map__heading,
-.radar-map__status,
-.radar-map__legend {
-  font-family: ui-monospace, "Cascadia Code", monospace;
-  letter-spacing: 0.08em;
-}
-
-.radar-map__heading {
-  color: var(--accent);
-  font-size: 0.68rem;
-}
-
-.radar-map__status,
-.radar-map__legend {
-  margin-top: 0.25rem;
-  color: var(--muted);
-  font-size: 0.52rem;
-  line-height: 1.4;
-}
-
-.radar-map__canvas {
-  display: block;
-  width: 100%;
-  height: 10rem;
-  margin-top: 0.45rem;
-  border: 1px solid rgb(80 227 194 / 18%);
-}
-
-.radar-map[data-expanded="true"] {
-  position: fixed;
-  inset: clamp(0.8rem, 3vw, 2.5rem);
-  z-index: 7;
-  width: auto;
-  background: rgb(2 8 17 / 98%);
-  box-shadow: 0 0 0 100vmax rgb(0 4 10 / 78%), 0 2rem 7rem rgb(0 0 0 / 75%);
-}
-
-.radar-map[data-expanded="true"] .radar-map__button {
-  height: 100%;
-  padding: clamp(0.8rem, 2vw, 1.5rem);
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
-}
-
-.radar-map[data-expanded="true"] .radar-map__heading {
-  font-size: clamp(0.9rem, 2vw, 1.25rem);
-}
-
-.radar-map[data-expanded="true"] .radar-map__status {
-  color: var(--warning);
-  font-size: 0.68rem;
-}
-
-.radar-map[data-expanded="true"] .radar-map__canvas {
-  width: 100%;
-  height: 100%;
-  min-height: 18rem;
-}
-
-.phase-three-panel__eyebrow,
-.phase-three-panel__environment,
-.phase-three-panel__metric-label,
-.phase-three-panel__label,
-.phase-three-panel__progress,
-.phase-three-panel__controls,
-.phase-three-panel__message {
+.game-hud__eyebrow,
+.game-hud__environment,
+.game-hud__metric-label,
+.game-hud__label,
+.game-hud__progress,
+.game-hud__controls,
+.game-hud__message {
   font-family: ui-monospace, "Cascadia Code", monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.phase-three-panel__environment {
-  margin: 0.55rem 0 0;
-  padding: 0.55rem 0.7rem;
+.game-hud__heading {
+  position: absolute;
+  top: 0.8rem;
+  left: 7.7rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  filter: drop-shadow(0 0.25rem 0.45rem rgb(0 0 0 / 82%));
+}
+
+.game-hud__environment {
+  position: absolute;
+  top: 4.25rem;
+  left: 0.9rem;
+  max-width: min(20rem, 25vw);
+  margin: 0;
+  padding: 0.48rem 0.65rem;
   border-left: 2px solid var(--accent);
-  background: var(--accent-soft);
+  background: rgb(4 15 29 / 72%);
   color: var(--accent);
   font-size: 0.58rem;
   line-height: 1.45;
 }
 
-.phase-three-panel__eyebrow {
-  margin: 0 0 0.45rem;
-  color: var(--muted);
-  font-size: 0.65rem;
-}
-
-.phase-three-panel__title {
+.game-hud__eyebrow {
   margin: 0;
-  font-size: clamp(2.5rem, 6vw, 4.3rem);
-  letter-spacing: -0.07em;
-  line-height: 0.9;
+  color: var(--muted);
+  font-size: 0.58rem;
 }
 
-.phase-three-panel__mission,
-.phase-three-panel__telemetry {
+.game-hud__title {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.game-hud__mission,
+.game-hud__telemetry,
+.game-hud__events {
+  position: absolute;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
   margin: 0;
-  overflow: hidden;
   border: 1px solid var(--line);
   background: var(--line);
+  box-shadow: 0 0.8rem 2.5rem rgb(0 0 0 / 30%);
 }
 
-.phase-three-panel__mission {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 1rem;
+.game-hud__mission {
+  top: 0.7rem;
+  right: 0.8rem;
+  width: min(48rem, calc(100% - 22rem));
+  grid-template-columns: 1.45fr 1fr 0.7fr 0.7fr;
 }
 
-.phase-three-panel__telemetry {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.game-hud__telemetry {
+  bottom: 0.75rem;
+  left: 0.8rem;
+  width: min(44rem, 53vw);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.phase-three-panel__metric {
+.game-hud__events {
+  right: 0.8rem;
+  bottom: 0.75rem;
+  width: min(34rem, 39vw);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.game-hud__metric {
   min-width: 0;
-  padding: 0.68rem;
-  background: rgb(6 18 33 / 96%);
+  padding: 0.5rem 0.58rem;
+  background: rgb(4 15 29 / 78%);
 }
 
-.phase-three-panel__metric-label {
-  margin-bottom: 0.25rem;
+.game-hud__metric-label {
+  margin-bottom: 0.18rem;
   color: var(--muted);
-  font-size: 0.55rem;
+  font-size: 0.48rem;
 }
 
-.phase-three-panel__metric-value {
+.game-hud__metric-value {
   margin: 0;
   overflow: hidden;
   color: #e9fff9;
   font-family: ui-monospace, "Cascadia Code", monospace;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.phase-three-panel[data-state="STUNNED"] [data-testid="simulation-state"],
-.phase-three-panel[data-state="STUNNED"] [data-testid="latest-collision"] {
+.game-hud[data-state="STUNNED"] [data-testid="simulation-state"],
+.game-hud[data-state="STUNNED"] [data-testid="latest-collision"] {
   color: var(--error);
 }
 
-.phase-three-panel[data-state="RECOVERY"] [data-testid="simulation-state"] {
+.game-hud[data-state="RECOVERY"] [data-testid="simulation-state"] {
   color: #ffd166;
 }
 
-.phase-three-panel__target-block {
-  margin: 0.75rem 0;
-  padding: 0.85rem;
+.game-hud__target-block {
+  position: absolute;
+  top: 4.15rem;
+  left: 50%;
+  width: min(34rem, 48vw);
+  padding: 0.65rem 0.8rem;
   border: 1px solid var(--line);
-  background: rgb(4 15 29 / 92%);
+  background: linear-gradient(180deg, rgb(4 15 29 / 80%), rgb(4 15 29 / 64%));
+  box-shadow: 0 0.8rem 2.5rem rgb(0 0 0 / 32%);
+  text-align: center;
+  transform: translateX(-50%);
 }
 
-.phase-three-panel__label,
-.phase-three-panel__part-of-speech,
-.phase-three-panel__progress,
-.phase-three-panel__controls {
-  margin: 0.75rem 0 0;
+.game-hud__label,
+.game-hud__part-of-speech,
+.game-hud__progress,
+.game-hud__controls {
+  margin: 0.45rem 0 0;
   color: var(--muted);
-  font-size: 0.58rem;
-  line-height: 1.55;
+  font-size: 0.54rem;
+  line-height: 1.45;
 }
 
-.phase-three-panel__label {
+.game-hud__label {
   margin-top: 0;
 }
 
-.phase-three-panel__target {
+.game-hud__target {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.3rem;
-  margin: 0.55rem 0;
+  margin: 0.42rem 0;
 }
 
-.phase-three-panel__target-token {
+.game-hud__target-token {
   display: grid;
-  min-width: 1.55rem;
-  height: 1.75rem;
+  min-width: 1.45rem;
+  height: 1.6rem;
   padding: 0 0.25rem;
   border: 1px solid var(--line);
   place-items: center;
   font-family: ui-monospace, "Cascadia Code", monospace;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
 }
 
-.phase-three-panel__target-token[data-status="collected"] {
+.game-hud__target-token[data-status="collected"] {
   opacity: 0.45;
   text-decoration: line-through;
 }
 
-.phase-three-panel__target-token[data-status="next"] {
+.game-hud__target-token[data-status="next"] {
   border: 2px solid #fff;
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -375,28 +315,47 @@ body {
   animation: target-outline 0.8s ease-in-out infinite alternate;
 }
 
-.phase-three-panel__meaning {
-  margin: 0.6rem 0 0;
-  font-size: 1rem;
+.game-hud__meaning {
+  display: inline;
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
   line-height: 1.45;
 }
 
-.phase-three-panel__part-of-speech {
-  margin-top: 0.25rem;
+.game-hud__part-of-speech {
+  display: inline;
+  margin-left: 0.45rem;
   color: var(--accent);
 }
 
-.phase-three-panel__message {
-  margin: 0.75rem 0 0;
+.game-hud__message {
+  position: absolute;
+  bottom: 8rem;
+  left: 50%;
+  width: min(42rem, calc(100% - 2rem));
+  margin: 0;
   padding: 0.7rem;
   border: 1px solid var(--accent);
-  background: var(--accent-soft);
+  background: rgb(4 15 29 / 88%);
   color: var(--accent);
   font-size: 0.62rem;
+  text-align: center;
+  transform: translateX(-50%);
 }
 
-.phase-three-panel__message[hidden] {
+.game-hud__message[hidden] {
   display: none;
+}
+
+.game-hud__controls {
+  position: absolute;
+  bottom: 4.7rem;
+  left: 50%;
+  margin: 0;
+  padding: 0.3rem 0.55rem;
+  background: rgb(4 15 29 / 58%);
+  text-align: center;
+  transform: translateX(-50%);
 }
 
 .audio-control {
@@ -1238,19 +1197,36 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .phase-three-panel {
-    right: auto;
-    left: 0.8rem;
-    max-height: calc(100% - 1.6rem);
-    overflow: auto;
+  .game-hud__heading,
+  .game-hud__environment,
+  .game-hud__events,
+  .game-hud__controls {
+    display: none;
   }
 
-  .radar-map {
-    width: min(14rem, calc(100% - 1.6rem));
+  .game-hud__mission {
+    top: 0.55rem;
+    right: 0.55rem;
+    left: 5.25rem;
+    width: auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .phase-three-panel__mission {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .game-hud__mission .game-hud__metric {
+    padding: 0.36rem 0.3rem;
+  }
+
+  .game-hud__target-block {
+    top: 4rem;
+    width: calc(100% - 1.1rem);
+    padding: 0.42rem;
+  }
+
+  .game-hud__telemetry {
+    right: 0.55rem;
+    bottom: 0.55rem;
+    left: 0.55rem;
+    width: auto;
   }
 
   .vocabulary-select {
@@ -1267,7 +1243,7 @@ body {
     animation: none !important;
   }
 
-  .phase-three-panel__target-token[data-status="next"] {
+  .game-hud__target-token[data-status="next"] {
     animation: none;
   }
 

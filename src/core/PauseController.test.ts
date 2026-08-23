@@ -45,20 +45,6 @@ describe("PauseController", () => {
     expect(controller.resumePending).toBe(false);
   });
 
-  it("returns to the exact tactical-map state after an automatic pause", () => {
-    const stateMachine = activeStateMachine();
-    stateMachine.transition(GameState.MAP_EXPANDED);
-    const presentation = new TestPausePresentation();
-    const controller = new PauseController(stateMachine, presentation);
-
-    expect(controller.pause(PauseReason.VISIBILITY)).toBe(true);
-    expect(presentation.reason).toBe(PauseReason.VISIBILITY);
-    controller.resume();
-    presentation.complete?.();
-
-    expect(stateMachine.state).toBe(GameState.MAP_EXPANDED);
-  });
-
   it("preserves an in-progress stun while paused", () => {
     const stateMachine = activeStateMachine();
     stateMachine.transition(GameState.STUNNED);

@@ -8,7 +8,6 @@ export const GameState = Object.freeze({
   HUNTING: "HUNTING",
   STUNNED: "STUNNED",
   RECOVERY: "RECOVERY",
-  MAP_EXPANDED: "MAP_EXPANDED",
   TYPING_TEST: "TYPING_TEST",
   PAUSED: "PAUSED",
   LEVEL_CLEAR: "LEVEL_CLEAR",
@@ -32,7 +31,6 @@ const GAME_TRANSITIONS: TransitionMap<GameState> = Object.freeze({
   [GameState.TRANSITION_IN]: Object.freeze([GameState.HUNTING]),
   [GameState.HUNTING]: Object.freeze([
     GameState.STUNNED,
-    GameState.MAP_EXPANDED,
     GameState.TYPING_TEST,
     GameState.PAUSED,
     GameState.LEVEL_CLEAR,
@@ -49,14 +47,6 @@ const GAME_TRANSITIONS: TransitionMap<GameState> = Object.freeze({
     GameState.PAUSED,
     GameState.LEVEL_FAILED,
   ]),
-  [GameState.MAP_EXPANDED]: Object.freeze([
-    GameState.HUNTING,
-    GameState.STUNNED,
-    GameState.PAUSED,
-    GameState.TYPING_TEST,
-    GameState.LEVEL_CLEAR,
-    GameState.LEVEL_FAILED,
-  ]),
   [GameState.TYPING_TEST]: Object.freeze([
     GameState.HUNTING,
     GameState.LEVEL_CLEAR,
@@ -66,7 +56,6 @@ const GAME_TRANSITIONS: TransitionMap<GameState> = Object.freeze({
     GameState.HUNTING,
     GameState.STUNNED,
     GameState.RECOVERY,
-    GameState.MAP_EXPANDED,
   ]),
   [GameState.LEVEL_CLEAR]: Object.freeze([GameState.TRANSITION_IN, GameState.GAME_CLEAR]),
   [GameState.LEVEL_FAILED]: Object.freeze([GameState.MAIN_MENU]),

@@ -15,12 +15,10 @@ const TIMER_STATES = new Set<GameStateValue>([
   GameState.HUNTING,
   GameState.STUNNED,
   GameState.RECOVERY,
-  GameState.MAP_EXPANDED,
 ]);
 
 const COLLECTION_STATES = new Set<GameStateValue>([
   GameState.HUNTING,
-  GameState.MAP_EXPANDED,
 ]);
 
 export const TokenCollectionKind = Object.freeze({

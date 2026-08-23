@@ -10,7 +10,7 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
   await expect(page.getByTestId("phase-three-data-version")).toContainText("1.0.0-phase0");
-  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.4.0");
+  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.5.0");
   await expect(page.getByTestId("vocabulary-error")).toBeHidden();
   await expect(page.getByTestId("phase-three-canvas")).toBeVisible();
 
@@ -19,9 +19,10 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await page.getByTestId("start-run").click();
 
   await expect(page.getByTestId("vocabulary-select")).toBeHidden();
-  await expect(page.getByTestId("phase-three-panel")).toBeVisible();
+  await expect(page.getByTestId("game-hud")).toBeVisible();
+  await expect(page.getByTestId("phase-three-panel")).toHaveCount(0);
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.4.0");
+  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.5.0");
   await expect(page.locator("#app")).toHaveAttribute(
     "data-environment-theme",
     "cargo-bay",
@@ -55,11 +56,8 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   );
   await expect(page.getByTestId("pinball-table-overlay")).toBeVisible();
   await expect(page.getByTestId("cockpit-overlay")).toHaveCount(0);
-  await expect(page.getByTestId("mini-map")).toBeVisible();
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-snake-points", "8");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-token-count", "30");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-power-up-count", "5");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-obstacle-count", "6");
+  await expect(page.getByTestId("mini-map")).toHaveCount(0);
+  await expect(page.getByTestId("tactical-map-toggle")).toHaveCount(0);
   await expect(page.getByTestId("environment-feature")).toHaveText(
     "環境機制：貨櫃形成實體掩體",
   );
@@ -68,23 +66,8 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByTestId("phase-message")).toBeHidden();
   await expect(page.getByTestId("no-progress-countdown")).toHaveCount(0);
 
-  await page.getByTestId("tactical-map-toggle").click();
-  await expect(page.getByTestId("simulation-state")).toHaveText("戰術地圖");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "true");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-time-scale", "0.25");
-  await expect(page.getByTestId("tactical-map-status")).toContainText("0.25×");
-  const expandedHeadZ = await page.getByTestId("mini-map").getAttribute("data-head-z");
-  await expect.poll(
-    () => page.getByTestId("mini-map").getAttribute("data-head-z"),
-  ).not.toBe(expandedHeadZ);
-  await page.keyboard.press("Escape");
-  await expect(page.getByTestId("simulation-state")).toHaveText("進行中");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "false");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-time-scale", "1");
   await page.keyboard.press("m");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "true");
-  await page.keyboard.press("m");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "false");
+  await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
 
   await page.keyboard.press("Space");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
@@ -92,18 +75,20 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   expect(pageErrors).toEqual([]);
 });
 
-test("進場期間提出的戰術雷達要求會在可操控時自動展開", async ({ page }) => {
+test("資訊直接配置於主遊戲畫面且不再建立側欄或雷達", async ({ page }) => {
   await page.goto("./");
   await page.getByTestId("vocabulary-select").waitFor();
-  await page.getByTestId("run-seed").fill("radar-queued-open");
+  await page.getByTestId("run-seed").fill("integrated-game-hud");
   await page.getByTestId("start-run").click();
-  await expect(page.locator("#app")).toHaveAttribute("data-game-state", "TRANSITION_IN");
+  await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
 
-  await page.keyboard.press("m");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-pending", "true");
-  await expect(page.getByTestId("tactical-map-status")).toContainText("自動展開");
-
-  await expect(page.locator("#app")).toHaveAttribute("data-game-state", "MAP_EXPANDED");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-expanded", "true");
-  await expect(page.getByTestId("mini-map")).toHaveAttribute("data-pending", "false");
+  const hud = page.getByTestId("game-hud");
+  await expect(hud).toBeVisible();
+  expect(
+    await hud.evaluate((element) => getComputedStyle(element).backgroundColor),
+  ).toBe("rgba(0, 0, 0, 0)");
+  await expect(page.getByTestId("phase-three-panel")).toHaveCount(0);
+  await expect(page.getByTestId("mini-map")).toHaveCount(0);
+  await expect(page.getByTestId("target-tokens")).toBeVisible();
+  await expect(page.getByTestId("main-timer")).toBeVisible();
 });

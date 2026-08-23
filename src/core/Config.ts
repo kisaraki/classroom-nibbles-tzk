@@ -2,7 +2,7 @@ import type { GameLevel } from "../vocabulary/WordSelector";
 
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  releaseVersion: "1.4.0",
+  releaseVersion: "1.5.0",
   phaseLabel: "第九階段",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
@@ -39,9 +39,6 @@ export const GAMEPLAY_CONFIG = Object.freeze({
   fixedStepSeconds: 1 / 60,
   maximumFrameDeltaSeconds: 0.1,
   maximumUpdatesPerFrame: 6,
-  tacticalMap: Object.freeze({
-    timeScale: 0.25,
-  }),
   snake: Object.freeze({
     initialLength: 8,
     minimumLength: 3,

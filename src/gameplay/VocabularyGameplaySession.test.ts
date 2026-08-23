@@ -184,16 +184,15 @@ describe("VocabularyGameplaySession", () => {
     expect(session.status.timeRemainingSeconds).toBe(remaining);
   });
 
-  it("collects ordered tokens while the tactical map remains expanded", () => {
-    const { session, stateMachine } = createSession("AB");
-    stateMachine.transition(GameState.MAP_EXPANDED);
+  it("collects ordered tokens while hunting", () => {
+    const { session } = createSession("AB");
     const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
 
     expect(session.resolveTokenCollision(correct.id)).toMatchObject({
       kind: TokenCollectionKind.CORRECT,
       progressIndex: 1,
     });
-    expect(session.status.state).toBe(GameState.MAP_EXPANDED);
+    expect(session.status.state).toBe(GameState.HUNTING);
     expect(session.status.nextToken).toBe("B");
   });
 
@@ -221,12 +220,11 @@ describe("VocabularyGameplaySession", () => {
   });
 
   it("keeps the current word after twenty seconds without a correct token", () => {
-    const { session, stateMachine } = createSession("AB");
-    stateMachine.transition(GameState.MAP_EXPANDED);
+    const { session } = createSession("AB");
 
     session.update(20);
 
-    expect(session.status.state).toBe(GameState.MAP_EXPANDED);
+    expect(session.status.state).toBe(GameState.HUNTING);
     expect(session.status.wordNumber).toBe(1);
     expect(session.status.progressIndex).toBe(0);
     expect(session.status.timeRemainingSeconds).toBe(100);

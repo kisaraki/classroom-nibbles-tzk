@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 1.7 (Version 1.4 native resolution, reliable radar and mecha backflip)
+Version: 1.8 (Version 1.5 integrated game-screen HUD and radar removal)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -34,15 +34,15 @@ Two rapid 90-degree inputs must not bypass the reversal rule and curl the head i
 
 Default configuration: initial length 8, min 3, max 40, segment spacing 0.75 world unit. Base speed is 3.0 units/sec in Game Level 1 and increases monotonically by level to 6.0 units/sec in Game Level 5. Put gameplay constants in a central config module.
 
-Pressing `J` performs an escape backflip by making the current tail the new head and reversing the existing body trail. The new head points away from the body along the tail tangent, so the maneuver changes the nose direction without folding inward or teleporting individual body segments. It is accepted in `HUNTING`, `MAP_EXPANDED`, and as the one permitted stationary turn in `RECOVERY`; it is rejected in `STUNNED` and all non-gameplay states. Repeated input is locked out for the duration of the mecha animation.
+Pressing `J` performs an escape backflip by making the current tail the new head and reversing the existing body trail. The new head points away from the body along the tail tangent, so the maneuver changes the nose direction without folding inward or teleporting individual body segments. It is accepted in `HUNTING` and as the one permitted stationary turn in `RECOVERY`; it is rejected in `STUNNED` and all non-gameplay states. Repeated input is locked out for the duration of the mecha animation.
 
 ## 4. State machine
 
 Use one explicit main state machine, not combinations of booleans:
 
-`BOOT`, `MAIN_MENU`, `VOCABULARY_SELECT`, `TRANSITION_IN`, `HUNTING`, `STUNNED`, `RECOVERY`, `MAP_EXPANDED`, `TYPING_TEST`, `PAUSED`, `LEVEL_CLEAR`, `LEVEL_FAILED`, `GAME_CLEAR`, `CREDITS`.
+`BOOT`, `MAIN_MENU`, `VOCABULARY_SELECT`, `TRANSITION_IN`, `HUNTING`, `STUNNED`, `RECOVERY`, `TYPING_TEST`, `PAUSED`, `LEVEL_CLEAR`, `LEVEL_FAILED`, `GAME_CLEAR`, `CREDITS`.
 
-Main timer runs in HUNTING, STUNNED, RECOVERY and MAP_EXPANDED. It pauses in PAUSED, TRANSITION_IN, TYPING_TEST and terminal/transition states. Tactical map uses `timeScale = 0.25` for gameplay and main timer. Typing timer always uses real time.
+Main timer runs in HUNTING, STUNNED and RECOVERY. It pauses in PAUSED, TRANSITION_IN, TYPING_TEST and terminal/transition states. Typing timer always uses real time.
 
 ## 5. Collision rules
 
@@ -73,7 +73,7 @@ Supported gameplay character tokens: `A-Z`, `SPACE`, `PERIOD`, `APOSTROPHE`, `HY
 - Game Level 4: Dense Atmosphere, unlimited token length, 5 words, 90 seconds, snake speed 5.25 units/sec.
 - Game Level 5: Alien Forest, unlimited token length, 5 words, 60 seconds, snake speed 6.0 units/sec.
 
-Each scene has a distinct world palette, interface accent/line/warning theme, fog range, solid obstacle layout and 3D obstacle treatment. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, appear on both map sizes and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
+Each scene has a distinct world palette, interface accent/line/warning theme, fog range, solid obstacle layout and 3D obstacle treatment. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, remain visible in the playfield and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
 
 If a vocabulary filter yields fewer than 5 candidates, relax recent-history filtering first, then increase max token length one token at a time until sufficient.
 
@@ -81,9 +81,9 @@ If a vocabulary filter yields fewer than 5 candidates, relax recent-history filt
 
 Use one fixed PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver animates one backward rotation on the snake head and leading body only; the camera and full-screen view remain fixed while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
 
-The Three.js canvas retains the full CSS viewport and automatically uses the browser's complete detected `devicePixelRatio`, with no application resolution cap. It re-detects changes while running and resizes the internal buffer to CSS size × device pixel ratio. The tactical-map canvas follows the same native-resolution rule.
+The Three.js canvas retains the full CSS viewport and automatically uses the browser's complete detected `devicePixelRatio`, with no application resolution cap. It re-detects changes while running and resizes the internal buffer to CSS size × device pixel ratio.
 
-Mini-map in lower left shows player-view directions, arena, walls/obstacles, all characters/power-ups, snake head and full snake trail. Clicking the mini-map or pressing `M` opens the enlarged tactical map. A request during scene entry, stun or recovery is queued and automatically fulfilled as soon as hunting resumes instead of being silently ignored. The enlarged map runs gameplay at 0.25 speed; `Esc` or `M` closes it.
+Do not render a mini-map, tactical radar, tactical-map state or `M`/`Esc` map controls. Do not reserve a separate information side panel. Mission information is distributed directly over the main game view as a transparent HUD: compact mission metrics at the top, the current vocabulary target near the upper center, movement status at the lower left, recent events at the lower right and contextual messages near the center. HUD child cards may use translucent backplates for readability, but the HUD root must not cover the playfield with a panel background.
 
 The Version 1.x user interface uses Traditional Chinese for navigation, labels, state feedback, countdown warnings and accessibility text. English vocabulary targets, CEEC names and conventional control abbreviations may remain where they are learning content or proper names.
 
@@ -121,7 +121,7 @@ Use fixed-step gameplay update at 1/60 sec with accumulator. Clamp frame delta t
 - Phase 3 — vocabulary gameplay/selection/token spawning/HUD progress. **Completed.**
 - Phase 4 — typing test. **Completed.**
 - Phase 5 — power-ups and weapon. **Completed.**
-- Phase 6 — HUD, mini-map and tactical map. **Completed.**
+- Phase 6 — HUD and the former mini-map/tactical map. **Completed; radar removed in Version 1.5.**
 - Phase 7 — five functional environments. **Completed.**
 - Phase 8 — presentation/audio/transitions/credits. **Completed.**
 - Phase 9 — full QA and release hardening. **Completed for Version 1.0.**
@@ -130,4 +130,4 @@ Do not start the next phase until the current phase passes typecheck, tests and 
 
 ## 16. Definition of Done for Version 1.x
 
-A player can choose CEEC vocabulary mode, complete all five game scenes from the pinball-table player view, steer in four fixed player-view directions with safe opposite-direction completion, use the `J` escape backflip, collect target characters in order, experience length rewards/penalties without collision death, use radar/power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. A main-timer failure has a Chinese, keyboard-accessible route back to mission settings. Vocabulary validation, unit tests, improved-resolution 1920×1080 performance/accessibility E2E tests, production build, release-artifact budgets and GitHub Pages deployment all pass.
+A player can choose CEEC vocabulary mode, complete all five game scenes from the pinball-table player view, read the integrated main-screen HUD, steer in four fixed player-view directions with safe opposite-direction completion, use the `J` escape backflip, collect target characters in order, experience length rewards/penalties without collision death, use power-ups/weapon, complete the 3× typing reinforcement for every word, finish Level 5, and reach KOSMOS TOOLKITS credits. A main-timer failure has a Chinese, keyboard-accessible route back to mission settings. Vocabulary validation, unit tests, native-resolution 1920×1080 performance/accessibility E2E tests, production build, release-artifact budgets and GitHub Pages deployment all pass.

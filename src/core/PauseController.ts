@@ -17,7 +17,6 @@ const PAUSABLE_STATES = new Set<GameStateValue>([
   GameState.HUNTING,
   GameState.STUNNED,
   GameState.RECOVERY,
-  GameState.MAP_EXPANDED,
 ]);
 
 export class PauseController {

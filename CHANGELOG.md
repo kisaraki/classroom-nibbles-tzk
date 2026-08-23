@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## Version 1.5 — 2026-08-23
+
+### Removed
+- Removed the mini-map, expanded tactical radar, `M`/`Esc` map controls, quarter-speed map configuration and the now-unreachable `MAP_EXPANDED` state.
+- Removed the separate right-side information panel and its large opaque backdrop.
+
+### Changed
+- Distributed mission metrics, vocabulary target, movement telemetry, event feedback and controls directly across the main game view as a transparent, responsive HUD.
+- Kept the HUD backplates lightweight and non-blurred so the 1920×1080 scene retains the 30 FPS release floor.
+- Added main-HUD position diagnostics so pause and backflip behavior remain verifiable without depending on radar data.
+- Updated the Traditional Chinese controls, public specification, release metadata and automated coverage to Version 1.5.
+
+### Added
+- Chromium coverage confirming the old panel/radar are absent, `M` no longer changes gameplay state and native-resolution rendering remains intact.
+
 ## Version 1.4 — 2026-08-23
 
 ### Fixed
