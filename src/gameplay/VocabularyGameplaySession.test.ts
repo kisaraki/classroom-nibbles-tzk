@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GAMEPLAY_CONFIG } from "../core/Config";
+import { GAMEPLAY_CONFIG, GAME_LEVEL_CONFIGS } from "../core/Config";
 import { createGameStateMachine, GameState } from "../core/GameState";
 import { SeededRandom } from "../core/SeededRandom";
 import type { StateMachine } from "../core/StateMachine";
@@ -47,13 +47,15 @@ function planFor(target: string): VocabularyRunPlan {
     mode: VocabularyMode.CEEC_1,
     seed: "session-test",
     scenes: Object.freeze(
-      Array.from({ length: 5 }, (_, index) =>
+      GAME_LEVEL_CONFIGS.map((config) =>
         Object.freeze({
-          gameLevel: (index + 1) as 1 | 2 | 3 | 4 | 5,
-          sceneName: `Scene ${index + 1}`,
-          durationSeconds: index === 0 ? 120 : 90,
-          maximumTokenLength: index < 3 ? 5 + index * 3 : null,
-          words: Object.freeze(Array.from({ length: 5 }, () => vocabularyEntry)),
+          gameLevel: config.gameLevel,
+          sceneName: `Scene ${config.gameLevel}`,
+          durationSeconds: config.durationSeconds,
+          maximumTokenLength: config.maximumTokenLength,
+          words: Object.freeze(
+            Array.from({ length: config.wordsPerScene }, () => vocabularyEntry),
+          ),
         }),
       ),
     ),
@@ -245,7 +247,7 @@ describe("VocabularyGameplaySession", () => {
     const startedScenes: number[] = [];
     session.subscribeToSceneStarted((scene) => startedScenes.push(scene.gameLevel));
 
-    for (let completedWords = 0; completedWords < 25; completedWords += 1) {
+    for (let completedWords = 0; completedWords < 75; completedWords += 1) {
       const correct = session.tokenEntities.find((entity) => entity.token === "A")!;
       session.resolveTokenCollision(correct.id);
       expect(session.status.state).toBe(GameState.TYPING_TEST);
@@ -253,16 +255,19 @@ describe("VocabularyGameplaySession", () => {
 
       if (completedWords === 4) {
         expect(session.status.gameLevel).toBe(2);
-        expect(session.status.timeRemainingSeconds).toBe(90);
+        expect(session.status.timeRemainingSeconds).toBe(180);
+        expect(session.status.sceneWordNumber).toBe(1);
+        expect(session.status.sceneTotalWords).toBe(10);
       }
-      if ([4, 9, 14, 19].includes(completedWords)) {
+      if ([4, 14, 29, 49].includes(completedWords)) {
         expect(session.status.state).toBe(GameState.TRANSITION_IN);
         stateMachine.transition(GameState.HUNTING);
       }
     }
 
     expect(session.status.state).toBe(GameState.GAME_CLEAR);
-    expect(session.status.wordNumber).toBe(25);
+    expect(session.status.wordNumber).toBe(75);
+    expect(session.status.totalWords).toBe(75);
     expect(startedScenes).toEqual([2, 3, 4, 5]);
   });
 });

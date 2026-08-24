@@ -69,8 +69,8 @@ async function main(): Promise<void> {
   const indexPath = path.join(DIST_DIRECTORY, "index.html");
   const html = await readFile(indexPath, "utf8");
   assertRelease(
-    html.includes("<title>NIBBLES — 第九階段</title>"),
-    "production title does not identify Phase 09",
+    html.includes("<title>NIBBLES — 深空字彙任務</title>"),
+    "production title does not identify the deep-space vocabulary mission",
   );
 
   const references = localReferences(html);

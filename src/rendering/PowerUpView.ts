@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { Arena } from "../gameplay/Arena";
+import type { EnvironmentProfile } from "../gameplay/Environment";
 import {
   POWER_UP_KINDS,
   PowerUpKind,
@@ -14,17 +15,24 @@ const POSITION_VALUES_PER_VERTEX = 3;
 const UV_VALUES_PER_VERTEX = 2;
 const INDICES_PER_POWER_UP = 6;
 
-function powerUpColor(kind: PowerUpKindValue): string {
+function powerUpColor(
+  kind: PowerUpKindValue,
+  accent: string,
+  warning: string,
+): string {
   if (kind === PowerUpKind.TIME_PLUS_10 || kind === PowerUpKind.TIME_PLUS_5) {
-    return "#50e3c2";
+    return accent;
   }
   if (kind === PowerUpKind.TIME_MINUS_10 || kind === PowerUpKind.TIME_MINUS_5) {
     return "#ff8e8e";
   }
-  return "#ffd166";
+  return warning;
 }
 
-function createPowerUpAtlas(): THREE.CanvasTexture {
+function createPowerUpAtlas(
+  accent = "#50e3c2",
+  warning = "#ffd166",
+): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = ATLAS_CELL_SIZE * POWER_UP_KINDS.length;
   canvas.height = ATLAS_CELL_SIZE;
@@ -32,7 +40,7 @@ function createPowerUpAtlas(): THREE.CanvasTexture {
   if (!context) throw new Error("Unable to create power-up atlas canvas context.");
   POWER_UP_KINDS.forEach((kind, index) => {
     const centerX = index * ATLAS_CELL_SIZE + ATLAS_CELL_SIZE / 2;
-    const color = powerUpColor(kind);
+    const color = powerUpColor(kind, accent, warning);
     context.fillStyle = "rgba(5, 15, 30, 0.96)";
     context.strokeStyle = color;
     context.lineWidth = 9;
@@ -56,7 +64,7 @@ function createPowerUpAtlas(): THREE.CanvasTexture {
 }
 
 export class PowerUpView {
-  readonly #texture = createPowerUpAtlas();
+  #texture = createPowerUpAtlas();
   readonly #material = new THREE.MeshBasicMaterial({
     map: this.#texture,
     transparent: true,
@@ -105,6 +113,17 @@ export class PowerUpView {
     this.#mesh.renderOrder = 2;
     this.#mesh.matrixAutoUpdate = false;
     parent.add(this.#mesh);
+  }
+
+  setEnvironment(environment: EnvironmentProfile): void {
+    const replacement = createPowerUpAtlas(
+      environment.uiTheme.accent,
+      environment.uiTheme.warning,
+    );
+    this.#texture.dispose();
+    this.#texture = replacement;
+    this.#material.map = replacement;
+    this.#material.needsUpdate = true;
   }
 
   update(

@@ -50,7 +50,7 @@ export class FailureScreen {
     );
     description.id = "failure-description";
     panel.append(
-      createElement("p", "failure-screen__eyebrow", "任務回報 / 09"),
+      createElement("p", "failure-screen__eyebrow", "深空任務回報"),
       createElement("p", "failure-screen__status", "時間結束"),
       title,
       createElement("p", "failure-screen__scene", summary.sceneName),

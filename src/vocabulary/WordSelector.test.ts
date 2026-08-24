@@ -47,17 +47,23 @@ function fixtureEntry(index: number, length: number, level: VocabularyLevel = 1)
 }
 
 describe("WordSelector", () => {
-  it("creates a deterministic 25-word fixed-level run without duplicate targets", () => {
+  it("creates a deterministic 75-word fixed-level run with progressive scene sizes", () => {
     const selector = new WordSelector(runtimeEntries);
     const first = selector.createRun(VocabularyMode.CEEC_2, "same-seed");
     const second = selector.createRun(VocabularyMode.CEEC_2, "same-seed");
     const targets = first.scenes.flatMap((scene) => scene.words.map((entry) => entry.target));
 
     expect(first.scenes).toHaveLength(5);
-    expect(first.scenes.every((scene) => scene.words.length === 5)).toBe(true);
-    expect(new Set(targets).size).toBe(25);
+    expect(first.scenes.map((scene) => scene.words.length)).toEqual([
+      5,
+      10,
+      15,
+      20,
+      25,
+    ]);
+    expect(new Set(targets).size).toBe(75);
     expect(first.scenes.flatMap((scene) => scene.words.map((entry) => entry.sourceLevel))).toEqual(
-      Array.from({ length: 25 }, () => 2),
+      Array.from({ length: 75 }, () => 2),
     );
     expect(second.scenes.flatMap((scene) => scene.words.map((entry) => entry.id))).toEqual(
       first.scenes.flatMap((scene) => scene.words.map((entry) => entry.id)),
@@ -89,8 +95,8 @@ describe("WordSelector", () => {
     expect(run.scenes[0]?.words.every((entry) => entry.sourceLevel === 1)).toBe(true);
     expect(run.scenes[1]?.words.every((entry) => entry.sourceLevel === 2)).toBe(true);
     expect(run.scenes[2]?.words.every((entry) => entry.sourceLevel === 3)).toBe(true);
-    expect(run.scenes[3]?.words.filter((entry) => entry.sourceLevel === 4)).toHaveLength(3);
-    expect(run.scenes[3]?.words.filter((entry) => entry.sourceLevel === 5)).toHaveLength(2);
+    expect(run.scenes[3]?.words.filter((entry) => entry.sourceLevel === 4)).toHaveLength(12);
+    expect(run.scenes[3]?.words.filter((entry) => entry.sourceLevel === 5)).toHaveLength(8);
     expect(run.scenes[4]?.words.every((entry) => entry.sourceLevel === 6)).toBe(true);
   });
 
@@ -98,15 +104,15 @@ describe("WordSelector", () => {
     const run = new WordSelector(runtimeEntries).createRun(VocabularyMode.MIXED, "mixed-run");
     const entries = run.scenes.flatMap((scene) => scene.words);
 
-    expect(entries).toHaveLength(25);
-    expect(new Set(entries.map((entry) => entry.target)).size).toBe(25);
+    expect(entries).toHaveLength(75);
+    expect(new Set(entries.map((entry) => entry.target)).size).toBe(75);
     expect(entries.every((entry) => entry.sourceLevel >= 1 && entry.sourceLevel <= 6)).toBe(true);
   });
 
   it("relaxes recent history before increasing the token-length limit", () => {
     const entries = [
       ...Array.from({ length: 5 }, (_, index) => fixtureEntry(index, 5)),
-      ...Array.from({ length: 25 }, (_, index) => fixtureEntry(index + 5, 6)),
+      ...Array.from({ length: 100 }, (_, index) => fixtureEntry(index + 5, 6)),
     ];
     const recentTargets = entries.slice(0, 5).map((entry) => entry.target);
     const run = new WordSelector(entries).createRun(

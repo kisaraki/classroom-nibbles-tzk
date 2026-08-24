@@ -1,5 +1,4 @@
-import { APP_CONFIG } from "../core/Config";
-import type { VocabularyMetadata } from "../vocabulary/types";
+import { APP_CONFIG, GAME_LEVEL_CONFIGS } from "../core/Config";
 import {
   VOCABULARY_MODE_OPTIONS,
   VocabularyMode,
@@ -9,7 +8,6 @@ import {
 
 export interface VocabularySelection {
   readonly mode: VocabularyModeValue;
-  readonly seed: string;
 }
 
 export type VocabularySelectionListener = (selection: VocabularySelection) => void;
@@ -29,13 +27,11 @@ export class VocabularySelectScreen {
   readonly #element: HTMLElement;
   readonly #form: HTMLFormElement;
   readonly #mode: HTMLSelectElement;
-  readonly #seed: HTMLInputElement;
   readonly #error: HTMLElement;
   readonly #listener: VocabularySelectionListener;
 
   constructor(
     container: HTMLElement,
-    metadata: VocabularyMetadata,
     listener: VocabularySelectionListener,
   ) {
     this.#listener = listener;
@@ -43,15 +39,26 @@ export class VocabularySelectScreen {
     this.#element.dataset.testid = "vocabulary-select";
     const panel = createElement("div", "vocabulary-select__panel");
     panel.append(
-      createElement("p", "vocabulary-select__eyebrow", "任務設定 / 09"),
+      createElement("p", "vocabulary-select__eyebrow", "深空字彙任務"),
       createElement("h1", "vocabulary-select__title", APP_CONFIG.title),
-      createElement("p", "vocabulary-select__phase", `${APP_CONFIG.phaseLabel} — 字元獵取`),
+      createElement("p", "vocabulary-select__phase", "選擇航行字彙"),
       createElement(
         "p",
         "vocabulary-select__intro",
-        "字彙級別與遊戲關卡彼此獨立。請選擇字彙來源；使用相同種子即可重現相同的五關任務。",
+        "字彙級別與遊戲關卡彼此獨立。選擇字彙來源後，系統會自動建立不重複的五關深空任務。",
       ),
     );
+
+    const route = createElement("ol", "vocabulary-select__route");
+    for (const level of GAME_LEVEL_CONFIGS) {
+      const item = createElement("li", "vocabulary-select__route-item");
+      item.append(
+        createElement("span", "vocabulary-select__route-level", `第 ${level.gameLevel} 關`),
+        createElement("strong", "vocabulary-select__route-count", `${level.wordsPerScene} 個單字`),
+      );
+      route.append(item);
+    }
+    panel.append(route);
 
     this.#form = createElement("form", "vocabulary-select__form");
     const modeLabel = createElement("label", "vocabulary-select__field");
@@ -67,16 +74,6 @@ export class VocabularySelectScreen {
     }
     modeLabel.append(this.#mode);
 
-    const seedLabel = createElement("label", "vocabulary-select__field");
-    seedLabel.append(createElement("span", "vocabulary-select__label", "關卡種子"));
-    this.#seed = createElement("input", "vocabulary-select__input");
-    this.#seed.dataset.testid = "run-seed";
-    this.#seed.name = "run-seed";
-    this.#seed.value = "NIBBLES-PHASE-9";
-    this.#seed.maxLength = 80;
-    this.#seed.required = true;
-    seedLabel.append(this.#seed);
-
     const submit = createElement("button", "vocabulary-select__submit", "開始字元獵取");
     submit.type = "submit";
     submit.dataset.testid = "start-run";
@@ -84,15 +81,8 @@ export class VocabularySelectScreen {
     this.#error.dataset.testid = "selection-error";
     this.#error.setAttribute("role", "alert");
     this.#error.hidden = true;
-    this.#form.append(modeLabel, seedLabel, submit, this.#error);
-
-    const dataset = createElement(
-      "p",
-      "vocabulary-select__dataset",
-      `NIBBLES ${APP_CONFIG.releaseVersion} · 資料版本 ${metadata.dataVersion} · ${metadata.eligibleEntries.toLocaleString("zh-TW")} 筆可遊玩字彙`,
-    );
-    dataset.dataset.testid = "phase-three-data-version";
-    panel.append(this.#form, dataset);
+    this.#form.append(modeLabel, submit, this.#error);
+    panel.append(this.#form);
     this.#element.append(panel);
     container.append(this.#element);
     this.#form.addEventListener("submit", this.#onSubmit);
@@ -112,7 +102,7 @@ export class VocabularySelectScreen {
     const message = error instanceof Error ? error.message : "";
     this.#error.textContent = /[\u3400-\u9fff]/u.test(message)
       ? message
-      : "無法建立關卡，請更換字彙模式或種子後再試。";
+      : "無法建立關卡，請更換字彙模式後再試。";
     this.#error.hidden = false;
   }
 
@@ -128,11 +118,6 @@ export class VocabularySelectScreen {
       this.showError(new Error("請選擇有效的字彙模式。"));
       return;
     }
-    const seed = this.#seed.value.trim();
-    if (!seed) {
-      this.showError(new Error("請輸入關卡種子。"));
-      return;
-    }
-    this.#listener(Object.freeze({ mode, seed }));
+    this.#listener(Object.freeze({ mode }));
   };
 }

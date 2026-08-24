@@ -57,6 +57,13 @@ import { createGameStateMachine, GameState } from "./GameState";
 import { PauseController, PauseReason } from "./PauseController";
 import { SeededRandom } from "./SeededRandom";
 
+function createAutomaticRunSeed(): string {
+  const values = crypto.getRandomValues(new Uint32Array(4));
+  return `nibbles-${[...values]
+    .map((value) => value.toString(16).padStart(8, "0"))
+    .join("")}`;
+}
+
 export class Game {
   readonly #container: HTMLElement;
   readonly #bootScreen: BootScreen;
@@ -164,7 +171,6 @@ export class Game {
       this.#stateMachine.transition(GameState.VOCABULARY_SELECT);
       this.#selectionScreen = new VocabularySelectScreen(
         this.#container,
-        this.#repository.metadata,
         this.#startRun,
       );
       this.#pauseInput.attach();
@@ -204,10 +210,11 @@ export class Game {
       this.#snake.resetPose({ length: GAMEPLAY_CONFIG.snake.initialLength });
       this.#fixedStepRunner.reset();
       this.#lastTelemetryUpdateSeconds = Number.NEGATIVE_INFINITY;
+      const runSeed = createAutomaticRunSeed();
       const selector = new WordSelector(this.#repository.eligibleEntries);
       const plan = selector.createRun(
         selection.mode,
-        selection.seed,
+        runSeed,
         this.#recentHistory.load(),
       );
       const initialEnvironment = this.#environment.select(plan.scenes[0]!.gameLevel);
@@ -220,7 +227,7 @@ export class Game {
       });
       const spawnManager = new SpawnManager(
         this.#arena,
-        new SeededRandom(`${selection.seed}:spawns`),
+        new SeededRandom(`${runSeed}:spawns`),
         {
           minimumHeadDistance: GAMEPLAY_CONFIG.token.minimumHeadDistance,
           minimumEntitySpacing: GAMEPLAY_CONFIG.token.minimumEntitySpacing,
@@ -279,7 +286,7 @@ export class Game {
         tokenPool,
         powerUpPool,
         weaponSystem,
-        new SeededRandom(`${selection.seed}:table-motion`),
+        new SeededRandom(`${runSeed}:table-motion`),
         GAMEPLAY_CONFIG.tableMotion,
         () => this.#environment.obstacles,
       );

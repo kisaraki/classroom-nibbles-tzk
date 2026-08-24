@@ -1,28 +1,34 @@
 import { expect, test } from "@playwright/test";
 
-test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環境", async ({ page }) => {
+test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", async ({ page }) => {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("./");
 
-  await expect(page).toHaveTitle("NIBBLES — 第九階段");
+  await expect(page).toHaveTitle("NIBBLES — 深空字彙任務");
   await expect(page.getByTestId("vocabulary-select")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
-  await expect(page.getByTestId("phase-three-data-version")).toContainText("1.0.0-phase0");
-  await expect(page.getByTestId("phase-three-data-version")).toContainText("NIBBLES 1.7.0");
+  await expect(page.getByLabel("關卡種子")).toHaveCount(0);
+  await expect(page.getByText(/資料版本|NIBBLES 1\.8\.0/u)).toHaveCount(0);
+  await expect(page.getByText("5 個單字", { exact: true })).toBeVisible();
+  await expect(page.getByText("25 個單字", { exact: true })).toBeVisible();
   await expect(page.getByTestId("vocabulary-error")).toBeHidden();
   await expect(page.getByTestId("phase-three-canvas")).toBeVisible();
+  await expect(page.getByTestId("deep-space-backdrop")).toBeVisible();
+  await expect(page.getByTestId("deep-space-backdrop")).toHaveAttribute(
+    "data-space-theme",
+    "orbital-dock-nebula",
+  );
 
   await page.getByTestId("vocabulary-mode").selectOption("CEEC_3");
-  await page.getByTestId("run-seed").fill("phase-seven-e2e");
   await page.getByTestId("start-run").click();
 
   await expect(page.getByTestId("vocabulary-select")).toBeHidden();
   await expect(page.getByTestId("game-hud")).toBeVisible();
   await expect(page.getByTestId("phase-three-panel")).toHaveCount(0);
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.7.0");
+  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.8.0");
   await expect(page.locator("#app")).toHaveAttribute(
     "data-environment-theme",
     "cargo-bay",
@@ -36,7 +42,8 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByTestId("snake-speed")).toHaveText("3.0 單位/秒");
   await expect(page.getByTestId("game-level")).toContainText("第 1 關 · 貨艙");
   await expect(page.getByTestId("vocabulary-level")).toHaveText("CEEC 第 3 級");
-  await expect(page.getByTestId("word-number")).toHaveText("1/25");
+  await expect(page.getByTestId("scene-word-number")).toHaveText("1/5");
+  await expect(page.getByTestId("word-number")).toHaveText("1/75");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-token-count", "30");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-power-up-count", "5");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
@@ -51,6 +58,10 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
     "貨艙",
   );
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute(
+    "data-space-theme",
+    "orbital-dock-nebula",
+  );
+  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute(
     "data-obstacle-count",
     "6",
   );
@@ -59,12 +70,13 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
   await expect(page.getByTestId("mini-map")).toHaveCount(0);
   await expect(page.getByTestId("tactical-map-toggle")).toHaveCount(0);
   await expect(page.getByTestId("environment-feature")).toHaveText(
-    "環境機制：貨櫃形成實體掩體",
+    "深空環境：青綠船塢星雲 · 貨櫃形成實體掩體",
   );
   await expect(page.getByTestId("ammo-count")).toHaveText("0");
   await expect(page.getByTestId("target-tokens").locator('[aria-current="step"]')).toHaveCount(1);
   await expect(page.getByTestId("phase-message")).toBeHidden();
   await expect(page.getByTestId("no-progress-countdown")).toHaveCount(0);
+  await expect(page.getByText(/第九階段|\/ 09|資料版本/u)).toHaveCount(0);
 
   await page.keyboard.press("m");
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
@@ -78,7 +90,6 @@ test("以中文彈珠台介面選擇獨立字彙並開始第九階段貨艙環�
 test("資訊直接配置於主遊戲畫面且不再建立側欄或雷達", async ({ page }) => {
   await page.goto("./");
   await page.getByTestId("vocabulary-select").waitFor();
-  await page.getByTestId("run-seed").fill("integrated-game-hud");
   await page.getByTestId("start-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
 

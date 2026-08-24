@@ -18,6 +18,14 @@ describe("Phase 7 environments", () => {
     expect(ENVIRONMENT_PROFILES).toHaveLength(5);
     expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.kind)).size).toBe(5);
     expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.uiTheme.accent)).size).toBe(5);
+    expect(
+      new Set(ENVIRONMENT_PROFILES.map((profile) => profile.spaceBackdrop.id)).size,
+    ).toBe(5);
+    expect(
+      new Set(
+        ENVIRONMENT_PROFILES.map((profile) => profile.palette.mechaPrimaryColor),
+      ).size,
+    ).toBe(5);
 
     for (const level of GAME_LEVEL_CONFIGS) {
       const profile = environmentForLevel(level.gameLevel);
@@ -26,7 +34,26 @@ describe("Phase 7 environments", () => {
       expect(profile.obstacles.length).toBeGreaterThanOrEqual(6);
       expect(profile.palette.fogFar).toBeGreaterThan(profile.palette.fogNear);
       expect(profile.uiTheme.accent).toMatch(/^#[\da-f]{6}$/iu);
+      expect(profile.spaceBackdrop.label.length).toBeGreaterThan(0);
+      expect(profile.spaceBackdrop.celestialAngularRadius).toBeGreaterThan(0);
     }
+  });
+
+  it("uses the requested cumulative word ladder with playable scaled timers", () => {
+    expect(GAME_LEVEL_CONFIGS.map((level) => level.wordsPerScene)).toEqual([
+      5,
+      10,
+      15,
+      20,
+      25,
+    ]);
+    expect(GAME_LEVEL_CONFIGS.map((level) => level.durationSeconds)).toEqual([
+      120,
+      180,
+      270,
+      360,
+      300,
+    ]);
   });
 
   it("starts slowly and increases machine speed in every successive level", () => {

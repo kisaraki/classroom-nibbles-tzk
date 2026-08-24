@@ -1,4 +1,4 @@
-import { PRESENTATION_CONFIG } from "../core/Config";
+import { PRESENTATION_CONFIG, TOTAL_RUN_WORDS } from "../core/Config";
 import { PauseReason, type PausePresentation } from "../core/PauseController";
 import type { EnvironmentProfile } from "../gameplay/Environment";
 
@@ -42,7 +42,7 @@ export class TransitionOverlay implements PausePresentation {
     this.#show(
       "scene",
       `第 ${environment.gameLevel} 關 · ${environment.sceneName}`,
-      environment.featureLabel,
+      `${environment.spaceBackdrop.label} · ${environment.featureLabel}`,
     );
     this.#element.dataset.door = "open";
     this.#nextFrame(() => {
@@ -60,7 +60,11 @@ export class TransitionOverlay implements PausePresentation {
 
   playMissionComplete(complete: () => void): void {
     this.#clearTimers();
-    this.#show("complete", "任務完成", "五個環境、二十五個單字全部完成");
+    this.#show(
+      "complete",
+      "任務完成",
+      `五個深空環境、${TOTAL_RUN_WORDS} 個單字全部完成`,
+    );
     this.#element.dataset.door = "closed";
     const timings = PRESENTATION_CONFIG.sceneTransition;
     this.#schedule(() => {

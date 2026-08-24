@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## Version 1.8 — 2026-08-24
+
+### Added
+- Added five distinct procedural deep-space backgrounds: orbital-dock nebula, cryogenic star current, violet asteroid rift, gold-blue ion storm and emerald alien aurora.
+- Added environment-linked mecha armor, canopy, engine glow, body energy rings, token frames, table rails and layered obstacle materials.
+- Added separate, enlarged current-scene and total-run word progress to the main HUD.
+
+### Changed
+- Changed the five scene sizes to 5, 10, 15, 20 and 25 words, for 75 unique words per completed run, and scaled scene timers to preserve the prior per-word difficulty curve.
+- Replaced the player-selectable run seed with an automatically generated internal seed while retaining seeded gameplay systems.
+- Enlarged selection, mission, target, telemetry, event, typing, failure and credits information with stronger contrast and scene-colored emphasis.
+- Updated the specification, README and release metadata to Version 1.8.
+
+### Removed
+- Removed all visible development phase numbers, release/data versions, dataset counts and seed controls from player-facing screens.
+
 ## Version 1.7 — 2026-08-23
 
 ### Changed

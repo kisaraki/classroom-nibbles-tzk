@@ -1,4 +1,4 @@
-import { GAMEPLAY_CONFIG } from "../core/Config";
+import { GAMEPLAY_CONFIG, GAME_LEVEL_CONFIGS } from "../core/Config";
 import { GameState, type GameState as GameStateValue } from "../core/GameState";
 import type { StateMachine } from "../core/StateMachine";
 import type { CharacterToken, VocabularyEntry } from "../vocabulary/types";
@@ -40,6 +40,8 @@ export interface VocabularyGameplayStatus {
   readonly vocabularyMode: string;
   readonly gameLevel: number;
   readonly sceneName: string;
+  readonly sceneWordNumber: number;
+  readonly sceneTotalWords: number;
   readonly wordNumber: number;
   readonly totalWords: number;
   readonly timeRemainingSeconds: number;
@@ -72,6 +74,8 @@ export class VocabularyGameplaySession {
   #latestCollection: TokenCollectionKind | null = null;
   #typingTimeoutCount = 0;
   #typingTimeoutNoticeActive = false;
+  readonly #totalWords: number;
+  readonly #sceneWordOffsets: readonly number[];
 
   constructor(
     plan: VocabularyRunPlan,
@@ -80,14 +84,28 @@ export class VocabularyGameplaySession {
     tokenPool: TokenPool,
     tokenCollisions: TokenCollisionSystem,
   ) {
-    if (plan.scenes.length !== 5 || plan.scenes.some((scene) => scene.words.length !== 5)) {
-      throw new Error("A vocabulary run must contain five scenes with five words each.");
+    const sceneWordCountsAreValid = plan.scenes.every((scene, index) =>
+      scene.words.length === GAME_LEVEL_CONFIGS[index]?.wordsPerScene
+    );
+    if (plan.scenes.length !== GAME_LEVEL_CONFIGS.length || !sceneWordCountsAreValid) {
+      throw new Error(
+        "A vocabulary run must contain five scenes with 5, 10, 15, 20 and 25 words.",
+      );
     }
     this.#plan = plan;
     this.#stateMachine = stateMachine;
     this.#snakeSimulation = snakeSimulation;
     this.#tokenPool = tokenPool;
     this.#tokenCollisions = tokenCollisions;
+    let runningTotal = 0;
+    this.#sceneWordOffsets = Object.freeze(
+      plan.scenes.map((scene) => {
+        const offset = runningTotal;
+        runningTotal += scene.words.length;
+        return offset;
+      }),
+    );
+    this.#totalWords = runningTotal;
     this.#timeRemainingSeconds = this.#currentScene.durationSeconds;
     this.#tokenPool.normalize(this.#snakeSimulation.snake);
   }
@@ -107,8 +125,10 @@ export class VocabularyGameplaySession {
       vocabularyMode: vocabularyModeLabel(this.#plan.mode),
       gameLevel: this.#currentScene.gameLevel,
       sceneName: this.#currentScene.sceneName,
-      wordNumber: this.#sceneIndex * 5 + this.#wordIndex + 1,
-      totalWords: 25,
+      sceneWordNumber: this.#wordIndex + 1,
+      sceneTotalWords: this.#currentScene.words.length,
+      wordNumber: this.#sceneWordOffsets[this.#sceneIndex]! + this.#wordIndex + 1,
+      totalWords: this.#totalWords,
       timeRemainingSeconds: Math.max(this.#timeRemainingSeconds, 0),
       entry,
       progressIndex: this.#progressIndex,

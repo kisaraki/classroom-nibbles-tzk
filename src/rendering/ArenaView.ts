@@ -17,6 +17,7 @@ export class ArenaView {
     this.#floorMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.floorColor,
       fog: false,
+      toneMapped: false,
     });
     const floor = new THREE.Mesh(this.#floorGeometry, this.#floorMaterial);
     floor.rotation.x = -Math.PI / 2;
@@ -38,11 +39,13 @@ export class ArenaView {
 
     this.#solidMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.solidWallColor,
+      toneMapped: false,
     });
     this.#wrapMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.wrapGateColor,
       transparent: true,
       opacity: 0.8,
+      toneMapped: false,
     });
     this.#xBoundaryGeometry = new THREE.BoxGeometry(0.22, 0.8, halfDepth * 2);
     this.#zBoundaryGeometry = new THREE.BoxGeometry(halfWidth * 2, 0.8, 0.22);

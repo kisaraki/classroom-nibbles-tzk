@@ -8,7 +8,6 @@ test.use({
 test("WebGL 自動使用裝置的完整像素比", async ({ page }) => {
   await page.goto("./");
   await page.getByTestId("vocabulary-select").waitFor();
-  await page.getByTestId("run-seed").fill("native-device-resolution");
   await page.getByTestId("start-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
 

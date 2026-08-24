@@ -8,7 +8,6 @@ test.use({ viewport: { width: 1920, height: 1080 } });
 async function startReleaseRun(page: import("@playwright/test").Page): Promise<void> {
   await page.goto("./");
   await page.getByTestId("vocabulary-select").waitFor();
-  await page.getByTestId("run-seed").fill("phase-nine-release");
   await page.getByTestId("start-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
   await expect(page.getByTestId("transition-overlay")).toBeHidden();
@@ -90,7 +89,7 @@ test("發行介面保有中文可及名稱、焦點與唯一識別碼", async ({
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-Hant-TW");
   await expect(page.locator("#app")).toHaveAttribute("aria-label", "NIBBLES 遊戲");
   await expect(page.getByLabel("字彙模式")).toBeVisible();
-  await expect(page.getByLabel("關卡種子")).toBeVisible();
+  await expect(page.getByLabel("關卡種子")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "開始字元獵取" })).toBeVisible();
   await expect(page.getByRole("button", { name: "關閉音效" })).toBeVisible();
 
@@ -106,7 +105,7 @@ test("發行介面保有中文可及名稱、焦點與唯一識別碼", async ({
   await startReleaseRun(page);
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute(
     "aria-label",
-    /第九階段.*貨艙/u,
+    /彈珠台字彙遊戲場.*貨艙/u,
   );
   await expect(page.getByTestId("target-tokens").locator('[aria-current="step"]')).toHaveCount(1);
   await page.keyboard.press("p");

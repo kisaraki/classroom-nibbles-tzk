@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { Arena } from "../gameplay/Arena";
+import type { EnvironmentProfile } from "../gameplay/Environment";
 import { tokenDisplayLabel, type TokenEntity } from "../gameplay/TokenPool";
 import {
   CHARACTER_TOKENS,
@@ -19,6 +20,7 @@ function drawTokenCell(
   token: CharacterToken,
   column: number,
   row: number,
+  accent: string,
 ): void {
   const x = column * ATLAS_CELL_SIZE;
   const y = row * ATLAS_CELL_SIZE;
@@ -26,7 +28,7 @@ function drawTokenCell(
   context.translate(x, y);
   context.clearRect(0, 0, ATLAS_CELL_SIZE, ATLAS_CELL_SIZE);
   context.fillStyle = "rgba(5, 15, 30, 0.94)";
-  context.strokeStyle = "#50e3c2";
+  context.strokeStyle = accent;
   context.lineWidth = 7;
   context.beginPath();
   context.roundRect(8, 8, 112, 112, 24);
@@ -40,14 +42,20 @@ function drawTokenCell(
   context.restore();
 }
 
-function createTokenAtlas(): THREE.CanvasTexture {
+function createTokenAtlas(accent = "#50e3c2"): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = ATLAS_COLUMNS * ATLAS_CELL_SIZE;
   canvas.height = ATLAS_ROWS * ATLAS_CELL_SIZE;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Unable to create token-atlas canvas context.");
   CHARACTER_TOKENS.forEach((token, index) => {
-    drawTokenCell(context, token, index % ATLAS_COLUMNS, Math.floor(index / ATLAS_COLUMNS));
+    drawTokenCell(
+      context,
+      token,
+      index % ATLAS_COLUMNS,
+      Math.floor(index / ATLAS_COLUMNS),
+      accent,
+    );
   });
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -57,7 +65,7 @@ function createTokenAtlas(): THREE.CanvasTexture {
 }
 
 export class TokenView {
-  readonly #texture = createTokenAtlas();
+  #texture = createTokenAtlas();
   readonly #material = new THREE.MeshBasicMaterial({
     map: this.#texture,
     transparent: true,
@@ -105,6 +113,14 @@ export class TokenView {
     this.#mesh.renderOrder = 2;
     this.#mesh.matrixAutoUpdate = false;
     parent.add(this.#mesh);
+  }
+
+  setEnvironment(environment: EnvironmentProfile): void {
+    const replacement = createTokenAtlas(environment.uiTheme.accent);
+    this.#texture.dispose();
+    this.#texture = replacement;
+    this.#material.map = replacement;
+    this.#material.needsUpdate = true;
   }
 
   update(

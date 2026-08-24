@@ -15,7 +15,7 @@ export class PinballTableOverlay {
     apron.className = "pinball-table-overlay__apron";
     const label = document.createElement("span");
     label.className = "pinball-table-overlay__label";
-    label.textContent = "NIBBLES // 彈珠台操控席";
+    label.textContent = "NIBBLES // 深空航行";
     this.#element.append(leftRail, rightRail, apron, label);
     container.append(this.#element);
   }

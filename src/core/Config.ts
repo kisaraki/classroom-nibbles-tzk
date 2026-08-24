@@ -2,8 +2,7 @@ import type { GameLevel } from "../vocabulary/WordSelector";
 
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  releaseVersion: "1.7.0",
-  phaseLabel: "第九階段",
+  releaseVersion: "1.8.0",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     cameraFieldOfView: 52,
@@ -15,8 +14,6 @@ export const APP_CONFIG = Object.freeze({
     cameraLookDepthRatio: -0.15,
     mechaBackflipDurationSeconds: 0.8,
     antialias: false,
-    snakeHeadColor: 0x86ffe1,
-    snakeBodyColor: 0x25bda5,
   }),
 });
 
@@ -107,35 +104,40 @@ export const GAME_LEVEL_CONFIGS = Object.freeze([
     gameLevel: 2 as const,
     sceneName: "艦艇管線",
     maximumTokenLength: 8 as number | null,
-    wordsPerScene: 5,
-    durationSeconds: 90,
+    wordsPerScene: 10,
+    durationSeconds: 180,
     snakeSpeed: 3.75,
   }),
   Object.freeze({
     gameLevel: 3 as const,
     sceneName: "小行星帶",
     maximumTokenLength: 10 as number | null,
-    wordsPerScene: 5,
-    durationSeconds: 90,
+    wordsPerScene: 15,
+    durationSeconds: 270,
     snakeSpeed: 4.5,
   }),
   Object.freeze({
     gameLevel: 4 as const,
     sceneName: "稠密大氣層",
     maximumTokenLength: null,
-    wordsPerScene: 5,
-    durationSeconds: 90,
+    wordsPerScene: 20,
+    durationSeconds: 360,
     snakeSpeed: 5.25,
   }),
   Object.freeze({
     gameLevel: 5 as const,
     sceneName: "異星森林",
     maximumTokenLength: null,
-    wordsPerScene: 5,
-    durationSeconds: 60,
+    wordsPerScene: 25,
+    durationSeconds: 300,
     snakeSpeed: 6,
   }),
 ]);
+
+export const TOTAL_RUN_WORDS = GAME_LEVEL_CONFIGS.reduce(
+  (total, level) => total + level.wordsPerScene,
+  0,
+);
 
 export function getGameLevelConfig(gameLevel: GameLevel) {
   const config = GAME_LEVEL_CONFIGS.find(

@@ -117,6 +117,7 @@ export class GameHud {
   readonly #element: HTMLElement;
   readonly #gameLevel: HTMLElement;
   readonly #vocabularyLevel: HTMLElement;
+  readonly #sceneWordNumber: HTMLElement;
   readonly #wordNumber: HTMLElement;
   readonly #timer: HTMLElement;
   readonly #environmentFeature: HTMLElement;
@@ -144,7 +145,7 @@ export class GameHud {
     this.#element.setAttribute("aria-label", "遊戲主畫面資訊");
     const heading = createElement("header", "game-hud__heading");
     heading.append(
-      createElement("p", "game-hud__eyebrow", "彈珠台任務 / 09"),
+      createElement("p", "game-hud__eyebrow", "深空字彙巡航"),
       createElement("h1", "game-hud__title", APP_CONFIG.title),
     );
 
@@ -156,12 +157,18 @@ export class GameHud {
       "—",
       "vocabulary-level",
     );
-    this.#wordNumber = this.#appendMetric(mission, "單字", "—", "word-number");
+    this.#sceneWordNumber = this.#appendMetric(
+      mission,
+      "本關單字",
+      "—",
+      "scene-word-number",
+    );
+    this.#wordNumber = this.#appendMetric(mission, "總任務", "—", "word-number");
     this.#timer = this.#appendMetric(mission, "主計時", "—", "main-timer");
     this.#environmentFeature = createElement(
       "p",
       "game-hud__environment",
-      "環境機制：—",
+      "深空環境：—",
     );
     this.#environmentFeature.dataset.testid = "environment-feature";
     this.#tableMotion = createElement(
@@ -233,9 +240,16 @@ export class GameHud {
     this.#element.dataset.tableMotion = tableMotion.mode;
     setText(this.#gameLevel, `第 ${gameplay.gameLevel} 關 · ${gameplay.sceneName}`);
     setText(this.#vocabularyLevel, gameplay.vocabularyMode);
+    setText(
+      this.#sceneWordNumber,
+      `${gameplay.sceneWordNumber}/${gameplay.sceneTotalWords}`,
+    );
     setText(this.#wordNumber, `${gameplay.wordNumber}/${gameplay.totalWords}`);
     setText(this.#timer, formatTime(gameplay.timeRemainingSeconds));
-    setText(this.#environmentFeature, `環境機制：${environment.featureLabel}`);
+    setText(
+      this.#environmentFeature,
+      `深空環境：${environment.spaceBackdrop.label} · ${environment.featureLabel}`,
+    );
     setText(this.#tableMotion, tableMotionLabel(tableMotion));
     setText(this.#state, stateLabel(gameplay.state));
     setText(this.#heading, directionLabel(snake.direction));
@@ -275,7 +289,7 @@ export class GameHud {
         : gameplay.state === "LEVEL_FAILED"
           ? "本關主計時已結束"
           : gameplay.state === "GAME_CLEAR"
-            ? "25 個單字皆已完成打字強化測驗"
+            ? `${gameplay.totalWords} 個單字皆已完成打字強化測驗`
             : gameplay.typingTimeoutNoticeActive
               ? `打字測驗逾時：已補回主計時 5 秒，請重新收集最後一個字元（第 ${gameplay.typingTimeoutCount} 次）`
               : "",

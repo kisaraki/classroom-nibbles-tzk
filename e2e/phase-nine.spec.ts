@@ -3,7 +3,6 @@ import { expect, test } from "@playwright/test";
 async function startRun(page: import("@playwright/test").Page): Promise<void> {
   await page.goto("./");
   await page.getByTestId("vocabulary-select").waitFor();
-  await page.getByTestId("run-seed").fill("phase-nine-presentation");
   await page.getByTestId("start-run").click();
   await expect(page.getByTestId("transition-overlay")).toHaveAttribute(
     "data-mode",
@@ -85,8 +84,8 @@ test("完成畫面顯示 KOSMOS TOOLKITS 製作名單並提供重玩入口", asy
   await expect(credits.getByText("KOSMOS TOOLKITS")).toBeVisible();
   await expect(credits.getByText("探真拓知酷")).toBeVisible();
   await expect(credits.getByText("任務完成", { exact: true })).toBeVisible();
-  await expect(credits.getByText("NIBBLES 1.7.0")).toBeVisible();
-  await expect(credits.getByText("25/25")).toBeVisible();
+  await expect(credits.getByText(/NIBBLES 1\.8\.0/u)).toHaveCount(0);
+  await expect(credits.getByText("75/75")).toBeVisible();
   await page.getByTestId("replay-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-replay-requested", "true");
 });
@@ -102,7 +101,7 @@ test("關卡失敗畫面提供中文回報、鍵盤焦點與返回入口", async
     const container = document.querySelector<HTMLElement>("#app")!;
     new FailureScreen(
       container,
-      { gameLevel: 4, sceneName: "稠密大氣層", wordNumber: 18, totalWords: 25 },
+      { gameLevel: 4, sceneName: "稠密大氣層", wordNumber: 38, totalWords: 75 },
       () => {
         container.dataset.failureReturnRequested = "true";
       },
@@ -114,7 +113,7 @@ test("關卡失敗畫面提供中文回報、鍵盤焦點與返回入口", async
   await expect(failure).toHaveAttribute("role", "alertdialog");
   await expect(failure.getByRole("heading", { name: "第 4 關未完成" })).toBeVisible();
   await expect(failure.getByText("稠密大氣層")).toBeVisible();
-  await expect(failure.getByText("第 18/25 個單字", { exact: false })).toBeVisible();
+  await expect(failure.getByText("第 38/75 個單字", { exact: false })).toBeVisible();
   const returnButton = page.getByTestId("failure-return");
   await expect(returnButton).toBeFocused();
   await returnButton.click();

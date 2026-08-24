@@ -1,4 +1,4 @@
-import { APP_CONFIG } from "../core/Config";
+import { APP_CONFIG, TOTAL_RUN_WORDS } from "../core/Config";
 
 export type ReplayListener = () => void;
 
@@ -28,7 +28,7 @@ export class CreditsScreen {
 
     const panel = createElement("div", "credits-screen__panel");
     panel.append(
-      createElement("p", "credits-screen__eyebrow", "任務紀錄 / 09"),
+      createElement("p", "credits-screen__eyebrow", "深空任務紀錄"),
       createElement("p", "credits-screen__status", "任務完成"),
     );
     const title = createElement("h1", "credits-screen__title", APP_CONFIG.title);
@@ -38,19 +38,14 @@ export class CreditsScreen {
       createElement(
         "p",
         "credits-screen__summary",
-        "你已穿越五個環境，完成二十五個單字與每次三連續正確的打字強化。",
-      ),
-      createElement(
-        "p",
-        "credits-screen__version",
-        `NIBBLES ${APP_CONFIG.releaseVersion}`,
+        `你已穿越五個深空環境，完成 ${TOTAL_RUN_WORDS} 個單字與每次三連續正確的打字強化。`,
       ),
     );
 
     const metrics = createElement("dl", "credits-screen__metrics");
     for (const [label, value] of [
       ["環境", "5/5"],
-      ["單字", "25/25"],
+      ["單字", `${TOTAL_RUN_WORDS}/${TOTAL_RUN_WORDS}`],
       ["打字強化", "全數完成"],
     ] as const) {
       const metric = createElement("div", "credits-screen__metric");

@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 2.0 (Version 1.7 hold-to-shake table controls)
+Version: 2.1 (Version 1.8 deep-space presentation and progressive mission sizes)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -63,21 +63,21 @@ The supplied CEEC Level 1–6 PDF is the source reference. Each level is labeled
 
 Runtime must never parse the PDF.
 
-Game Level and Vocabulary Level are independent. Vocabulary selection supports CEEC 1–6, PROGRESSIVE, and MIXED 1–6. A full run contains 5 game scenes × 5 words = 25 words. Avoid repeating the same entry/target in one run. Word selection must support a deterministic seed.
+Game Level and Vocabulary Level are independent. Vocabulary selection supports CEEC 1–6, PROGRESSIVE, and MIXED 1–6. A full run contains five scenes with 5, 10, 15, 20 and 25 words respectively, for 75 words total. Avoid repeating the same entry/target in one run. The player chooses only the vocabulary mode; the application automatically generates an internal seed for deterministic word selection, spawning and table motion within that run.
 
-PROGRESSIVE mapping: Game 1→CEEC 1, Game 2→CEEC 2, Game 3→CEEC 3, Game 4→3 words from CEEC 4 + 2 from CEEC 5, Game 5→CEEC 6.
+PROGRESSIVE mapping: Game 1→CEEC 1, Game 2→CEEC 2, Game 3→CEEC 3, Game 4→12 words from CEEC 4 + 8 from CEEC 5, Game 5→CEEC 6.
 
 Supported gameplay character tokens: `A-Z`, `SPACE`, `PERIOD`, `APOSTROPHE`, `HYPHEN`. Slash is a source variant delimiter and never a gameplay token. Token length, not JavaScript string length, controls level word-length constraints.
 
 ## 7. Game scenes
 
 - Game Level 1: Cargo Bay, max token length 5, 5 words, 120 seconds, snake speed 3.0 units/sec.
-- Game Level 2: Ship Pipeline, max token length 8, 5 words, 90 seconds, snake speed 3.75 units/sec.
-- Game Level 3: Asteroid Belt, max token length 10, 5 words, 90 seconds, snake speed 4.5 units/sec.
-- Game Level 4: Dense Atmosphere, unlimited token length, 5 words, 90 seconds, snake speed 5.25 units/sec.
-- Game Level 5: Alien Forest, unlimited token length, 5 words, 60 seconds, snake speed 6.0 units/sec.
+- Game Level 2: Ship Pipeline, max token length 8, 10 words, 180 seconds, snake speed 3.75 units/sec.
+- Game Level 3: Asteroid Belt, max token length 10, 15 words, 270 seconds, snake speed 4.5 units/sec.
+- Game Level 4: Dense Atmosphere, unlimited token length, 20 words, 360 seconds, snake speed 5.25 units/sec.
+- Game Level 5: Alien Forest, unlimited token length, 25 words, 300 seconds, snake speed 6.0 units/sec.
 
-Each scene has a distinct world palette, interface accent/line/warning theme, fog range, solid obstacle layout and 3D obstacle treatment. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, remain visible in the playfield and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
+Each scene has a distinct world palette, interface accent/line/warning theme, procedural deep-space background, celestial feature, fog range, solid obstacle layout and 3D obstacle treatment. The mecha armor, canopy, engine glow, character frames, table rails and environment lighting adopt the current scene palette. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, remain visible in the playfield and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
 
 If a vocabulary filter yields fewer than 5 candidates, relax recent-history filtering first, then increase max token length one token at a time until sufficient.
 
@@ -87,7 +87,9 @@ Use one fixed PerspectiveCamera at the player's end of the table, angled downwar
 
 The Three.js canvas retains the full CSS viewport and automatically uses the browser's complete detected `devicePixelRatio`, with no application resolution cap. It re-detects changes while running and resizes the internal buffer to CSS size × device pixel ratio.
 
-Do not render a mini-map, tactical radar, tactical-map state or `M`/`Esc` map controls. Do not reserve a separate information side panel. Mission information is distributed directly over the main game view as a transparent HUD: compact mission metrics at the top, the current vocabulary target near the upper center, movement status at the lower left, recent events at the lower right and contextual messages near the center. HUD child cards may use translucent backplates for readability, but the HUD root must not cover the playfield with a panel background.
+Do not render a mini-map, tactical radar, tactical-map state or `M`/`Esc` map controls. Do not reserve a separate information side panel. Mission information is distributed directly over the main game view as a transparent HUD: prominent mission metrics at the top, separate current-scene and total-run word progress, the current vocabulary target near the upper center, movement status at the lower left, recent events at the lower right and contextual messages near the center. HUD child cards may use high-contrast translucent backplates for readability, but the HUD root must not cover the playfield with a panel background.
+
+Do not show development-phase numbers, build/release versions, vocabulary data versions, diagnostic counts or selectable run seeds in the player interface. Internal diagnostics may remain as non-visible DOM attributes for automated release verification.
 
 The Version 1.x user interface uses Traditional Chinese for navigation, labels, state feedback, countdown warnings and accessibility text. English vocabulary targets, CEEC names and conventional control abbreviations may remain where they are learning content or proper names.
 

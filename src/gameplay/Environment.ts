@@ -43,8 +43,31 @@ export interface EnvironmentPalette {
   readonly hemisphereSkyColor: number;
   readonly hemisphereGroundColor: number;
   readonly keyLightColor: number;
+  readonly mechaPrimaryColor: number;
+  readonly mechaSecondaryColor: number;
+  readonly mechaGlowColor: number;
+  readonly mechaCanopyColor: number;
   readonly fogNear: number;
   readonly fogFar: number;
+}
+
+export interface SpaceBackdropTheme {
+  readonly id: string;
+  readonly label: string;
+  readonly deepColor: number;
+  readonly horizonColor: number;
+  readonly nebulaPrimaryColor: number;
+  readonly nebulaSecondaryColor: number;
+  readonly starColor: number;
+  readonly accentStarColor: number;
+  readonly celestialColor: number;
+  readonly celestialDirection: Readonly<{
+    x: number;
+    y: number;
+    z: number;
+  }>;
+  readonly celestialAngularRadius: number;
+  readonly variant: number;
 }
 
 export interface EnvironmentUiTheme {
@@ -60,6 +83,7 @@ export interface EnvironmentProfile {
   readonly sceneName: string;
   readonly featureLabel: string;
   readonly palette: EnvironmentPalette;
+  readonly spaceBackdrop: SpaceBackdropTheme;
   readonly uiTheme: EnvironmentUiTheme;
   readonly obstacles: readonly EnvironmentObstacle[];
 }
@@ -101,6 +125,20 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       line: "rgb(80 227 194 / 28%)",
       warning: "#ffd166",
     }),
+    spaceBackdrop: Object.freeze({
+      id: "orbital-dock-nebula",
+      label: "青綠船塢星雲",
+      deepColor: 0x01050d,
+      horizonColor: 0x09283a,
+      nebulaPrimaryColor: 0x0b7f83,
+      nebulaSecondaryColor: 0xb5692a,
+      starColor: 0xc8f7ff,
+      accentStarColor: 0xffd27a,
+      celestialColor: 0x4b7189,
+      celestialDirection: Object.freeze({ x: -0.56, y: 0.34, z: -0.75 }),
+      celestialAngularRadius: 0.16,
+      variant: 1,
+    }),
     palette: Object.freeze({
       backgroundColor: 0x050b16,
       floorColor: 0x091827,
@@ -113,6 +151,10 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       hemisphereSkyColor: 0xbcecff,
       hemisphereGroundColor: 0x08101e,
       keyLightColor: 0x73ffe1,
+      mechaPrimaryColor: 0x72f5dc,
+      mechaSecondaryColor: 0x163f51,
+      mechaGlowColor: 0xffc857,
+      mechaCanopyColor: 0xbafcff,
       fogNear: 18,
       fogFar: 32,
     }),
@@ -136,6 +178,20 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       line: "rgb(85 184 255 / 30%)",
       warning: "#a9e6ff",
     }),
+    spaceBackdrop: Object.freeze({
+      id: "cryogenic-current",
+      label: "藍白低溫星流",
+      deepColor: 0x01070d,
+      horizonColor: 0x062b3b,
+      nebulaPrimaryColor: 0x087eaa,
+      nebulaSecondaryColor: 0x23d6c8,
+      starColor: 0xd8fbff,
+      accentStarColor: 0x75d9ff,
+      celestialColor: 0x8ddbe7,
+      celestialDirection: Object.freeze({ x: 0.58, y: 0.23, z: -0.78 }),
+      celestialAngularRadius: 0.1,
+      variant: 2,
+    }),
     palette: Object.freeze({
       backgroundColor: 0x041016,
       floorColor: 0x0a2025,
@@ -148,6 +204,10 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       hemisphereSkyColor: 0xa5f7f1,
       hemisphereGroundColor: 0x07171c,
       keyLightColor: 0x5cf2e6,
+      mechaPrimaryColor: 0x5ccaff,
+      mechaSecondaryColor: 0x123b55,
+      mechaGlowColor: 0x61fff1,
+      mechaCanopyColor: 0xd5fbff,
       fogNear: 15,
       fogFar: 29,
     }),
@@ -173,6 +233,20 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       line: "rgb(200 168 255 / 30%)",
       warning: "#ffca80",
     }),
+    spaceBackdrop: Object.freeze({
+      id: "violet-asteroid-rift",
+      label: "紫晶小行星裂谷",
+      deepColor: 0x05020d,
+      horizonColor: 0x241337,
+      nebulaPrimaryColor: 0x7042a8,
+      nebulaSecondaryColor: 0xbe496f,
+      starColor: 0xf1e6ff,
+      accentStarColor: 0xffc18b,
+      celestialColor: 0x7d637f,
+      celestialDirection: Object.freeze({ x: -0.12, y: 0.43, z: -0.9 }),
+      celestialAngularRadius: 0.2,
+      variant: 3,
+    }),
     palette: Object.freeze({
       backgroundColor: 0x070711,
       floorColor: 0x151321,
@@ -185,6 +259,10 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       hemisphereSkyColor: 0xcfc7ff,
       hemisphereGroundColor: 0x0a0712,
       keyLightColor: 0xb9a8ff,
+      mechaPrimaryColor: 0xc7a7ff,
+      mechaSecondaryColor: 0x3c254f,
+      mechaGlowColor: 0xffa46f,
+      mechaCanopyColor: 0xf1dcff,
       fogNear: 14,
       fogFar: 28,
     }),
@@ -211,6 +289,20 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       line: "rgb(142 217 237 / 30%)",
       warning: "#ffe0a3",
     }),
+    spaceBackdrop: Object.freeze({
+      id: "ion-storm-haze",
+      label: "金藍離子風暴",
+      deepColor: 0x07111d,
+      horizonColor: 0x25495d,
+      nebulaPrimaryColor: 0x4e9ab0,
+      nebulaSecondaryColor: 0xd79c55,
+      starColor: 0xe8fbff,
+      accentStarColor: 0xffdda6,
+      celestialColor: 0xd0b98d,
+      celestialDirection: Object.freeze({ x: 0.5, y: 0.31, z: -0.81 }),
+      celestialAngularRadius: 0.24,
+      variant: 4,
+    }),
     palette: Object.freeze({
       backgroundColor: 0x172738,
       floorColor: 0x203747,
@@ -223,6 +315,10 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       hemisphereSkyColor: 0xd1ecf2,
       hemisphereGroundColor: 0x142635,
       keyLightColor: 0xffe0a3,
+      mechaPrimaryColor: 0xa4e7f3,
+      mechaSecondaryColor: 0x2e5366,
+      mechaGlowColor: 0xffd185,
+      mechaCanopyColor: 0xf4feff,
       fogNear: 6,
       fogFar: 17,
     }),
@@ -246,6 +342,20 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       line: "rgb(120 239 155 / 30%)",
       warning: "#d7ff91",
     }),
+    spaceBackdrop: Object.freeze({
+      id: "emerald-biosphere",
+      label: "翠綠異星極光",
+      deepColor: 0x010a07,
+      horizonColor: 0x0b3025,
+      nebulaPrimaryColor: 0x168b59,
+      nebulaSecondaryColor: 0x6d3e9a,
+      starColor: 0xdcffe7,
+      accentStarColor: 0xb8ff72,
+      celestialColor: 0x4b8c68,
+      celestialDirection: Object.freeze({ x: -0.45, y: 0.27, z: -0.85 }),
+      celestialAngularRadius: 0.18,
+      variant: 5,
+    }),
     palette: Object.freeze({
       backgroundColor: 0x03110c,
       floorColor: 0x092219,
@@ -258,6 +368,10 @@ export const ENVIRONMENT_PROFILES: readonly EnvironmentProfile[] = Object.freeze
       hemisphereSkyColor: 0xa8efc3,
       hemisphereGroundColor: 0x06130d,
       keyLightColor: 0x82ffab,
+      mechaPrimaryColor: 0x75ef9b,
+      mechaSecondaryColor: 0x163f2d,
+      mechaGlowColor: 0xc8ff70,
+      mechaCanopyColor: 0xd7ffe3,
       fogNear: 10,
       fogFar: 23,
     }),

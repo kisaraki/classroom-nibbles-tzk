@@ -3,7 +3,6 @@ import { expect, test } from "@playwright/test";
 async function startRun(page: import("@playwright/test").Page): Promise<void> {
   await page.goto("./");
   await page.getByTestId("vocabulary-select").waitFor();
-  await page.getByTestId("run-seed").fill("version-1-3-player-controls");
   await page.getByTestId("start-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
   await expect(page.getByTestId("transition-overlay")).toBeHidden();

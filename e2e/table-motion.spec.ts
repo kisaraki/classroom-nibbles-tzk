@@ -3,7 +3,6 @@ import { expect, test, type Page } from "@playwright/test";
 async function startRun(page: Page): Promise<void> {
   await page.goto("./");
   await page.getByTestId("vocabulary-select").waitFor();
-  await page.getByTestId("run-seed").fill("table-motion-e2e");
   await page.getByTestId("start-run").click();
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
 }

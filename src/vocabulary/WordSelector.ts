@@ -39,28 +39,39 @@ export class WordSelectionError extends Error {
   }
 }
 
-function progressiveBuckets(gameLevel: GameLevel): readonly SelectionBucket[] {
+function progressiveBuckets(
+  gameLevel: GameLevel,
+  wordCount: number,
+): readonly SelectionBucket[] {
   if (gameLevel === 4) {
+    const levelFourCount = Math.round(wordCount * 0.6);
     return Object.freeze([
-      Object.freeze({ levels: Object.freeze([4 as const]), count: 3 }),
-      Object.freeze({ levels: Object.freeze([5 as const]), count: 2 }),
+      Object.freeze({ levels: Object.freeze([4 as const]), count: levelFourCount }),
+      Object.freeze({ levels: Object.freeze([5 as const]), count: wordCount - levelFourCount }),
     ]);
   }
   const sourceLevel: VocabularyLevel = gameLevel === 5 ? 6 : gameLevel;
-  return Object.freeze([Object.freeze({ levels: Object.freeze([sourceLevel]), count: 5 })]);
+  return Object.freeze([
+    Object.freeze({ levels: Object.freeze([sourceLevel]), count: wordCount }),
+  ]);
 }
 
 function bucketsForMode(
   mode: VocabularyModeValue,
   gameLevel: GameLevel,
+  wordCount: number,
 ): readonly SelectionBucket[] {
   const fixedLevel = fixedLevelForMode(mode);
   if (fixedLevel) {
-    return Object.freeze([Object.freeze({ levels: Object.freeze([fixedLevel]), count: 5 })]);
+    return Object.freeze([
+      Object.freeze({ levels: Object.freeze([fixedLevel]), count: wordCount }),
+    ]);
   }
-  if (mode === VocabularyMode.PROGRESSIVE) return progressiveBuckets(gameLevel);
+  if (mode === VocabularyMode.PROGRESSIVE) {
+    return progressiveBuckets(gameLevel, wordCount);
+  }
   return Object.freeze([
-    Object.freeze({ levels: CEEC_LEVELS, count: 5 }),
+    Object.freeze({ levels: CEEC_LEVELS, count: wordCount }),
   ]);
 }
 
@@ -83,7 +94,11 @@ export class WordSelector {
 
     const scenes = GAME_LEVEL_CONFIGS.map((config): RunScenePlan => {
       const selected: VocabularyEntry[] = [];
-      for (const bucket of bucketsForMode(mode, config.gameLevel)) {
+      for (const bucket of bucketsForMode(
+        mode,
+        config.gameLevel,
+        config.wordsPerScene,
+      )) {
         const bucketEntries = this.#selectBucket(
           bucket,
           config.maximumTokenLength,

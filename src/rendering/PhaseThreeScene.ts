@@ -17,6 +17,7 @@ import { PinballCameraRig } from "./PinballCameraRig";
 import { EnvironmentView } from "./EnvironmentView";
 import { PowerUpView } from "./PowerUpView";
 import { SnakeView } from "./SnakeView";
+import { SpaceBackdrop } from "./SpaceBackdrop";
 import { TokenView } from "./TokenView";
 import { detectDevicePixelRatio } from "./DeviceResolution";
 
@@ -35,6 +36,7 @@ export class PhaseThreeScene {
   readonly #tokenView: TokenView;
   readonly #powerUpView: PowerUpView;
   readonly #bulletView: BulletView;
+  readonly #spaceBackdrop: SpaceBackdrop;
   #activePixelRatio = 0;
 
   constructor(
@@ -47,12 +49,14 @@ export class PhaseThreeScene {
     this.#tableGroup.matrixAutoUpdate = false;
     this.#renderer = new THREE.WebGLRenderer({
       antialias: APP_CONFIG.scene.antialias,
-      alpha: false,
+      alpha: true,
+      premultipliedAlpha: false,
       precision: "mediump",
       powerPreference: "high-performance",
       stencil: false,
     });
     this.#renderer.setPixelRatio(detectDevicePixelRatio());
+    this.#renderer.setClearColor(0x000000, 0);
     this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.#renderer.domElement.className = "phase-three-scene";
     this.#renderer.domElement.dataset.testid = "phase-three-canvas";
@@ -61,10 +65,9 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.backflipState = "idle";
     this.#renderer.domElement.dataset.backflipScope = "mecha";
     this.#renderer.domElement.dataset.resolutionMode = "device-native";
-    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第九階段第一人稱彈珠台字彙遊戲場");
+    this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第一人稱彈珠台字彙遊戲場");
     container.prepend(this.#renderer.domElement);
 
-    this.#scene.background = new THREE.Color(environment.palette.backgroundColor);
     this.#scene.fog = new THREE.Fog(
       environment.palette.backgroundColor,
       environment.palette.fogNear,
@@ -88,6 +91,7 @@ export class PhaseThreeScene {
     this.#camera.matrixAutoUpdate = false;
 
     this.#tableGroup.name = "pinball-table-world";
+    this.#spaceBackdrop = new SpaceBackdrop(this.#container, environment);
     this.#scene.add(this.#tableGroup);
     this.#arenaView = new ArenaView(this.#tableGroup, arena, environment);
     this.#environmentView = new EnvironmentView(this.#tableGroup);
@@ -102,9 +106,6 @@ export class PhaseThreeScene {
 
   setEnvironment(environment: EnvironmentProfile): void {
     const { palette } = environment;
-    if (this.#scene.background instanceof THREE.Color) {
-      this.#scene.background.setHex(palette.backgroundColor);
-    }
     this.#scene.fog = new THREE.Fog(
       palette.backgroundColor,
       palette.fogNear,
@@ -112,14 +113,19 @@ export class PhaseThreeScene {
     );
     this.#arenaView.setEnvironment(environment);
     this.#environmentView.setEnvironment(environment);
+    this.#snakeView.setEnvironment(environment);
+    this.#tokenView.setEnvironment(environment);
+    this.#powerUpView.setEnvironment(environment);
+    this.#spaceBackdrop.setEnvironment(environment);
     this.#renderer.domElement.dataset.environmentKind = environment.kind
       .toLowerCase()
       .replaceAll("_", "-");
     this.#renderer.domElement.dataset.environmentName = environment.sceneName;
+    this.#renderer.domElement.dataset.spaceTheme = environment.spaceBackdrop.id;
     this.#renderer.domElement.dataset.obstacleCount = String(environment.obstacles.length);
     this.#renderer.domElement.setAttribute(
       "aria-label",
-      `NIBBLES 第九階段第一人稱彈珠台字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
+      `NIBBLES 第一人稱彈珠台字彙遊戲場：${environment.sceneName}，${environment.featureLabel}`,
     );
   }
 
@@ -183,6 +189,7 @@ export class PhaseThreeScene {
     this.#tokenView.dispose();
     this.#powerUpView.dispose();
     this.#bulletView.dispose();
+    this.#spaceBackdrop.dispose();
     this.#renderer.dispose();
     this.#renderer.forceContextLoss();
   }
