@@ -23,12 +23,14 @@ export class EnvironmentView {
     const material = this.#trackMaterial(
       new THREE.MeshBasicMaterial({
         color: environment.palette.obstacleColor,
+        fog: false,
         toneMapped: false,
       }),
     );
     const accent = this.#trackMaterial(
       new THREE.MeshBasicMaterial({
         color: environment.palette.obstacleAccentColor,
+        fog: false,
         toneMapped: false,
       }),
     );

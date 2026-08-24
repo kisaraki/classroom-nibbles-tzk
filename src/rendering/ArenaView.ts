@@ -39,12 +39,14 @@ export class ArenaView {
 
     this.#solidMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.solidWallColor,
+      fog: false,
       toneMapped: false,
     });
     this.#wrapMaterial = new THREE.MeshBasicMaterial({
       color: environment.palette.wrapGateColor,
       transparent: true,
       opacity: 0.8,
+      fog: false,
       toneMapped: false,
     });
     this.#xBoundaryGeometry = new THREE.BoxGeometry(0.22, 0.8, halfDepth * 2);
@@ -77,6 +79,7 @@ export class ArenaView {
     const gridMaterials = Array.isArray(this.#grid.material)
       ? this.#grid.material
       : [this.#grid.material];
+    for (const material of gridMaterials) material.fog = false;
     if (gridMaterials[0] instanceof THREE.LineBasicMaterial) {
       gridMaterials[0].color.setHex(palette.gridCenterColor);
     }

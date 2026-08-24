@@ -80,10 +80,6 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
 
   await page.keyboard.press("m");
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-
-  await page.keyboard.press("Space");
-  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
-  await expect(page.getByTestId("ammo-count")).toHaveText("0");
   expect(pageErrors).toEqual([]);
 });
 

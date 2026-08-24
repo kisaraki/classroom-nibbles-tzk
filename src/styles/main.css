@@ -410,9 +410,8 @@ body {
 .game-hud__target-token[data-status="next"] {
   border: 2px solid #fff;
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline-offset: 4px;
   color: #fff;
-  animation: target-outline 0.8s ease-in-out infinite alternate;
 }
 
 .game-hud__meaning {
@@ -1142,15 +1141,6 @@ body {
   line-height: 1.5;
 }
 
-@keyframes target-outline {
-  from {
-    outline-offset: 1px;
-  }
-  to {
-    outline-offset: 5px;
-  }
-}
-
 .boot-screen {
   display: grid;
   width: 100%;
@@ -1389,10 +1379,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .boot-screen__status::before {
     animation: none !important;
-  }
-
-  .game-hud__target-token[data-status="next"] {
-    animation: none;
   }
 
   .transition-overlay__door,

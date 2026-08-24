@@ -5,7 +5,11 @@ import type { BulletEntity } from "../gameplay/WeaponSystem";
 export class BulletView {
   readonly #parent: THREE.Object3D;
   readonly #geometry = new THREE.SphereGeometry(0.12, 10, 8);
-  readonly #material = new THREE.MeshBasicMaterial({ color: 0xfff3a6 });
+  readonly #material = new THREE.MeshBasicMaterial({
+    color: 0xfff3a6,
+    fog: false,
+    toneMapped: false,
+  });
   readonly #visuals = new Map<string, THREE.Mesh>();
 
   constructor(parent: THREE.Object3D) {
