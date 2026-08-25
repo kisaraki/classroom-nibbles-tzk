@@ -8,13 +8,54 @@ import { MechaBackflipAnimator } from "./MechaBackflipAnimator";
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const LOCAL_RIGHT = new THREE.Vector3(1, 0, 0);
+const PANEL_LIGHT_DIRECTION = new THREE.Vector3(-0.38, 0.84, 0.39).normalize();
+const PANEL_SHADE_MINIMUM = 0.58;
+const PANEL_SHADE_RANGE = 0.42;
+const PANEL_BAND_DARKENING = 0.14;
+const PANEL_BAND_HALF_HEIGHT_RATIO = 0.2;
+const ACCENT_PANEL_PRIMARY_BLEND = 0.42;
+const PRIMARY_SEGMENT_SCALE = 1.03;
+const ACCENT_SEGMENT_SCALE = 0.88;
+
+function addPanelShading<T extends THREE.BufferGeometry>(geometry: T): T {
+  geometry.computeBoundingSphere();
+  const radius = geometry.boundingSphere?.radius ?? 1;
+  const positions = geometry.getAttribute("position");
+  const normals = geometry.getAttribute("normal");
+  const colors = new THREE.BufferAttribute(
+    new Float32Array(positions.count * 3),
+    3,
+  );
+  for (let index = 0; index < positions.count; index += 1) {
+    const light = Math.max(
+      0,
+      normals.getX(index) * PANEL_LIGHT_DIRECTION.x
+        + normals.getY(index) * PANEL_LIGHT_DIRECTION.y
+        + normals.getZ(index) * PANEL_LIGHT_DIRECTION.z,
+    );
+    const panelBand = Math.abs(positions.getY(index))
+      < radius * PANEL_BAND_HALF_HEIGHT_RATIO;
+    const shade = Math.max(
+      PANEL_SHADE_MINIMUM,
+      PANEL_SHADE_MINIMUM
+        + light * PANEL_SHADE_RANGE
+        - (panelBand ? PANEL_BAND_DARKENING : 0),
+    );
+    colors.setXYZ(index, shade, shade, shade);
+  }
+  geometry.setAttribute("color", colors);
+  return geometry;
+}
 
 export class SnakeView {
-  readonly #headGeometry = new THREE.DodecahedronGeometry(0.42, 1);
+  readonly #headGeometry = addPanelShading(
+    new THREE.DodecahedronGeometry(0.42, 1),
+  );
   readonly #headMaterial = new THREE.MeshBasicMaterial({
     color: 0x72f5dc,
     fog: false,
     toneMapped: false,
+    vertexColors: true,
   });
   readonly #canopyGeometry = new THREE.SphereGeometry(0.27, 18, 12);
   readonly #canopyMaterial = new THREE.MeshBasicMaterial({
@@ -23,7 +64,7 @@ export class SnakeView {
     toneMapped: false,
   });
   readonly #noseGeometry = new THREE.ConeGeometry(0.14, 0.38, 4);
-  readonly #armorGeometry = new THREE.BoxGeometry(0.62, 0.09, 0.34);
+  readonly #armorGeometry = new THREE.BoxGeometry(0.66, 0.12, 0.38);
   readonly #armorMaterial = new THREE.MeshBasicMaterial({
     color: 0x163f51,
     fog: false,
@@ -35,13 +76,16 @@ export class SnakeView {
     toneMapped: false,
   });
   readonly #engineGeometry = new THREE.SphereGeometry(0.075, 10, 7);
-  readonly #bodyGeometry = new THREE.DodecahedronGeometry(0.31, 1);
+  readonly #bodyGeometry = addPanelShading(
+    new THREE.DodecahedronGeometry(0.31, 1),
+  );
   readonly #bodyMaterial = new THREE.MeshBasicMaterial({
-    color: 0x25bda5,
+    color: 0xffffff,
     fog: false,
     toneMapped: false,
+    vertexColors: true,
   });
-  readonly #ringGeometry = new THREE.TorusGeometry(0.285, 0.035, 6, 12);
+  readonly #ringGeometry = new THREE.TorusGeometry(0.335, 0.045, 6, 12);
   readonly #ringMaterial = new THREE.MeshBasicMaterial({
     color: 0xffc857,
     fog: false,
@@ -83,14 +127,16 @@ export class SnakeView {
     APP_CONFIG.scene.mechaBackflipDurationSeconds,
   );
   readonly #backflipAxis = new THREE.Vector3();
+  readonly #primaryBodyColor = new THREE.Color();
+  readonly #accentBodyColor = new THREE.Color();
 
   constructor(parent: THREE.Object3D) {
     this.#canopy.scale.set(0.78, 0.48, 0.92);
-    this.#canopy.position.set(0, 0.16, -0.04);
+    this.#canopy.position.set(0, 0.2, -0.04);
     this.#nose.rotation.x = -Math.PI / 2;
     this.#nose.rotation.z = Math.PI / 4;
     this.#nose.position.set(0, -0.02, -0.48);
-    this.#armor.position.set(0, -0.08, 0.04);
+    this.#armor.position.set(0, 0.08, 0.04);
 
     const engineMatrix = new THREE.Matrix4();
     engineMatrix.makeTranslation(-0.2, -0.02, 0.34);
@@ -127,11 +173,21 @@ export class SnakeView {
   setEnvironment(environment: EnvironmentProfile): void {
     const { palette } = environment;
     this.#headMaterial.color.setHex(palette.mechaPrimaryColor);
-    this.#bodyMaterial.color.setHex(palette.mechaPrimaryColor);
     this.#armorMaterial.color.setHex(palette.mechaSecondaryColor);
     this.#canopyMaterial.color.setHex(palette.mechaCanopyColor);
     this.#glowMaterial.color.setHex(palette.mechaGlowColor);
     this.#ringMaterial.color.setHex(palette.mechaGlowColor);
+    this.#primaryBodyColor.setHex(palette.mechaPrimaryColor);
+    this.#accentBodyColor
+      .setHex(palette.mechaSecondaryColor)
+      .lerp(this.#primaryBodyColor, ACCENT_PANEL_PRIMARY_BLEND);
+    for (let index = 0; index < GAMEPLAY_CONFIG.snake.maximumLength - 1; index += 1) {
+      this.#body.setColorAt(
+        index,
+        index % 2 === 0 ? this.#primaryBodyColor : this.#accentBodyColor,
+      );
+    }
+    if (this.#body.instanceColor) this.#body.instanceColor.needsUpdate = true;
   }
 
   update(
@@ -170,21 +226,27 @@ export class SnakeView {
         this.#backflipAxis,
         pose.rotationRadians * leadingBodyWeight,
       );
+      const instanceIndex = index - 1;
+      const segmentScale = instanceIndex % 2 === 0
+        ? PRIMARY_SEGMENT_SCALE
+        : ACCENT_SEGMENT_SCALE;
+      this.#scale.setScalar(segmentScale);
       this.#matrix.compose(
         this.#position,
         this.#segmentQuaternion,
         this.#scale,
       );
-      this.#body.setMatrixAt(index - 1, this.#matrix);
+      this.#body.setMatrixAt(instanceIndex, this.#matrix);
       this.#composedRingQuaternion
         .copy(this.#segmentQuaternion)
         .multiply(this.#ringQuaternion);
+      this.#scale.setScalar(1);
       this.#ringMatrix.compose(
         this.#position,
         this.#composedRingQuaternion,
         this.#scale,
       );
-      this.#rings.setMatrixAt(index - 1, this.#ringMatrix);
+      this.#rings.setMatrixAt(instanceIndex, this.#ringMatrix);
     }
     this.#body.instanceMatrix.needsUpdate = true;
     this.#rings.instanceMatrix.needsUpdate = true;

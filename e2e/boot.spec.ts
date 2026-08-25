@@ -14,7 +14,7 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
   await expect(page.getByLabel("關卡種子")).toHaveCount(0);
-  await expect(page.getByText(/資料版本|NIBBLES 1\.9\.0/u)).toHaveCount(0);
+  await expect(page.getByText(/資料版本|NIBBLES 1\.9\.1/u)).toHaveCount(0);
   await expect(page.getByText("5 個單字", { exact: true })).toBeVisible();
   await expect(page.getByText("25 個單字", { exact: true })).toBeVisible();
   await expect(page.getByTestId("vocabulary-error")).toBeHidden();
@@ -36,7 +36,7 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
   await expect(page.getByTestId("game-hud")).toBeVisible();
   await expect(page.getByTestId("phase-three-panel")).toHaveCount(0);
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.9.0");
+  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.9.1");
   await expect(page.locator("#app")).toHaveAttribute(
     "data-visual-style",
     "classic-space-pinball",
@@ -71,6 +71,14 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-bullet-count", "0");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-camera-mode", "pinball-player");
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute("data-camera-count", "1");
+  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute(
+    "data-mecha-body-pattern",
+    "faceted-alternating-panels",
+  );
+  await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute(
+    "data-mecha-segment-separator",
+    "energy-rings",
+  );
   await expect(page.getByTestId("phase-three-canvas")).toHaveAttribute(
     "data-environment-kind",
     "cargo-bay",

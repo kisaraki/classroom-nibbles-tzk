@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 2.2 (Version 1.9 classic space-pinball cabinet presentation)
+Version: 2.3 (Version 1.9.1 high-contrast mecha panel pattern)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -77,7 +77,7 @@ Supported gameplay character tokens: `A-Z`, `SPACE`, `PERIOD`, `APOSTROPHE`, `HY
 - Game Level 4: Dense Atmosphere, unlimited token length, 20 words, 360 seconds, snake speed 5.25 units/sec.
 - Game Level 5: Alien Forest, unlimited token length, 25 words, 300 seconds, snake speed 6.0 units/sec.
 
-Each scene has a distinct world palette, interface accent/line/warning theme, procedural deep-space background, celestial feature, fog range, solid obstacle layout and 3D obstacle treatment. The mecha armor, canopy, engine glow, character frames, table rails and environment lighting adopt the current scene palette. The common presentation language is a classic space-pinball cabinet: saturated navy or scene-colored cabinet panels, silver beveled frames, red-orange rails, illuminated circular target lamps, high-contrast score displays and a painted-backglass-like deep-space backdrop. All artwork remains original and procedural; do not include third-party trademarks or proprietary cabinet artwork. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, remain visible in the playfield and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
+Each scene has a distinct world palette, interface accent/line/warning theme, procedural deep-space background, celestial feature, fog range, solid obstacle layout and 3D obstacle treatment. The mecha armor, canopy, engine glow, character frames, table rails and environment lighting adopt the current scene palette. The snake-mecha body uses baked faceted panel shading, alternating primary/accent armor sections, slightly varied section scale and a bright energy ring around every section so adjacent parts remain distinguishable from the full-table camera. The common presentation language is a classic space-pinball cabinet: saturated navy or scene-colored cabinet panels, silver beveled frames, red-orange rails, illuminated circular target lamps, high-contrast score displays and a painted-backglass-like deep-space backdrop. All artwork remains original and procedural; do not include third-party trademarks or proprietary cabinet artwork. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, remain visible in the playfield and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
 
 If a vocabulary filter yields fewer than 5 candidates, relax recent-history filtering first, then increase max token length one token at a time until sufficient.
 

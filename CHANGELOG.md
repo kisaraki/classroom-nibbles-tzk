@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Version 1.9.1 — 2026-08-25
+
+### Changed
+- Added baked faceted light/dark panel shading to the mecha head and every body section without adding a lighting pass.
+- Alternated primary and scene-accent body armor colors and section scale so neighboring sections remain visually distinct at the full-table camera distance.
+- Enlarged the existing luminous section rings and raised the head armor/canopy layers for a clearer head-to-body silhouette without increasing the mecha draw-call count.
+- Added browser diagnostics and regression coverage for the alternating panel pattern and energy-ring separators.
+- Updated the specification, README and release metadata to Version 1.9.1.
+
 ## Version 1.9 — 2026-08-25
 
 ### Added

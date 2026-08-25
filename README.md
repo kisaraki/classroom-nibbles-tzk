@@ -4,7 +4,7 @@ NIBBLES is a desktop-web, first-person 3D pinball-table vocabulary game based on
 
 ## Current status
 
-Version 1.9 is complete. It restyles the existing game as an original classic space-pinball cabinet with saturated blue and scene-colored panels, silver beveled frames, red-orange rails, illuminated circular word lamps and a painted-backglass-like deep-space presentation. The five worlds retain their distinct palettes, native-resolution rendering and all Version 1.8 gameplay rules.
+Version 1.9.1 is complete. It gives the snake-mecha a clearer faceted armor pattern, alternating light/dark body sections and stronger energy-ring separators so the machine no longer reads as one fused shape. It retains Version 1.9's original classic space-pinball cabinet, five scene palettes, native-resolution rendering and all existing gameplay rules.
 
 ## Requirements
 
@@ -19,9 +19,9 @@ npm install
 npm run dev
 ```
 
-Vite prints the local development URL. Choose a vocabulary mode, then start the automatically generated Version 1.9 classic space-pinball run.
+Vite prints the local development URL. Choose a vocabulary mode, then start the automatically generated Version 1.9.1 classic space-pinball run.
 
-## Version 1.9 gameplay, presentation and controls
+## Version 1.9.1 gameplay, presentation and controls
 
 - Choose CEEC Level 1–6, Progressive, or Mixed 1–6 independently from the Game Level.
 - The five scenes contain 5, 10, 15, 20 and 25 words respectively, for 75 unique targets in a complete run. The application generates the internal seed automatically; the player no longer selects one.
@@ -43,6 +43,7 @@ Vite prints the local development URL. Choose a vocabulary mode, then start the 
 - The single player camera looks down from the near end of the pinball table, showing the full arena and the complete visible snake. The former cockpit mask and reticle are removed.
 - Enlarged mission metrics appear at the top of the playfield with separate current-scene and total-run progress. The current vocabulary target remains near the upper center, movement telemetry at the lower left, recent events at the lower right, and contextual messages near the center. High-contrast translucent backplates preserve the full playfield without reserving a separate information panel.
 - Every Game Level has its own procedural star field, nebula palette and celestial feature. Mecha armor, canopy, engine glow, cabinet panels, target lamps, table rails and lighting switch with the same environment theme.
+- The snake-mecha uses baked faceted shading plus alternating silver and scene-accent armor sections. Slightly smaller accent sections and enlarged luminous rings create visible gaps without adding per-section draw calls.
 - The interface uses an original classic space-pinball drawing language: extruded score typography, silver ridged frames, saturated cabinet panels, red-orange playfield rails and circular metal-ring token/power-up lamps. It does not ship third-party logos, trademarks or proprietary cabinet artwork.
 - Player-facing screens omit phase numbers, release/data versions, diagnostic counts and the former run-seed field.
 - The mini-map, enlarged tactical radar, `M`/`Esc` map controls and tactical-map slow-motion state have been removed.
@@ -115,7 +116,7 @@ Only run the importer when intentionally changing vocabulary import logic or sou
 - Phase 7 tests cover all five environment profiles, obstacle-safe arena capacity, level switching, safe pose reset, non-lethal obstacle collision and projectile blocking.
 - Phase 8 tests cover synthesized cue/ambient definitions, mute persistence, token/power-up/impact event routing, exact-state pause/resume, hidden-page auto-pause, door transitions and credits/replay presentation.
 - Phase 9 tests cover successful and failed state-machine exits, the Chinese failure dialog and focus, release metadata, unique IDs, accessible names, asset/network errors, draw-call and render-resolution budgets, and the 30 FPS minimum at 1920×1080.
-- Version 1.9 tests cover the classic space-pinball visual contract, five distinct cabinet/rail/lamp palettes, circular playfield markers and retained native-resolution performance. Version 1.8's 75-word scene ladder, automatic seed-free selection UI, enlarged HUD and development-information removal coverage remains active, as does Version 1.7 continuous dual-Shift table shaking coverage.
+- Version 1.9.1 tests cover the faceted alternating mecha-body pattern, energy-ring separators and retained native-resolution performance. Version 1.9's classic space-pinball visual contract, five distinct cabinet/rail/lamp palettes and circular playfield-marker coverage remains active, as does all earlier gameplay coverage.
 - Playwright also checks vocabulary selection, independent Game/Vocabulary labels, the Cargo Bay environment and obstacle markers, the 30-token and five-power-up scene, integrated HUD, steering/firing rules, pause behavior, typing-modal submission and modal-scoped clipboard blocking.
 - `.github/workflows/ci.yml` runs typecheck, vocabulary validation, unit tests, production build, artifact verification and isolated Chromium E2E jobs on pushes and pull requests.
 - `.github/workflows/deploy-pages.yml` repeats the release gates before deploying `dist/` through official GitHub Pages actions on `main`.
@@ -138,4 +139,4 @@ docs/reference/    Source CEEC PDF (reference only)
 .github/workflows/ CI and GitHub Pages deployment
 ```
 
-See `SPEC.md` for the full product contract. Phase 9 remains complete and NIBBLES Version 1.9 is release-ready.
+See `SPEC.md` for the full product contract. Phase 9 remains complete and NIBBLES Version 1.9.1 is release-ready.

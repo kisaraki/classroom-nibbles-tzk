@@ -64,6 +64,8 @@ export class PhaseThreeScene {
     this.#renderer.domElement.dataset.cameraCount = "1";
     this.#renderer.domElement.dataset.backflipState = "idle";
     this.#renderer.domElement.dataset.backflipScope = "mecha";
+    this.#renderer.domElement.dataset.mechaBodyPattern = "faceted-alternating-panels";
+    this.#renderer.domElement.dataset.mechaSegmentSeparator = "energy-rings";
     this.#renderer.domElement.dataset.resolutionMode = "device-native";
     this.#renderer.domElement.setAttribute("aria-label", "NIBBLES 第一人稱彈珠台字彙遊戲場");
     container.prepend(this.#renderer.domElement);
