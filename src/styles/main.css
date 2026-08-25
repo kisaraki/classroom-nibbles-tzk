@@ -2047,16 +2047,27 @@ body {
 }
 
 .deep-space-backdrop::after {
-  background: repeating-linear-gradient(
-    165deg,
-    transparent 0 7rem,
-    color-mix(in srgb, var(--space-accent-star) 7%, transparent) 7.04rem 7.1rem
+  display: none;
+}
+
+.deep-space-backdrop::before {
+  background-image: radial-gradient(
+    circle,
+    var(--space-star) 0 1px,
+    transparent 1.45px
   );
-  opacity: 0.5;
+  background-position: var(--space-star-offset-x) var(--space-star-offset-y);
+  background-size: 79px 83px;
+  opacity: 0.72;
 }
 
 .pinball-table-overlay {
   background: none;
+}
+
+.pinball-table-overlay::before,
+.pinball-table-overlay::after {
+  display: none;
 }
 
 .pinball-table-overlay::before,
@@ -2114,4 +2125,18 @@ body {
 
 .game-hud__controls {
   background-color: #080f31;
+}
+
+.pinball-table-overlay__rail,
+.pinball-table-overlay__apron,
+.game-hud__environment,
+.game-hud__table-motion,
+.game-hud__target-block,
+.game-hud__controls {
+  clip-path: none;
+}
+
+.game-hud__heading,
+.game-hud__heading > * {
+  transform: none;
 }
