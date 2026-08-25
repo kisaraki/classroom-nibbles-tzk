@@ -37,11 +37,12 @@ export class VocabularySelectScreen {
     this.#listener = listener;
     this.#element = createElement("section", "vocabulary-select");
     this.#element.dataset.testid = "vocabulary-select";
+    this.#element.dataset.visualStyle = "classic-space-pinball";
     const panel = createElement("div", "vocabulary-select__panel");
     panel.append(
-      createElement("p", "vocabulary-select__eyebrow", "深空字彙任務"),
+      createElement("p", "vocabulary-select__eyebrow", "太空字彙彈珠台"),
       createElement("h1", "vocabulary-select__title", APP_CONFIG.title),
-      createElement("p", "vocabulary-select__phase", "選擇航行字彙"),
+      createElement("p", "vocabulary-select__phase", "選擇任務字彙牌組"),
       createElement(
         "p",
         "vocabulary-select__intro",

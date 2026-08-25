@@ -134,6 +134,7 @@ export class Game {
     this.#container = container;
     this.#container.dataset.gameState = GameState.BOOT;
     this.#container.dataset.releaseVersion = APP_CONFIG.releaseVersion;
+    this.#container.dataset.visualStyle = "classic-space-pinball";
     this.#bootScreen = new BootScreen(container);
     this.#transitionOverlay = new TransitionOverlay(container);
     this.#pauseController = new PauseController(
@@ -473,6 +474,13 @@ export class Game {
     this.#container.style.setProperty("--accent-soft", environment.uiTheme.accentSoft);
     this.#container.style.setProperty("--line", environment.uiTheme.line);
     this.#container.style.setProperty("--warning", environment.uiTheme.warning);
+    this.#container.style.setProperty("--cabinet", environment.uiTheme.cabinet);
+    this.#container.style.setProperty(
+      "--cabinet-deep",
+      environment.uiTheme.cabinetDeep,
+    );
+    this.#container.style.setProperty("--rail", environment.uiTheme.rail);
+    this.#container.style.setProperty("--lamp", environment.uiTheme.lamp);
   }
 
   readonly #onVisibilityChange = (): void => {
@@ -575,5 +583,9 @@ export class Game {
     this.#container.style.removeProperty("--accent-soft");
     this.#container.style.removeProperty("--line");
     this.#container.style.removeProperty("--warning");
+    this.#container.style.removeProperty("--cabinet");
+    this.#container.style.removeProperty("--cabinet-deep");
+    this.#container.style.removeProperty("--rail");
+    this.#container.style.removeProperty("--lamp");
   }
 }

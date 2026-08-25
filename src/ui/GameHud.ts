@@ -145,7 +145,7 @@ export class GameHud {
     this.#element.setAttribute("aria-label", "遊戲主畫面資訊");
     const heading = createElement("header", "game-hud__heading");
     heading.append(
-      createElement("p", "game-hud__eyebrow", "深空字彙巡航"),
+      createElement("p", "game-hud__eyebrow", "太空字彙彈珠台"),
       createElement("h1", "game-hud__title", APP_CONFIG.title),
     );
 
@@ -180,7 +180,7 @@ export class GameHud {
     this.#tableMotion.setAttribute("aria-live", "polite");
 
     const targetBlock = createElement("article", "game-hud__target-block");
-    targetBlock.append(createElement("p", "game-hud__label", "目標單字"));
+    targetBlock.append(createElement("p", "game-hud__label", "任務字牌"));
     this.#target = createElement("div", "game-hud__target");
     this.#target.dataset.testid = "target-tokens";
     this.#meaning = createElement("p", "game-hud__meaning");

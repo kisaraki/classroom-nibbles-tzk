@@ -27,22 +27,46 @@ function drawTokenCell(
   context.save();
   context.translate(x, y);
   context.clearRect(0, 0, ATLAS_CELL_SIZE, ATLAS_CELL_SIZE);
-  context.fillStyle = "rgba(5, 15, 30, 0.94)";
-  context.strokeStyle = accent;
-  context.lineWidth = 7;
+  const metal = context.createRadialGradient(48, 38, 4, 64, 64, 61);
+  metal.addColorStop(0, "#ffffff");
+  metal.addColorStop(0.22, "#aebbd2");
+  metal.addColorStop(0.52, "#53658c");
+  metal.addColorStop(0.78, "#d9e2f2");
+  metal.addColorStop(1, "#182343");
+  context.fillStyle = metal;
   context.beginPath();
-  context.roundRect(8, 8, 112, 112, 24);
+  context.arc(64, 64, 59, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "#050b23";
+  context.strokeStyle = "#0b1028";
+  context.lineWidth = 4;
+  context.beginPath();
+  context.arc(64, 64, 48, 0, Math.PI * 2);
   context.fill();
   context.stroke();
-  context.fillStyle = "#e9fff9";
-  context.font = "700 66px ui-monospace, monospace";
+  context.strokeStyle = accent;
+  context.lineWidth = 5;
+  context.beginPath();
+  context.arc(64, 64, 43, 0, Math.PI * 2);
+  context.stroke();
+  context.fillStyle = "#cfd8eb";
+  for (const [rivetX, rivetY] of [[64, 10], [118, 64], [64, 118], [10, 64]]) {
+    context.beginPath();
+    context.arc(rivetX, rivetY, 2.8, 0, Math.PI * 2);
+    context.fill();
+  }
+  context.fillStyle = "#fffbea";
+  context.font = "900 62px 'Arial Narrow', ui-monospace, monospace";
   context.textAlign = "center";
   context.textBaseline = "middle";
+  context.shadowColor = accent;
+  context.shadowBlur = 9;
   context.fillText(tokenDisplayLabel(token), 64, 66);
+  context.shadowBlur = 0;
   context.restore();
 }
 
-function createTokenAtlas(accent = "#50e3c2"): THREE.CanvasTexture {
+function createTokenAtlas(accent = "#35f2e0"): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = ATLAS_COLUMNS * ATLAS_CELL_SIZE;
   canvas.height = ATLAS_ROWS * ATLAS_CELL_SIZE;

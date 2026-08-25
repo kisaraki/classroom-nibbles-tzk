@@ -18,6 +18,9 @@ describe("Phase 7 environments", () => {
     expect(ENVIRONMENT_PROFILES).toHaveLength(5);
     expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.kind)).size).toBe(5);
     expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.uiTheme.accent)).size).toBe(5);
+    expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.uiTheme.cabinet)).size).toBe(5);
+    expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.uiTheme.rail)).size).toBe(5);
+    expect(new Set(ENVIRONMENT_PROFILES.map((profile) => profile.uiTheme.lamp)).size).toBe(5);
     expect(
       new Set(ENVIRONMENT_PROFILES.map((profile) => profile.spaceBackdrop.id)).size,
     ).toBe(5);
@@ -34,6 +37,10 @@ describe("Phase 7 environments", () => {
       expect(profile.obstacles.length).toBeGreaterThanOrEqual(6);
       expect(profile.palette.fogFar).toBeGreaterThan(profile.palette.fogNear);
       expect(profile.uiTheme.accent).toMatch(/^#[\da-f]{6}$/iu);
+      expect(profile.uiTheme.cabinet).toMatch(/^#[\da-f]{6}$/iu);
+      expect(profile.uiTheme.cabinetDeep).toMatch(/^#[\da-f]{6}$/iu);
+      expect(profile.uiTheme.rail).toMatch(/^#[\da-f]{6}$/iu);
+      expect(profile.uiTheme.lamp).toMatch(/^#[\da-f]{6}$/iu);
       expect(profile.spaceBackdrop.label.length).toBeGreaterThan(0);
       expect(profile.spaceBackdrop.celestialAngularRadius).toBeGreaterThan(0);
     }

@@ -2,7 +2,7 @@ import type { GameLevel } from "../vocabulary/WordSelector";
 
 export const APP_CONFIG = Object.freeze({
   title: "NIBBLES",
-  releaseVersion: "1.8.0",
+  releaseVersion: "1.9.0",
   vocabularyPath: "data/vocabulary.json",
   scene: Object.freeze({
     cameraFieldOfView: 52,

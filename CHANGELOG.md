@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## Version 1.9 — 2026-08-25
+
+### Added
+- Added an original classic space-pinball cabinet presentation with beveled metal frames, saturated cabinet panels, red-orange table rails, illuminated target lamps and high-impact score typography.
+- Added five distinct cabinet, rail and lamp palettes that switch atomically with the existing environment themes.
+- Added circular brushed-metal texture-atlas faces for all character tokens and power-ups, plus machine-readable visual-style diagnostics for release regression coverage.
+- Created and verified a complete pre-change workspace archive and an all-references Git bundle before implementation.
+
+### Changed
+- Restyled vocabulary selection, gameplay HUD, transition, typing, failure, credits and audio controls with one coherent arcade cabinet drawing language while preserving the Chinese interface and all gameplay mechanics.
+- Refined mecha, floor, grid, wall and obstacle colors toward silver hardware, deep cabinet blues, bright lamps and scene-specific highlights.
+- Kept native-resolution performance within the release budget by simplifying full-viewport live-table compositing without reducing the detected device pixel ratio.
+- Updated the specification, README and release metadata to Version 1.9.
+
+### Security and provenance
+- Used only repository-native CSS, Canvas and Three.js drawing; no third-party logos, trademarks or proprietary cabinet artwork were added.
+
 ## Version 1.8 — 2026-08-24
 
 ### Added

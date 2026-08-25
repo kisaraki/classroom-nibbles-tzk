@@ -30,8 +30,8 @@ function powerUpColor(
 }
 
 function createPowerUpAtlas(
-  accent = "#50e3c2",
-  warning = "#ffd166",
+  accent = "#35f2e0",
+  warning = "#ffd343",
 ): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = ATLAS_CELL_SIZE * POWER_UP_KINDS.length;
@@ -41,20 +41,43 @@ function createPowerUpAtlas(
   POWER_UP_KINDS.forEach((kind, index) => {
     const centerX = index * ATLAS_CELL_SIZE + ATLAS_CELL_SIZE / 2;
     const color = powerUpColor(kind, accent, warning);
-    context.fillStyle = "rgba(5, 15, 30, 0.96)";
-    context.strokeStyle = color;
-    context.lineWidth = 9;
+    context.save();
+    const metal = context.createRadialGradient(
+      centerX - 22,
+      52,
+      6,
+      centerX,
+      80,
+      73,
+    );
+    metal.addColorStop(0, "#ffffff");
+    metal.addColorStop(0.25, "#a9b7ce");
+    metal.addColorStop(0.58, "#39496e");
+    metal.addColorStop(0.82, "#dce5f2");
+    metal.addColorStop(1, "#111a35");
+    context.fillStyle = metal;
     context.beginPath();
-    context.arc(centerX, 80, 65, 0, Math.PI * 2);
+    context.arc(centerX, 80, 72, 0, Math.PI * 2);
     context.fill();
+    context.fillStyle = "#070d2a";
+    context.beginPath();
+    context.arc(centerX, 80, 58, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = color;
+    context.lineWidth = 8;
+    context.beginPath();
+    context.arc(centerX, 80, 53, 0, Math.PI * 2);
     context.stroke();
-    context.fillStyle = color;
+    context.fillStyle = "#f6f7ff";
     context.font = kind === PowerUpKind.ATTACK
-      ? "700 34px 'Noto Sans TC', sans-serif"
-      : "800 52px ui-monospace, monospace";
+      ? "900 31px 'Noto Sans TC', sans-serif"
+      : "900 51px 'Arial Narrow', ui-monospace, monospace";
     context.textAlign = "center";
     context.textBaseline = "middle";
+    context.shadowColor = color;
+    context.shadowBlur = 10;
     context.fillText(powerUpDisplayLabel(kind), centerX, 82);
+    context.restore();
   });
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;

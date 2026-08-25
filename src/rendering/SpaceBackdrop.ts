@@ -52,6 +52,7 @@ export class SpaceBackdrop {
     this.#element = document.createElement("div");
     this.#element.className = "deep-space-backdrop";
     this.#element.dataset.testid = "deep-space-backdrop";
+    this.#element.dataset.artStyle = "painted-pinball-backglass";
     this.#element.setAttribute("aria-hidden", "true");
     container.prepend(this.#element);
     this.setEnvironment(environment);

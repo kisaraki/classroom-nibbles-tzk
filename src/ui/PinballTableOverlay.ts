@@ -5,6 +5,7 @@ export class PinballTableOverlay {
     this.#element = document.createElement("div");
     this.#element.className = "pinball-table-overlay";
     this.#element.dataset.testid = "pinball-table-overlay";
+    this.#element.dataset.visualStyle = "classic-space-pinball";
     this.#element.setAttribute("aria-hidden", "true");
 
     const leftRail = document.createElement("span");
@@ -15,8 +16,13 @@ export class PinballTableOverlay {
     apron.className = "pinball-table-overlay__apron";
     const label = document.createElement("span");
     label.className = "pinball-table-overlay__label";
-    label.textContent = "NIBBLES // 深空航行";
-    this.#element.append(leftRail, rightRail, apron, label);
+    label.textContent = "NIBBLES · 太空字彙彈珠台";
+    this.#element.append(
+      leftRail,
+      rightRail,
+      apron,
+      label,
+    );
     container.append(this.#element);
   }
 

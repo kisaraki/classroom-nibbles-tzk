@@ -7,10 +7,14 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
 
   await expect(page).toHaveTitle("NIBBLES — 深空字彙任務");
   await expect(page.getByTestId("vocabulary-select")).toBeVisible();
+  await expect(page.getByTestId("vocabulary-select")).toHaveAttribute(
+    "data-visual-style",
+    "classic-space-pinball",
+  );
   await expect(page.getByRole("heading", { level: 1, name: "NIBBLES" })).toBeVisible();
   await expect(page.getByText("字彙級別與遊戲關卡彼此獨立。", { exact: false })).toBeVisible();
   await expect(page.getByLabel("關卡種子")).toHaveCount(0);
-  await expect(page.getByText(/資料版本|NIBBLES 1\.8\.0/u)).toHaveCount(0);
+  await expect(page.getByText(/資料版本|NIBBLES 1\.9\.0/u)).toHaveCount(0);
   await expect(page.getByText("5 個單字", { exact: true })).toBeVisible();
   await expect(page.getByText("25 個單字", { exact: true })).toBeVisible();
   await expect(page.getByTestId("vocabulary-error")).toBeHidden();
@@ -20,6 +24,10 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
     "data-space-theme",
     "orbital-dock-nebula",
   );
+  await expect(page.getByTestId("deep-space-backdrop")).toHaveAttribute(
+    "data-art-style",
+    "painted-pinball-backglass",
+  );
 
   await page.getByTestId("vocabulary-mode").selectOption("CEEC_3");
   await page.getByTestId("start-run").click();
@@ -28,7 +36,11 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
   await expect(page.getByTestId("game-hud")).toBeVisible();
   await expect(page.getByTestId("phase-three-panel")).toHaveCount(0);
   await expect(page.locator("#app")).toHaveAttribute("data-game-state", "HUNTING");
-  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.8.0");
+  await expect(page.locator("#app")).toHaveAttribute("data-release-version", "1.9.0");
+  await expect(page.locator("#app")).toHaveAttribute(
+    "data-visual-style",
+    "classic-space-pinball",
+  );
   await expect(page.locator("#app")).toHaveAttribute(
     "data-environment-theme",
     "cargo-bay",
@@ -37,7 +49,17 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
     await page.locator("#app").evaluate((element) =>
       getComputedStyle(element).getPropertyValue("--accent").trim()
     ),
-  ).toBe("#50e3c2");
+  ).toBe("#35f2e0");
+  expect(
+    await page.locator("#app").evaluate((element) =>
+      getComputedStyle(element).getPropertyValue("--cabinet").trim()
+    ),
+  ).toBe("#173376");
+  expect(
+    await page.locator("#app").evaluate((element) =>
+      getComputedStyle(element).getPropertyValue("--rail").trim()
+    ),
+  ).toBe("#ff5a4f");
   await expect(page.getByTestId("simulation-state")).toHaveText("進行中");
   await expect(page.getByTestId("snake-speed")).toHaveText("3.0 單位/秒");
   await expect(page.getByTestId("game-level")).toContainText("第 1 關 · 貨艙");
@@ -66,6 +88,10 @@ test("以中文彈珠台介面選擇獨立字彙並開始深空貨艙環境", as
     "6",
   );
   await expect(page.getByTestId("pinball-table-overlay")).toBeVisible();
+  await expect(page.getByTestId("pinball-table-overlay")).toHaveAttribute(
+    "data-visual-style",
+    "classic-space-pinball",
+  );
   await expect(page.getByTestId("cockpit-overlay")).toHaveCount(0);
   await expect(page.getByTestId("mini-map")).toHaveCount(0);
   await expect(page.getByTestId("tactical-map-toggle")).toHaveCount(0);

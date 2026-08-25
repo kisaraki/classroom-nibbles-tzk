@@ -1,6 +1,6 @@
 # NIBBLES — Engineering Specification
 
-Version: 2.1 (Version 1.8 deep-space presentation and progressive mission sizes)
+Version: 2.2 (Version 1.9 classic space-pinball cabinet presentation)
 Team: KOSMOS TOOLKITS 探真拓知酷  
 Target: Desktop Web / GitHub Pages  
 Core stack: TypeScript + Three.js + Vite
@@ -77,13 +77,13 @@ Supported gameplay character tokens: `A-Z`, `SPACE`, `PERIOD`, `APOSTROPHE`, `HY
 - Game Level 4: Dense Atmosphere, unlimited token length, 20 words, 360 seconds, snake speed 5.25 units/sec.
 - Game Level 5: Alien Forest, unlimited token length, 25 words, 300 seconds, snake speed 6.0 units/sec.
 
-Each scene has a distinct world palette, interface accent/line/warning theme, procedural deep-space background, celestial feature, fog range, solid obstacle layout and 3D obstacle treatment. The mecha armor, canopy, engine glow, character frames, table rails and environment lighting adopt the current scene palette. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, remain visible in the playfield and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
+Each scene has a distinct world palette, interface accent/line/warning theme, procedural deep-space background, celestial feature, fog range, solid obstacle layout and 3D obstacle treatment. The mecha armor, canopy, engine glow, character frames, table rails and environment lighting adopt the current scene palette. The common presentation language is a classic space-pinball cabinet: saturated navy or scene-colored cabinet panels, silver beveled frames, red-orange rails, illuminated circular target lamps, high-contrast score displays and a painted-backglass-like deep-space backdrop. All artwork remains original and procedural; do not include third-party trademarks or proprietary cabinet artwork. Theme values and snake speed switch atomically with the Game Level. Environment obstacles use the same non-lethal stun/recovery rule as SOLID walls, block bullets, remain visible in the playfield and are excluded from every token/power-up spawn. A scene change resets the snake pose/trail to the safe center while preserving earned length and cumulative ammo, then rebuilds entities outside the new geometry.
 
 If a vocabulary filter yields fewer than 5 candidates, relax recent-history filtering first, then increase max token length one token at a time until sufficient.
 
 ## 8. HUD and pinball-table view
 
-Use one fixed PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver animates one backward rotation on the snake head and leading body only; the camera and full-screen view remain fixed while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. The next required token must use pulse/outline or another non-color-only cue.
+Use one fixed PerspectiveCamera at the player's end of the table, angled downward to keep the full playfield and visible snake in view. Do not render the former cockpit/snake-eye mask or center reticle. An accepted `J` escape maneuver animates one backward rotation on the snake head and leading body only; the camera and full-screen view remain fixed while the gameplay head/tail orientation changes as specified in Section 3. HUD shows game level, vocabulary level, word number, main time, target, Chinese meaning, optional part of speech, token progress, heading, speed and ammo. Character tokens and power-ups use readable circular metal-ring lamp faces instead of plain development billboards. The next required token must use pulse/outline or another non-color-only cue.
 
 The Three.js canvas retains the full CSS viewport and automatically uses the browser's complete detected `devicePixelRatio`, with no application resolution cap. It re-detects changes while running and resizes the internal buffer to CSS size × device pixel ratio.
 
